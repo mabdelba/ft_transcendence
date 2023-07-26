@@ -1,0 +1,12 @@
+version: '3.5'
+
+services:
+  backend:
+    build: ./backend
+    container_name: backend
+    image: backend
+    volumes:
+      - ./backend/srcs:/app
+    ports:
+      - "3000:3000"
+    # restart: always
