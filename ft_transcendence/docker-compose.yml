@@ -11,20 +11,6 @@ services:
       - "3000:3000"
     restart: always
 
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    restart: always
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: transcendence
-      POSTGRES_PASSWORD: team_password
-      POSTGRES_DB: transcendence
-    volumes:
-      - ./database/pgdata:/var/lib/postgresql/data
-
-
   frontend:
     build: ./frontend
     container_name: frontend
