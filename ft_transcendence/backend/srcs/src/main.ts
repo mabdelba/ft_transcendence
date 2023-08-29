@@ -9,6 +9,7 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
-  await app.listen(3000);
+  const port = 3000;
+  await app.listen(port);
 }
 bootstrap();
