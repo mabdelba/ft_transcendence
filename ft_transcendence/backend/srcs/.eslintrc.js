@@ -47,12 +47,10 @@ module.exports = {
     "no-magic-numbers": "off",
     "@typescript-eslint/no-magic-numbers": "error",
     //Detects unnecessary classes that don't provide any functionality.
-    "@typescript-eslint/no-extraneous-class": "error",
+    // "@typescript-eslint/no-extraneous-class": "error",
 
 
-    // Code style and formatting
-    indent: ['error', 2],
-    // quotes: ['error', 'single'],
+    // // Code style and formatting
     semi: ['error', 'always'],
   },
 };
