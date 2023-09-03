@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function home() {
   return (
     <main className="h-screen">
@@ -17,8 +19,8 @@ export default function home() {
       </div>
       <div className="flex flex-col items-center justify-center min-h-fit h-full min-w-fit">
           <h1 className="ft_title">Atari pong</h1>
-          <button className="ft_button">log-in</button>
-          <button className="ft_button">Register</button>
+          <Link className="ft_button" href={"/login"}>log-in</Link>
+          <Link className="ft_button" href={"/register"}>Register</Link>
       </div>
     </main>
   )
