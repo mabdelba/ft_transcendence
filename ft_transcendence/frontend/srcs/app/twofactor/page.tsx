@@ -8,7 +8,7 @@ import { useState } from "react";
 
 function TwoFactor(){
 
-	const [fir, setFir] = useState(-1);
+	const [fir, setFir] = useState(0);
 	const [sec, setSec] = useState(0);
 	const [thi, setThi] = useState(0);
 	const [forth, setForth] = useState(0);
