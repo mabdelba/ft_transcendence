@@ -43,7 +43,7 @@ export class AuthService {
     const isPasswordValid = await argon.verify(user.password, dto.password);
     if (!isPasswordValid) throw new ForbiddenException('Wrong password');
     return {
-      token: this.getToken(user.id, user.login),
+      token: await this.getToken(user.id, user.login),
     }
   }
 
