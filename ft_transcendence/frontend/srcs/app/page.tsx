@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function home() {
   return (
@@ -13,15 +13,18 @@ export default function home() {
             <div className="ft_edge"></div>
             <div className="ft_edge ft_edge-down"></div>
           </div>
-          <div className="ft_ball">
-          </div>
+          <div className="ft_ball"></div>
         </div>
       </div>
       <div className="flex flex-col items-center justify-center min-h-fit h-full min-w-fit">
-          <h1 className="ft_title">Atari pong</h1>
-          <Link className="ft_button" href={"/login"}>log-in</Link>
-          <Link className="ft_button" href={"/register"}>Register</Link>
+        <h1 className="ft_title">Atari pong</h1>
+        <Link className="ft_button" href={'/login'}>
+          log-in
+        </Link>
+        <Link className="ft_button" href={'/register'}>
+          Register
+        </Link>
       </div>
     </main>
-  )
+  );
 }
