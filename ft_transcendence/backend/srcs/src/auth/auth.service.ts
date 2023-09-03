@@ -44,7 +44,7 @@ export class AuthService {
     if (!isPasswordValid) throw new ForbiddenException('Wrong password');
     return {
       token: await this.getToken(user.id, user.login),
-    }
+    };
   }
 
   getToken(userId: number, userLogin: string): Promise<string> {
