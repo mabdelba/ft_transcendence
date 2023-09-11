@@ -24,7 +24,7 @@ export class AuthService {
           email: dto.email,
           password: hash,
           avatar: dto.avatar,
-          twoFA_Active: false,
+          twoFaActive: false,
         },
       });
       return user;
@@ -44,10 +44,10 @@ export class AuthService {
     if (!user) throw new ForbiddenException('User not found');
     const isPasswordValid = await argon.verify(user.password, dto.password);
     if (!isPasswordValid) throw new ForbiddenException('Wrong password');
-      return {
-        token: await this.getToken(user.id, user.login),
-        twoFA_Active: user.twoFA_Active,
-      };
+    return {
+      token: await this.getToken(user.id, user.login),
+      twoFaActive: user.twoFaActive,
+    };
   }
 
   getToken(userId: number, userLogin: string): Promise<string> {

@@ -20,6 +20,6 @@ model User {
   email         String  @unique
   password      String
   avatar        String?
-  twoFA_Active     Boolean  @default(false)
-  twoFA_Secret     String?
+  twoFaActive     Boolean  @default(false)
+  twoFaSecret     String?
 }

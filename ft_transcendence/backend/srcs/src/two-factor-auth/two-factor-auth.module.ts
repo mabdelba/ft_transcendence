@@ -4,6 +4,6 @@ import { TwoFactorAuthService } from './two-factor-auth.service';
 
 @Module({
   controllers: [TwoFactorAuthController],
-  providers: [TwoFactorAuthService]
+  providers: [TwoFactorAuthService],
 })
 export class TwoFactorAuthModule {}
