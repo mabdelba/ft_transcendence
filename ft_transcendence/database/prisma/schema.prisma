@@ -21,4 +21,5 @@ model User {
   password      String
   avatar        String?
   twoFA_Active     Boolean  @default(false)
+  twoFA_Secret     String?
 }
