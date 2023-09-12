@@ -5,6 +5,7 @@ import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+
 @Injectable({})
 export class AuthService {
   constructor(
@@ -23,6 +24,7 @@ export class AuthService {
           email: dto.email,
           password: hash,
           avatar: dto.avatar,
+          twoFaActive: false,
         },
       });
       return user;
@@ -44,6 +46,7 @@ export class AuthService {
     if (!isPasswordValid) throw new ForbiddenException('Wrong password');
     return {
       token: await this.getToken(user.id, user.login),
+      twoFaActive: user.twoFaActive,
     };
   }
 
