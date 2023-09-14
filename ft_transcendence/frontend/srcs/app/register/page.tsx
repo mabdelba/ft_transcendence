@@ -8,9 +8,13 @@ import close from '../../public/close.svg';
 import SimpleInput from '../components/inputs/simpleInput';
 import QuaranteDeux from '../../public/42.svg';
 import seePassword from '../../public/seePassword.svg';
+import hidePass from '../../public/hidepass.svg';
 import blackupload from '../../public/blackupload.svg';
 import blackQuarante from '../../public/black42.svg';
 import { useState } from 'react';
+import React from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Register() {
 	var Regex = /\b([a-zA-ZÀ-ÿ][-a-zA-ZÀ-ÿ. ']+[ ]*)+/;
@@ -33,21 +37,68 @@ function Register() {
 	const [valid, setValid] = useState(false);
 
 	const Data = { firstname, lastname, username, email, password, vpassword };
+	
+	// const notify = () => toast.warn('Please fill out all fields with compatible format!', {
+	// 	position: "top-center",
+	// 	autoClose: 2500,
+	// 	hideProgressBar: false,
+	// 	closeOnClick: true,
+	// 	pauseOnHover: true,
+	// 	draggable: true,
+	// 	progress: undefined,
+	// 	theme: "dark",
+	// 	});
+	// const success = () => toast.success('Congratulations! You have successfully registered!', {
+	// 	position: "top-center",
+	// 	autoClose: 2500,
+	// 	hideProgressBar: false,
+	// 	closeOnClick: true,
+	// 	pauseOnHover: true,
+	// 	draggable: true,
+	// 	progress: undefined,
+	// 	theme: "dark",
+	// 	});
+
+	const handleBlur = () => {
+		if (ferror && lerror && uerror && eerror && perror && verror)
+			setValid(true);
+		else
+			setValid(false);
+
+		valid? console.log('true'): console.log('false');
+	}
+
 
 	const handleSubmit = (event: any) => {
 		event.preventDefault();
-		// if (Data.firstname == '') setValid(false);
-		// if (Data.lastname == '')  setValid(false);
-		// if (Data.username == '')  setValid(false);
-		// if (Data.email == '')  setValid(false);
-		// if (Data.password == '')  setValid(false);
-		if (!ferror || !lerror || !uerror || !eerror || !perror || !verror) 
-			return (alert("Please fill out all fields with compatible format!"));
-		// if(valid)
+
+		if (!ferror || !lerror || !uerror || !eerror || !perror || !verror)
+		{
+
+			toast.error('Please fill out all fields with compatible format!', {
+				position: "top-center",
+				autoClose: 2500,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "dark",
+				});
+			return;
+		}
+		toast.success('Congratulations! You have successfully registered!', {
+			position: "top-center",
+			autoClose: 2500,
+			hideProgressBar: false,
+			closeOnClick: true,
+			pauseOnHover: true,
+			draggable: true,
+			progress: undefined,
+			theme: "dark",
+			});
+		
 		console.log(Data);
-		// else
-		//   alert("Please fill out all fields with supported formats!");
-	 
 	};
 
 
@@ -64,9 +115,9 @@ function Register() {
 						<h1>Atari Pong</h1>
 					</div>
 				</div>
-				<form onSubmit={handleSubmit} className=" w-full h-5/6 flex  flex-col space-y-3 px-2">
+				<form  onSubmit={handleSubmit} className=" w-full h-5/6 flex  flex-col space-y-3 px-2">
 					<div className="h-[10%] w-full flex flex-row justify-center space-x-2">
-						<div  className="w-1/2 h-full">
+						<div onBlur={handleBlur} className="w-1/2 h-full">
 							<SimpleInput
 								holder="First Name"
 								type1="text"
@@ -79,7 +130,7 @@ function Register() {
 
 							/>
 						</div>
-						<div  className="w-[50%] h-full">
+						<div onBlur={handleBlur}  className="w-[50%] h-full">
 							<SimpleInput
 							 	holder="Last Name"
 							 	type1="text" 
@@ -88,11 +139,10 @@ function Register() {
 								regex={Regex}
 								val = {Data.lastname}
 								isVerif = {false} 
-								
 								/>
 						</div>
 					</div>
-					<div  className="h-[10%] w-full ">
+					<div onBlur={handleBlur}  className="h-[10%] w-full ">
 						<SimpleInput 
 							holder="Username" 
 							type1="text" 
@@ -103,7 +153,7 @@ function Register() {
 							isVerif = {false}
 							/>
 					</div>
-					<div  className="h-[10%] w-full ">
+					<div onBlur={handleBlur}  className="h-[10%] w-full ">
 						<SimpleInput
 							holder="Mail@example.com"
 							type1="email"
@@ -114,12 +164,13 @@ function Register() {
 							isVerif = {false}
 						/>
 					</div>
-					<div  className="h-[10%] w-full ">
+					<div onBlur={handleBlur} className="h-[10%] w-full ">
 						<SimpleInput
 							holder="Password"
 							type1="password"
 							type2="text"
 							icon={seePassword}
+							icon2={hidePass}
 							SetValue={setPassword}
 							setError={setPerror}
 							regex={PassRegex}
@@ -127,12 +178,13 @@ function Register() {
 							isVerif = {false}
 						/>
 					</div>
-					<div  className="h-[10%] w-full ">
+					<div onBlur={handleBlur} className="h-[10%] w-full ">
 						<SimpleInput
 							holder="Verify Password"
 							type1="password"
 							type2="text"
 							icon={seePassword}
+							icon2={hidePass}
 							SetValue={setVerif}
 							setError={setVerror}
 							val = {Data.vpassword}
@@ -140,7 +192,7 @@ function Register() {
 							pass = {Data.password}
 						/>
 					</div>
-					<div className="h-[10%] w-full ">
+					<div  className="h-[10%] w-full ">
 						<SimpleButton
 							buttonType="button"
 							content="Upload avatar"
@@ -148,12 +200,24 @@ function Register() {
 							icon2={blackupload}
 						/>
 					</div>
-					<div className="h-[10%] w-full ">
+					<div   className="h-[10%] w-full ">
 						<SimpleButton buttonType="submit" content="Register" />
+						<ToastContainer
+							position="top-center"
+							autoClose={4000}
+							hideProgressBar={false}
+							newestOnTop={false}
+							closeOnClick
+							rtl={false}
+							pauseOnFocusLoss
+							draggable
+							pauseOnHover
+							theme="dark"
+						/>
 					</div>
 					<div className="h-[10%] w-full flex flex-row justify-center space-x-2">
-						<div className="w-1/2 h-full">
-							<SimpleButton buttonType="button" icon={QuaranteDeux} icon2={blackQuarante} />
+						<div  className="w-1/2 h-full">
+							<SimpleButton  buttonType="button" icon={QuaranteDeux} icon2={blackQuarante} />
 						</div>
 						<div className="w-[50%] h-full">
 							<SimpleButton buttonType="button" icon={google} icon2={google} />
