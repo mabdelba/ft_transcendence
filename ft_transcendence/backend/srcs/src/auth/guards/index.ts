@@ -1,2 +1,2 @@
 export * from './jwt.guard';
-export * from './googleOauth.guard';
+export * from './google-oauth.guard';
