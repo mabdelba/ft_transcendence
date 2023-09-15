@@ -61,7 +61,7 @@ export class AuthService {
     if (!user) {
       const newUser = await this.prisma.user.create({
         data: {
-          login: req.user.email,
+          login: req.user.firstName + req.user.lastName,
           firstName: req.user.firstName,
           lastName: req.user.lastName,
           email: req.user.email,
