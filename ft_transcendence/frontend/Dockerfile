@@ -6,6 +6,9 @@ COPY ./srcs .
 
 RUN npm install
 
+RUN npm install --save react-toastify
+
+RUN npm install @headlessui/react
 
 EXPOSE 4000
 
