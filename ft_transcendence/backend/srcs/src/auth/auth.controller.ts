@@ -2,6 +2,7 @@ import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto';
 import { FtOauthGuard, GoogleOauthGuard } from './guards';
+import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -17,21 +18,20 @@ export class AuthController {
   }
   @Get('google')
   @UseGuards(GoogleOauthGuard)
-  async googleAuth(@Req() req) {}
+  googleAuth() {}
 
   @Get('google-redirect')
   @UseGuards(GoogleOauthGuard)
   googleAuthRedirect(@Req() req) {
-    return this.authService.googleLogin(req);
+    return this.authService.googleLogin(req.user as User);
   }
   @Get('ft')
   @UseGuards(FtOauthGuard)
-  async ftAuth(@Req() req) {}
+  ftAuth() {}
 
   @Get('ft-redirect')
   @UseGuards(FtOauthGuard)
   ftAuthRedirect(@Req() req) {
-    // return req.user;
-    return this.authService.ftLogin(req);
+    return this.authService.ftLogin(req.user as User);
   }
 }
