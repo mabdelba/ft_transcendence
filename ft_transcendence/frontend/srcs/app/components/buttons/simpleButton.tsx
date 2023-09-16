@@ -11,7 +11,6 @@ type ButtonProps = {
 };
 
 function SimpleButton(props: ButtonProps) {
-  
   const [hoverBool, setHoverBool] = useState(false);
   function handleEnter() {
     setHoverBool(true);
