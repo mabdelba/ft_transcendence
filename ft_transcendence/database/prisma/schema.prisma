@@ -18,7 +18,7 @@ model User {
   firstName     String
   lastName      String
   email         String  @unique
-  password      String
+  password      String?
   avatar        String?
   twoFaActive     Boolean  @default(false)
   twoFaSecret     String?

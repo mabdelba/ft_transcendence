@@ -17,7 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       where: { login: payload.login },
     });
     delete user.password;
-    // console.log(payload);
     return user;
   }
 }

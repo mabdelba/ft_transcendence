@@ -5,6 +5,7 @@ import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { User } from '@prisma/client';
 
 @Injectable({})
 export class AuthService {
@@ -50,6 +51,60 @@ export class AuthService {
     };
   }
 
+  async googleLogin(req) {
+    if (!req.user) {
+      throw new ForbiddenException('No user from google');
+    }
+    const user = await this.prisma.user.findUnique({
+      where: { email: req.user.email },
+    });
+    if (!user) {
+      const newUser = await this.prisma.user.create({
+        data: {
+          login: req.user.firstName + req.user.lastName,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+          email: req.user.email,
+          avatar: req.user.picture,
+          twoFaActive: false,
+        } as User,
+      });
+      return {
+        token: await this.getToken(newUser.id, newUser.login),
+        twoFaActive: newUser.twoFaActive,
+      };
+    }
+  };
+
+  async ftLogin(req) {
+    if (!req.user) {
+      throw new ForbiddenException('No user from 42');
+    }
+    const user = await this.prisma.user.findUnique({
+      where: { login: req.user.login },
+    });
+    if (!user) {
+      const newUser = await this.prisma.user.create({
+        data: {
+          login: req.user.login,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName,
+          email: req.user.email,
+          avatar: req.user.picture,
+          twoFaActive: false,
+        } as User,
+      });
+      return {
+        token: await this.getToken(newUser.id, newUser.login),
+        twoFaActive: newUser.twoFaActive,
+      };
+    }
+    else
+    return {
+      token: await this.getToken(user.id, user.login),
+    }
+  };
+    
   getToken(userId: number, userLogin: string): Promise<string> {
     const payload = { login: userLogin, sub: userId };
     const secret = this.config.get('JWT_SECRET');
