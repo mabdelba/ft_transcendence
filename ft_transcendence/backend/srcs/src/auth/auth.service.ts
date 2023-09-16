@@ -51,21 +51,21 @@ export class AuthService {
     };
   }
 
-  async googleLogin(req) {
-    if (!req.user) {
+  async googleLogin(req: User) {
+    if (!req) {
       throw new ForbiddenException('No user from google');
     }
     const user = await this.prisma.user.findUnique({
-      where: { email: req.user.email },
+      where: { email: req.email },
     });
     if (!user) {
       const newUser = await this.prisma.user.create({
         data: {
-          login: req.user.firstName + req.user.lastName,
-          firstName: req.user.firstName,
-          lastName: req.user.lastName,
-          email: req.user.email,
-          avatar: req.user.picture,
+          login: req.firstName + req.lastName,
+          firstName: req.firstName,
+          lastName: req.lastName,
+          email: req.email,
+          avatar: req.avatar,
           twoFaActive: false,
         } as User,
       });
@@ -73,24 +73,27 @@ export class AuthService {
         token: await this.getToken(newUser.id, newUser.login),
         twoFaActive: newUser.twoFaActive,
       };
-    }
-  };
+    } else
+      return {
+        token: await this.getToken(user.id, user.login),
+      };
+  }
 
-  async ftLogin(req) {
-    if (!req.user) {
+  async ftLogin(req: User) {
+    if (!req) {
       throw new ForbiddenException('No user from 42');
     }
     const user = await this.prisma.user.findUnique({
-      where: { login: req.user.login },
+      where: { login: req.login },
     });
     if (!user) {
       const newUser = await this.prisma.user.create({
         data: {
-          login: req.user.login,
-          firstName: req.user.firstName,
-          lastName: req.user.lastName,
-          email: req.user.email,
-          avatar: req.user.picture,
+          login: req.login,
+          firstName: req.firstName,
+          lastName: req.lastName,
+          email: req.email,
+          avatar: req.avatar,
           twoFaActive: false,
         } as User,
       });
@@ -98,13 +101,12 @@ export class AuthService {
         token: await this.getToken(newUser.id, newUser.login),
         twoFaActive: newUser.twoFaActive,
       };
-    }
-    else
-    return {
-      token: await this.getToken(user.id, user.login),
-    }
-  };
-    
+    } else
+      return {
+        token: await this.getToken(user.id, user.login),
+      };
+  }
+
   getToken(userId: number, userLogin: string): Promise<string> {
     const payload = { login: userLogin, sub: userId };
     const secret = this.config.get('JWT_SECRET');
