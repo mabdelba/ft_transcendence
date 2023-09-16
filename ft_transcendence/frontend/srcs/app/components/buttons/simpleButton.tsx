@@ -23,10 +23,10 @@ function SimpleButton(props: ButtonProps) {
       type={props.buttonType}
       onMouseEnter={(event) => handleEnter()}
       onMouseLeave={(event) => handleLeave()}
-      className={`Register bg-black text-white hover:bg-white  hover:text-black transition-all pl-4  xl:pl-0 text-sm md:text-lg lg:text-xl h-full w-full  font-Orbitron flex justify-center items-center`}
+      className={`Register bg-black text-white hover:bg-white  hover:text-black hover:Boxshad transition-all duration-500 text-sm md:text-lg lg:text-xl h-full w-full  font-Orbitron flex justify-center items-center`}
     >
       {props.icon && props.icon2 && (
-        <Image src={!hoverBool ? props.icon : props.icon2} alt="upload icon" className=" w-9 h-8" />
+        <Image src={!hoverBool ? props.icon : props.icon2} alt="upload icon" className=" w-8 h-7" />
       )}
       {props.content}
     </button>

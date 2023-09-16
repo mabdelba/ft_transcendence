@@ -5,8 +5,8 @@ services:
     build: ./backend
     container_name: backend
     image: backend
-    volumes:
-      - ./backend/srcs:/app
+    # volumes:
+    #   - ./backend/srcs:/app
     ports:
       - "3000:3000"
     restart: always
