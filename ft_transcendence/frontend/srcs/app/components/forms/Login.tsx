@@ -5,8 +5,9 @@ import google from '../../../public/google.svg';
 import close from '../../../public/close.svg';
 import SimpleInput from '../inputs/simpleInput';
 import QuaranteDeux from '../../../public/42.svg';
-import seePassword from '../../../public/seePassword.svg';
 import blackQuarante from '../../../public/black42.svg';
+import seePassword from '../../../public/seePassword.svg';
+import hidePass from '../../../public/hidepass.svg';
 import { useState } from 'react';
 import React from 'react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -87,6 +88,7 @@ function Login(props: closeFunc) {
               type1="password"
               type2="text"
               icon={seePassword}
+              icon2={hidePass}
               setError={setPerror}
               regex={regex}
               val={Data.password}
