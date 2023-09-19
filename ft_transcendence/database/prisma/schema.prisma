@@ -13,13 +13,97 @@ datasource db {
 
 
 model User {
-  id            Int      @id @default(autoincrement())
-  login         String   @unique
-  firstName     String
-  lastName      String
-  email         String  @unique
-  password      String?
-  avatar        String?
-  twoFaActive     Boolean  @default(false)
-  twoFaSecret     String?
+  id                      Int      @id @default(autoincrement())
+  login                   String   @unique
+  firstName               String
+  lastName                String
+  email                   String   @unique
+  password                String?
+  avatar                  String?
+  twoFaActive             Boolean  @default(false)
+  twoFaSecret             String?
+
+  level                   Float    @default(0)
+  numberOfGamesPlayed     Int      @default(0)
+  numberOfGamesWon        Int      @default(0)
+
+  friends                 User[]   @relation("friend")
+  friendOf                User[]   @relation("friend")
+
+  blockedList             User[]   @relation("blocked")
+  blockedBy               User[]   @relation("blocked")
+
+  senderFriendRequestId   Int?
+  senderFriendRequests    User?    @relation("friendRequest", fields: [senderFriendRequestId], references: [id])
+  recieverFriendRequest   User[]   @relation("friendRequest")
+
+  gamesAsPlayer1          Game[]   @relation("player1")
+  gamesAsPlayer2          Game[]   @relation("player2")
+
+  achievements            Achievement[]
+
+  channels                Channel[] @relation("joinedChannel")
+  bannedFromChannel       Channel[] @relation("bannedFromChannel")
+  adminOfChannel          Channel[] @relation("adminOfChannel")
+  ownerOfChannel          Channel[] @relation("ownerOfChannel")
+
+  mutedInChannel          UserMutedInChannel[]
+
+  sentMessages            Message[] @relation("sender")
+  recievedMessages        Message[] @relation("reciever")
+}
+
+model UserMutedInChannel {
+  id                Int      @id @default(autoincrement())
+  dateBegin         DateTime @default(now())
+  dateEnd           DateTime
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id])
+  channelId         Int
+  channel           Channel  @relation(fields: [channelId], references: [id])
+}
+
+model Channel {
+  id                Int       @id @default(autoincrement())
+  name              String    @unique
+  description       String?
+  members           User[]    @relation("joinedChannel")
+  banned            User[]    @relation("bannedFromChannel")
+  muted             UserMutedInChannel[]
+  admins            User[]    @relation("adminOfChannel")
+  ownerId           Int
+  owner             User      @relation("ownerOfChannel", fields: [ownerId], references: [id])
+  messages          Message[]
+}
+
+model Message {
+  id                    Int      @id @default(autoincrement())
+  text                  String
+  dateOfSending         DateTime @default(now())
+  senderId              Int
+  senderUser            User     @relation("sender", fields: [senderId], references: [id])
+  recieverUserId        Int?
+  recieverUser          User?    @relation("reciever", fields: [recieverUserId], references: [id])
+  recieverchannelId     Int?
+  channel               Channel? @relation(fields: [recieverchannelId], references: [id])
+}
+
+model Achievement {
+  id                Int      @id @default(autoincrement())
+  name              String   @unique
+  description       String?
+  level             Float
+  icon              String?
+  users             User[]
+}
+
+model Game {
+  id                Int      @id @default(autoincrement())
+  player1Id         Int
+  player2Id         Int
+  player1           User     @relation("player1", fields: [player1Id], references: [id])
+  player2           User     @relation("player2", fields: [player2Id], references: [id])
+  scoreOfPlayer1    Int
+  scoreOfPlayer2    Int
+  dateOfGame        DateTime @default(now())
 }
