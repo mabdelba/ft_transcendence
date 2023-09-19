@@ -20,3 +20,13 @@ services:
     ports:
       - "4000:4000"
     restart: always
+
+  database:
+    build: ./database
+    container_name: database
+    image: database
+    volumes:
+      - ./database/srcs:/app
+    ports:
+      - "5000:5000"
+    restart: always
