@@ -58,16 +58,6 @@ function Register(props: closeFunc) {
 			});
 			return;
 		}
-		toast.success('Congratulations! You have successfully registered!', {
-			position: 'top-center',
-			autoClose: 2500,
-			hideProgressBar: false,
-			closeOnClick: true,
-			pauseOnHover: true,
-			draggable: true,
-			progress: undefined,
-			theme: 'dark',
-		});
 
 		console.log(Data);
 
@@ -84,11 +74,31 @@ function Register(props: closeFunc) {
 		}
 		axios.post(apiUrl, requestData).then(response => {
 
+			toast.success('Congratulations! You have successfully registered!', {
+				position: 'top-center',
+				autoClose: 2500,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: 'dark',
+			});
 			console.log('Response from loclahost:3000' , response.data);
 
 		})
 		.catch(error => {
 
+			toast.error('This user is already registred!', {
+				position: 'top-center',
+				autoClose: 2500,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: 'dark',
+			});
 			console.log("Error", error);
 		})
 
