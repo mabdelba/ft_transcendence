@@ -3,6 +3,7 @@ import { TwoFactorAuthService } from './two-factor-auth.service';
 import { JwtGuard } from 'src/auth/guards';
 import { Request } from 'express';
 import { User } from '@prisma/client';
+import { VerifyDto } from './dto';
 
 @Controller('two-factor-auth')
 export class TwoFactorAuthController {
@@ -16,7 +17,7 @@ export class TwoFactorAuthController {
 
   @Post('verify')
   @UseGuards(JwtGuard)
-  twoFactorAuth(@Body() { code }: { code: string }, @Req() req: Request) {
-    return this.twoFactorAuthService.verify(code, req.user as User);
+  twoFactorAuth(@Body() dto: VerifyDto, @Req() req: Request) {
+    return this.twoFactorAuthService.verify(dto, req.user as User);
   }
 }
