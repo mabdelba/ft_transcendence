@@ -82,17 +82,15 @@ function Login(props: closeFunc) {
 
 		// event.preventDefault();
 		const apiUrl = "http://localhost:3000/api/atari-pong/v1/auth/ft";
-		window.location.href = apiUrl;
 
+		axios.get(apiUrl).then(response =>{
 
-		// axios.get(apiUrl).then(response =>{
+			console.log("response from 42 api: ", response.data);
+		})
+		.catch(error =>{
 
-		// 	console.log("response from 42 api: ", response.data);
-		// })
-		// .catch(error =>{
-
-		// 	console.log("error from 42 api: ", error);
-		// })
+			console.log("error from 42 api: ", error);
+		})
 	};
 
 	return (
