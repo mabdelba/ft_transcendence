@@ -1,4 +1,15 @@
-import { Controller, Post, Body, Get, UseGuards, Req, UseInterceptors, UploadedFile, ParseFilePipeBuilder, HttpStatus} from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Req,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipeBuilder,
+  HttpStatus,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto';
 import { FtOauthGuard, GoogleOauthGuard, JwtGuard } from './guards';
@@ -40,21 +51,26 @@ export class AuthController {
 
   @UseGuards(JwtGuard)
   @Post('upload-avatar')
-  @UseInterceptors(FileInterceptor('avatar',
-    { 
+  @UseInterceptors(
+    FileInterceptor('avatar', {
       fileFilter: imageFileFilter,
       storage: diskStorage({
         destination: 'public/avatars',
         filename: (req, file, cb) => {
           const user = req.user as User;
           cb(null, user.login + '.jpg');
-        }
-      })
+        },
+      }),
     }),
-)
-  uploadFile(@UploadedFile(new ParseFilePipeBuilder().addFileTypeValidator({fileType: /(jpg|jpeg|png|gif)$/,}).build({
-    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
-}),) avatar: Express.Multer.File) {
+  )
+  uploadFile(
+    @UploadedFile(
+      new ParseFilePipeBuilder().addFileTypeValidator({ fileType: /(jpg|jpeg|png|gif)$/ }).build({
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+      }),
+    )
+    avatar: Express.Multer.File,
+  ) {
     return avatar.path;
   }
 }
