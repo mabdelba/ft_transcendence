@@ -15,154 +15,156 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
 type closeFunc = {
-	handler: any;
+  handler: any;
+  rout: any;
 };
 function Login(props: closeFunc) {
-	const [username, setUsername] = useState('');
-	const [password, setPassword] = useState('');
-	const [Uerror, setUerror] = useState(false);
-	const [Perror, setPerror] = useState(false);
-	const Data = { username, password };
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [Uerror, setUerror] = useState(false);
+  const [Perror, setPerror] = useState(false);
+  const Data = { username, password };
 
-	var regex = /^.+$/;
+  const regex = /^.+$/;
 
-	const handleSubmit = (event: any) => {
-		event.preventDefault();
+  const handleSubmit = (event: any) => {
+    event.preventDefault();
 
-		if (!Uerror || !Perror) {
-			toast.error('Please fill out all fields with compatible format!', {
-				position: 'top-center',
-				autoClose: 2500,
-				hideProgressBar: false,
-				closeOnClick: true,
-				pauseOnHover: true,
-				draggable: true,
-				progress: undefined,
-				theme: 'dark',
-			});
-			return;
-		}
+    if (!Uerror || !Perror) {
+      toast.error('Please fill out all fields with compatible format!', {
+        position: 'top-center',
+        autoClose: 2500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'dark',
+      });
+      return;
+    }
 
-		var login = Data.username;
-		var password = Data.password;
+    const login = Data.username;
+    const password = Data.password;
 
-		const logData = {login , password};
-		const apiUrl = "http://localhost:3000/api/atari-pong/v1/auth/login";
-		axios.post(apiUrl, logData).then(response => {
+    const logData = { login, password };
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/login';
+    axios
+      .post(apiUrl, logData)
+      .then((response) => {
+        toast.success('You have successfully logged in!', {
+          position: 'top-center',
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'dark',
+        });
+        console.log('Response from server: ', response.data);
+      })
+      .catch((error) => {
+        toast.error('Incorrect username or password!', {
+          position: 'top-center',
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'dark',
+        });
+        console.log('Error', error);
+      });
+  };
 
-			toast.success('You have successfully logged in!', {
-				position: 'top-center',
-				autoClose: 2500,
-				hideProgressBar: false,
-				closeOnClick: true,
-				pauseOnHover: true,
-				draggable: true,
-				progress: undefined,
-				theme: 'dark',
-			});
-			console.log("Response from server: ", response.data);
-		})
-		.catch(error => {
-			toast.error('Incorrect username or password!', {
-				position: 'top-center',
-				autoClose: 2500,
-				hideProgressBar: false,
-				closeOnClick: true,
-				pauseOnHover: true,
-				draggable: true,
-				progress: undefined,
-				theme: 'dark',
-			});
-			console.log("Error", error);
-		})
+  const handleFtClick = (event: any) => {
+    event.preventDefault();
+    const apiUrl =
+      'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-ae7399cd8ce3177bfd638813299cc7a0d4908431f7959eda3bd395b0790adc64&redirect_uri=https%3A%2F%2Fwww.google.co.ma%2F&response_type=code';
+    props.rout.push(apiUrl);
 
-	};
+    // axios.get(apiUrl).then(response =>{
 
-	const handleFtClick = (event: any)=>{
+    // 	console.log("response from 42 api: ", response.data);
+    // })
+    // .catch(error =>{
 
-		// event.preventDefault();
-		const apiUrl = "http://localhost:3000/api/atari-pong/v1/auth/ft";
+    // 	console.log("error from 42 api: ", error);
+    // })
+  };
 
-		axios.get(apiUrl).then(response =>{
-
-			console.log("response from 42 api: ", response.data);
-		})
-		.catch(error =>{
-
-			console.log("error from 42 api: ", error);
-		})
-	};
-
-	return (
-		// <div className="w-full h-full">
-		<>
-			<div className="w-full h-[30%]">
-				<div className="flex justify-end items-center h-1/5 w-full ">
-					<button type="button" onClick={props.handler}>
-						<Image src={close} alt="close" className="w-10 h-10" />
-					</button>
-				</div>
-				<div className="w-full h-4/6 text-white text-3xl font-bold NeonShadow font-Orbitron flex justify-center items-center">
-					<h1>Atari Pong</h1>
-				</div>
-			</div>
-			<form onSubmit={handleSubmit} className="w-full h-[70%]">
-				<div className="w-full h-[42.85%] flex  flex-col justify-start space-y-6 px-2 ">
-					<div className="h-[30%] w-full ">
-						<SimpleInput
-							holder="Username"
-							type1="text"
-							SetValue={setUsername}
-							setError={setUerror}
-							regex={regex}
-							val={Data.username}
-							isVerif={false}
-						/>
-					</div>
-					<div className="h-[30%] w-full ">
-						<SimpleInput
-							SetValue={setPassword}
-							holder="Password"
-							type1="password"
-							type2="text"
-							icon={seePassword}
-							icon2={hidePass}
-							setError={setPerror}
-							regex={regex}
-							val={Data.password}
-							isVerif={false}
-						/>
-					</div>
-				</div>
-				<div className="px-2 w-full h-[57.15%] space-y-10">
-					<div className="h-[25%] w-full ">
-						<SimpleButton content="Log-in" buttonType="submit" />
-						<ToastContainer
-							position="top-center"
-							autoClose={4000}
-							hideProgressBar={false}
-							newestOnTop={false}
-							closeOnClick
-							rtl={false}
-							pauseOnFocusLoss
-							draggable
-							pauseOnHover
-							theme="dark"
-						/>
-					</div>
-					<div className="h-[25%] w-full flex flex-row justify-center space-x-10">
-						<div onClick={handleFtClick} className="w-1/2 h-full">
-							<SimpleButton icon={QuaranteDeux} icon2={blackQuarante} buttonType="button" />
-						</div>
-						<div className="w-[50%] h-full">
-							<SimpleButton icon={google} icon2={google} buttonType="button" />
-						</div>
-					</div>
-				</div>
-			</form>
-		</>
-		// </div>
-	);
+  return (
+    // <div className="w-full h-full">
+    <>
+      <div className="w-full h-[30%]">
+        <div className="flex justify-end items-center h-1/5 w-full ">
+          <button type="button" onClick={props.handler}>
+            <Image src={close} alt="close" className="w-10 h-10" />
+          </button>
+        </div>
+        <div className="w-full h-4/6 text-white text-3xl font-bold NeonShadow font-Orbitron flex justify-center items-center">
+          <h1>Atari Pong</h1>
+        </div>
+      </div>
+      <form onSubmit={handleSubmit} className="w-full h-[70%]">
+        <div className="w-full h-[42.85%] flex  flex-col justify-start space-y-6 px-2 ">
+          <div className="h-[30%] w-full ">
+            <SimpleInput
+              holder="Username"
+              type1="text"
+              SetValue={setUsername}
+              setError={setUerror}
+              regex={regex}
+              val={Data.username}
+              isVerif={false}
+            />
+          </div>
+          <div className="h-[30%] w-full ">
+            <SimpleInput
+              SetValue={setPassword}
+              holder="Password"
+              type1="password"
+              type2="text"
+              icon={seePassword}
+              icon2={hidePass}
+              setError={setPerror}
+              regex={regex}
+              val={Data.password}
+              isVerif={false}
+            />
+          </div>
+        </div>
+        <div className="px-2 w-full h-[57.15%] space-y-10">
+          <div className="h-[25%] w-full ">
+            <SimpleButton content="Log-in" buttonType="submit" />
+            <ToastContainer
+              position="top-center"
+              autoClose={4000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="dark"
+            />
+          </div>
+          <div className="h-[25%] w-full flex flex-row justify-center space-x-10">
+            <div onClick={handleFtClick} className="w-1/2 h-full">
+              <SimpleButton icon={QuaranteDeux} icon2={blackQuarante} buttonType="button" />
+            </div>
+            <div className="w-[50%] h-full">
+              <SimpleButton icon={google} icon2={google} buttonType="button" />
+            </div>
+          </div>
+        </div>
+      </form>
+    </>
+    // </div>
+  );
 }
 
 export default Login;

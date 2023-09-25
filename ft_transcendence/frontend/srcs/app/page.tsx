@@ -1,4 +1,6 @@
 'use client';
+
+import { useRouter } from 'next/navigation';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment, useState } from 'react';
 import Register from './components/forms/Register';
@@ -23,6 +25,8 @@ export default function Home() {
   const openRegisterModal = () => {
     setRegisterOpen(true);
   };
+
+  const router = useRouter();
 
   return (
     <>
@@ -111,7 +115,7 @@ export default function Home() {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="px-6 py-1 flex flex-col justify-center min-w-[280px] min-h-[479px] w-full h-[65%] md:w-2/3  lg:w-1/3  bg-black NeonShadowBord">
-                  <Login handler={closeLoginModal} />
+                  <Login handler={closeLoginModal} rout={router} />
                 </Dialog.Panel>
               </Transition.Child>
             </div>

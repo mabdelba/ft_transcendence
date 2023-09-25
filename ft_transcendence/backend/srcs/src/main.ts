@@ -17,6 +17,7 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+  
   app.setGlobalPrefix('api/atari-pong/v1');
   const port = 3000;
   await app.listen(port);
