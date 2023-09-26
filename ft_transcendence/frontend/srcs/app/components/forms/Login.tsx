@@ -13,7 +13,6 @@ import React from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
 
 type closeFunc = {
   handler: any;
@@ -26,7 +25,6 @@ function Login(props: closeFunc) {
   const [Uerror, setUerror] = useState(false);
   const [Perror, setPerror] = useState(false);
   const Data = { username, password };
-  const router = useRouter();
 
   const regex = /^.+$/;
 
@@ -95,13 +93,24 @@ function Login(props: closeFunc) {
       }
       setTimeout(() => {
         if (newWind) newWind.close();
-      }, 100);
+      }, 500);
       const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/ft-redirect?code=' + code;
       axios
         .get(apiUrl)
         .then((response) => {
-          console.log('Response from server: ', response.data);
-          router.push('/dashboard');
+          console.log('Response from 42 api: ', response.data);
+          toast.success('You have successfully logged in!', {
+            position: 'top-center',
+            autoClose: 2500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'dark',
+          });
+          props.rout.push('/dashboard');
+          // router.push('/dashboard');
         })
         .catch((error) => {
           console.log('error from 42 api: ', error);
