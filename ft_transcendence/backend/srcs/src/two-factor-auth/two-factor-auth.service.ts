@@ -17,7 +17,6 @@ export class TwoFactorAuthService {
       where: { id: user.id },
       data: { twoFaSecret: TwoFactorAuthService.secret.base32 },
     });
-    // console.log(TwoFactorAuthService.secret);
     return new Promise((resolve, reject) => {
       qrcode.toDataURL(TwoFactorAuthService.secret.otpauth_url, (err, data) => {
         if (err) {

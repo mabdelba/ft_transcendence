@@ -83,28 +83,32 @@ export class AuthService {
     if (!req) {
       throw new ForbiddenException('No user from 42');
     }
-    const user = await this.prisma.user.findUnique({
-      where: { login: req.login },
-    });
-    if (!user) {
-      const newUser = await this.prisma.user.create({
-        data: {
-          login: req.login,
-          firstName: req.firstName,
-          lastName: req.lastName,
-          email: req.email,
-          avatar: req.avatar,
-          twoFaActive: false,
-        } as User,
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { login: req.login },
       });
-      return {
-        token: await this.getToken(newUser.id, newUser.login),
-        twoFaActive: newUser.twoFaActive,
-      };
-    } else
-      return {
-        token: await this.getToken(user.id, user.login),
-      };
+      if (!user) {
+        const newUser = await this.prisma.user.create({
+          data: {
+            login: req.login,
+            firstName: req.firstName,
+            lastName: req.lastName,
+            email: req.email,
+            avatar: req.avatar,
+            twoFaActive: false,
+          } as User,
+        });
+        return {
+          token: await this.getToken(newUser.id, newUser.login),
+          twoFaActive: newUser.twoFaActive,
+        };
+      } else
+        return {
+          token: await this.getToken(user.id, user.login),
+        };
+    } catch (e) {
+      throw e;
+    }
   }
 
   getToken(userId: number, userLogin: string): Promise<string> {

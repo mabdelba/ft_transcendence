@@ -13,17 +13,20 @@ import React from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 type closeFunc = {
   handler: any;
   rout: any;
 };
+
 function Login(props: closeFunc) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [Uerror, setUerror] = useState(false);
   const [Perror, setPerror] = useState(false);
   const Data = { username, password };
+  const router = useRouter();
 
   const regex = /^.+$/;
 
@@ -81,18 +84,29 @@ function Login(props: closeFunc) {
 
   const handleFtClick = (event: any) => {
     event.preventDefault();
-    const apiUrl =
-      'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-ae7399cd8ce3177bfd638813299cc7a0d4908431f7959eda3bd395b0790adc64&redirect_uri=https%3A%2F%2Fwww.google.co.ma%2F&response_type=code';
-    props.rout.push(apiUrl);
+    const ftApiUrl =
+      'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-ae7399cd8ce3177bfd638813299cc7a0d4908431f7959eda3bd395b0790adc64&redirect_uri=http%3A%2F%2Flocalhost%3A4000%2Fcallback&response_type=code';
 
-    // axios.get(apiUrl).then(response =>{
-
-    // 	console.log("response from 42 api: ", response.data);
-    // })
-    // .catch(error =>{
-
-    // 	console.log("error from 42 api: ", error);
-    // })
+    let code: string = '';
+    const newWind = window.open(ftApiUrl);
+    window.addEventListener('message', (event) => {
+      if (event.origin === 'http://localhost:4000') {
+        code = event.data.code;
+      }
+      setTimeout(() => {
+        if (newWind) newWind.close();
+      }, 100);
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/ft-redirect?code=' + code;
+      axios
+        .get(apiUrl)
+        .then((response) => {
+          console.log('Response from server: ', response.data);
+          router.push('/dashboard');
+        })
+        .catch((error) => {
+          console.log('error from 42 api: ', error);
+        });
+    });
   };
 
   return (
