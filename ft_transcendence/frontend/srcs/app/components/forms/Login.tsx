@@ -12,9 +12,11 @@ import { useState } from 'react';
 import React from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 type closeFunc = {
   handler: any;
+  rout: any;
 };
 function Login(props: closeFunc) {
   const [username, setUsername] = useState('');
@@ -23,7 +25,7 @@ function Login(props: closeFunc) {
   const [Perror, setPerror] = useState(false);
   const Data = { username, password };
 
-  var regex = /^.+$/;
+  const regex = /^.+$/;
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -41,18 +43,56 @@ function Login(props: closeFunc) {
       });
       return;
     }
-    toast.success('You have successfully logged in!', {
-      position: 'top-center',
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'dark',
-    });
 
-    console.log(Data);
+    const login = Data.username;
+    const password = Data.password;
+
+    const logData = { login, password };
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/login';
+    axios
+      .post(apiUrl, logData)
+      .then((response) => {
+        toast.success('You have successfully logged in!', {
+          position: 'top-center',
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'dark',
+        });
+        console.log('Response from server: ', response.data);
+      })
+      .catch((error) => {
+        toast.error('Incorrect username or password!', {
+          position: 'top-center',
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'dark',
+        });
+        console.log('Error', error);
+      });
+  };
+
+  const handleFtClick = (event: any) => {
+    event.preventDefault();
+    const apiUrl =
+      'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-ae7399cd8ce3177bfd638813299cc7a0d4908431f7959eda3bd395b0790adc64&redirect_uri=https%3A%2F%2Fwww.google.co.ma%2F&response_type=code';
+    props.rout.push(apiUrl);
+
+    // axios.get(apiUrl).then(response =>{
+
+    // 	console.log("response from 42 api: ", response.data);
+    // })
+    // .catch(error =>{
+
+    // 	console.log("error from 42 api: ", error);
+    // })
   };
 
   return (
@@ -113,7 +153,7 @@ function Login(props: closeFunc) {
             />
           </div>
           <div className="h-[25%] w-full flex flex-row justify-center space-x-10">
-            <div className="w-1/2 h-full">
+            <div onClick={handleFtClick} className="w-1/2 h-full">
               <SimpleButton icon={QuaranteDeux} icon2={blackQuarante} buttonType="button" />
             </div>
             <div className="w-[50%] h-full">

@@ -14,16 +14,17 @@ import { useState, MouseEvent } from 'react';
 import React from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 type closeFunc = {
   handler: any;
 };
 
 function Register(props: closeFunc) {
-  var Regex = /\b([a-zA-ZÀ-ÿ][-a-zA-ZÀ-ÿ. ']+[ ]*)+/;
-  var EmRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-  var PassRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-  var UserRegex = /^[^\s]+$/;
+  const Regex = /\b([a-zA-ZÀ-ÿ][-a-zA-ZÀ-ÿ. ']+[ ]*)+/;
+  const EmRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+  const PassRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+  const UserRegex = /^[^\s]+$/;
 
   const [firstname, setFirstName] = useState('');
   const [lastname, setLastName] = useState('');
@@ -41,7 +42,7 @@ function Register(props: closeFunc) {
 
   const Data = { firstname, lastname, username, email, password, vpassword };
 
-  const handleSubmit = (event: any) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
 
     if (!ferror || !lerror || !uerror || !eerror || !perror || !verror) {
@@ -57,18 +58,53 @@ function Register(props: closeFunc) {
       });
       return;
     }
-    toast.success('Congratulations! You have successfully registered!', {
-      position: 'top-center',
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'dark',
-    });
 
     console.log(Data);
+
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/register';
+    const login = Data.username;
+    const firstName = Data.firstname;
+    const lastName = Data.lastname;
+    const avatar = '';
+    const email = Data.email;
+    const password = Data.password;
+
+    const requestData = {
+      login,
+      firstName,
+      lastName,
+      email,
+      password,
+      avatar,
+    };
+    axios
+      .post(apiUrl, requestData)
+      .then((response) => {
+        toast.success('Congratulations! You have successfully registered!', {
+          position: 'top-center',
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'dark',
+        });
+        console.log('Response from loclahost:3000', response.data);
+      })
+      .catch((error) => {
+        toast.error('This user is already registred!', {
+          position: 'top-center',
+          autoClose: 2500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'dark',
+        });
+        console.log('Error', error);
+      });
   };
 
   return (
