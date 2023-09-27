@@ -28,7 +28,10 @@ export class AuthService {
           twoFaActive: false,
         },
       });
-      return user;
+      return {
+        token: await this.getToken(user.id, user.login),
+        twoFaActive: user.twoFaActive,
+      };
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError)
         if (e.code === 'P2002') {
@@ -83,28 +86,39 @@ export class AuthService {
     if (!req) {
       throw new ForbiddenException('No user from 42');
     }
-    const user = await this.prisma.user.findUnique({
-      where: { login: req.login },
-    });
-    if (!user) {
-      const newUser = await this.prisma.user.create({
-        data: {
-          login: req.login,
-          firstName: req.firstName,
-          lastName: req.lastName,
-          email: req.email,
-          avatar: req.avatar,
-          twoFaActive: false,
-        } as User,
+    try {
+      let user = await this.prisma.user.findUnique({
+        where: { login: req.login,  password: {not: null}},
       });
-      return {
-        token: await this.getToken(newUser.id, newUser.login),
-        twoFaActive: newUser.twoFaActive,
-      };
-    } else
-      return {
-        token: await this.getToken(user.id, user.login),
-      };
+      if (user) {
+        throw new ForbiddenException('User already exists');
+      }
+      user = await this.prisma.user.findUnique({
+        where: { login: req.login},
+      });
+      if (!user) {
+        console.log("create new user");
+        const newUser = await this.prisma.user.create({
+          data: {
+            login: req.login,
+            firstName: req.firstName,
+            lastName: req.lastName,
+            email: req.email,
+            avatar: req.avatar,
+            twoFaActive: false,
+          } as User,
+        });
+        return {
+          token: await this.getToken(newUser.id, newUser.login),
+          twoFaActive: newUser.twoFaActive,
+        };
+      } else
+        return {
+          token: await this.getToken(user.id, user.login),
+        };
+    } catch (e) {
+      throw e;
+    }
   }
 
   getToken(userId: number, userLogin: string): Promise<string> {
