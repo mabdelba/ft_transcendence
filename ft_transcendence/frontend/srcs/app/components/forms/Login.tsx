@@ -111,7 +111,17 @@ function Login(props: closeFunc) {
               props.rout.push('/dashboard');
             })
             .catch((error) => {
-              console.log('error from 42 api: ', error);
+              toast.error('User not connected with 42 account', {
+                position: 'top-center',
+                autoClose: 2500,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'dark',
+              });
+              console.log('Error', error);
             });
         }
       }
