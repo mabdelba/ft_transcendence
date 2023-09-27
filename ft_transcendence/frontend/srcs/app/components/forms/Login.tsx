@@ -85,37 +85,38 @@ function Login(props: closeFunc) {
     const ftApiUrl =
       'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-ae7399cd8ce3177bfd638813299cc7a0d4908431f7959eda3bd395b0790adc64&redirect_uri=http%3A%2F%2Flocalhost%3A4000%2Fcallback&response_type=code';
 
-    let code: string = '';
     const newWind = window.open(ftApiUrl);
-    window.addEventListener('message', (event) => {
+    const handleWindowMessage = (event: any) => {
       if (event.origin === 'http://localhost:4000') {
-        code = event.data.code;
+        const code = event.data.code;
+
+        if (code) {
+          window.removeEventListener('message', handleWindowMessage);
+          if (newWind) newWind.close();
+          const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/ft-redirect?code=' + code;
+          axios
+            .get(apiUrl)
+            .then((response) => {
+              console.log('Response from 42 api: ', response.data);
+              toast.success('You have successfully registred!', {
+                position: 'top-center',
+                autoClose: 2500,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'dark',
+              });
+              props.rout.push('/dashboard');
+            })
+            .catch((error) => {
+              console.log('error from 42 api: ', error);
+            });
+        }
       }
-      setTimeout(() => {
-        if (newWind) newWind.close();
-      }, 500);
-      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/ft-redirect?code=' + code;
-      axios
-        .get(apiUrl)
-        .then((response) => {
-          console.log('Response from 42 api: ', response.data);
-          toast.success('You have successfully logged in!', {
-            position: 'top-center',
-            autoClose: 2500,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'dark',
-          });
-          props.rout.push('/dashboard');
-          // router.push('/dashboard');
-        })
-        .catch((error) => {
-          console.log('error from 42 api: ', error);
-        });
-    });
+    };
+    window.addEventListener('message', handleWindowMessage);
   };
 
   return (
