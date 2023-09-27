@@ -81,7 +81,7 @@ export default function Home() {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="px-2 py-1 flex flex-col justify-center min-w-[280px] min-h-[479px] w-full h-[90%] md:w-2/3  lg:w-1/3  lg:h-[80%] bg-black NeonShadowBord">
-                  <Register handler={closeRegisterModal} />
+                  <Register handler={closeRegisterModal} rout={router} />
                 </Dialog.Panel>
               </Transition.Child>
             </div>
