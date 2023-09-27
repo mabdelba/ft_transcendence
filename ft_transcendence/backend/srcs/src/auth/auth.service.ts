@@ -28,7 +28,10 @@ export class AuthService {
           twoFaActive: false,
         },
       });
-      return user;
+      return {
+        token: await this.getToken(user.id, user.login),
+        twoFaActive: user.twoFaActive,
+      };
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError)
         if (e.code === 'P2002') {

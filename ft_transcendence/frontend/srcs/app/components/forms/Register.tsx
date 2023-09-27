@@ -91,6 +91,9 @@ function Register(props: closeFunc) {
           progress: undefined,
           theme: 'dark',
         });
+        const jwtToken = response.data.token;
+        localStorage.setItem('jwtToken', jwtToken);
+        props.rout.push('/dashboard');
         console.log('Response from loclahost:3000', response.data);
       })
       .catch((error) => {
@@ -136,6 +139,8 @@ function Register(props: closeFunc) {
                 progress: undefined,
                 theme: 'dark',
               });
+              const jwtToken = response.data.token;
+              localStorage.setItem('jwtToken', jwtToken);
               props.rout.push('/dashboard');
             })
             .catch((error) => {

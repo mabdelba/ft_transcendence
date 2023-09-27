@@ -63,6 +63,9 @@ function Login(props: closeFunc) {
           progress: undefined,
           theme: 'dark',
         });
+        const jwtToken = response.data.token;
+        localStorage.setItem('jwtToken', jwtToken);
+        props.rout.push('/dashboard');
         console.log('Response from server: ', response.data);
       })
       .catch((error) => {
@@ -108,6 +111,8 @@ function Login(props: closeFunc) {
                 progress: undefined,
                 theme: 'dark',
               });
+              const jwtToken = response.data.token;
+              localStorage.setItem('jwtToken', jwtToken);
               props.rout.push('/dashboard');
             })
             .catch((error) => {
