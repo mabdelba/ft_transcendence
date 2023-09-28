@@ -15,9 +15,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
 type closeFunc = {
+  
   handler: any;
   rout: any;
 };
+
 function Login(props: closeFunc) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
