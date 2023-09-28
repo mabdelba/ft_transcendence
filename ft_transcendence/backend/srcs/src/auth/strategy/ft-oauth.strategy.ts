@@ -2,7 +2,6 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-42';
 import { ConfigService } from '@nestjs/config';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { User } from '@prisma/client';
 
 @Injectable()
 export class FtStrategy extends PassportStrategy(Strategy, '42') {

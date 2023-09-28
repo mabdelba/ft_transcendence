@@ -95,6 +95,7 @@ model Achievement {
   level             Float
   icon              String?
   users             User[]
+  dateOfAchievement DateTime @default(now())
 }
 
 model Game {
