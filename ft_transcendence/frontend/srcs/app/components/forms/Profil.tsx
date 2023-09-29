@@ -22,13 +22,11 @@ type profileProp = {
 function Profil(props: profileProp) {
 
 
-	const percentage = `w-[53%]`;
-	const win = `w-[70%]`;
-	const lose = `w-[30%]`;
+	const percentage = `${props.percentage}%`;
+	const win = `${props.winPercent}%`;
+	const lose = `${100 - props.winPercent}%`;
 	
-	console.log(percentage, win, lose);
 
-	
 	return (
 
 		<div className="h-full w-full flex flex-col  justify-center items-center bg-black NeonShadowBord">
@@ -50,10 +48,10 @@ function Profil(props: profileProp) {
 					</div>
 				</div>
 			</div>
-			<div className='h-1/2 w-full flex flex-row text-xs md:text:base lg:text-xl'>
+			<div className='h-1/2 w-full flex flex-row text-xs  lg:text-xl'>
 				<div className='h-full w-1/2 flex flex-col items-center justify-center'>
 					<div className='h-1/2 w-full flex justify-center items-center'><h1>Matches Played</h1></div>
-					<div className='h-1/2 w-full flex justify-center items-start text-2xl'><h1>{props.matchPlayed}</h1></div>
+					<div className='h-1/2 w-full flex justify-center items-start text-base lg:text-2xl'><h1>{props.matchPlayed}</h1></div>
 				</div>
 				<div className='h-full w-1/2 flex flex-col items-center'>
 					<div className='h-1/2 w-full flex justify-center items-center -green-500'>
