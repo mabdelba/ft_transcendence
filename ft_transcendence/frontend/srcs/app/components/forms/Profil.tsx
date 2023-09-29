@@ -34,7 +34,7 @@ function Profil(props: profileProp) {
 				<div className='w-1/4 h-[50%] flex justify-end  '>
 					<Image src={props.avatar} alt='avatar' className=''/>
 				</div>
-				<div className='w-3/4 h-[40%] flex flex-col justify-center items-start px-2'>
+				<div className='w-3/4 h-[40%] flex flex-col justify-center items-start px-2 text-xs md:text-sm xl:text-lg'>
 					<div className='h-1/3 w-full -slate-700'>
 						{props.firstname} {props.lastname} - {props.login}
 					</div>
