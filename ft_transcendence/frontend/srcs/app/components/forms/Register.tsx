@@ -18,6 +18,7 @@ import axios from 'axios';
 
 type closeFunc = {
   handler: any;
+  rout: any;
 };
 
 function Register(props: closeFunc) {
@@ -90,6 +91,9 @@ function Register(props: closeFunc) {
           progress: undefined,
           theme: 'dark',
         });
+        const jwtToken = response.data.token;
+        localStorage.setItem('jwtToken', jwtToken);
+        props.rout.push('/dashboard');
         console.log('Response from loclahost:3000', response.data);
       })
       .catch((error) => {
@@ -107,6 +111,56 @@ function Register(props: closeFunc) {
       });
   };
 
+  const handleFtClick = (event: any) => {
+    event.preventDefault();
+    const ftApiUrl =
+      'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-ae7399cd8ce3177bfd638813299cc7a0d4908431f7959eda3bd395b0790adc64&redirect_uri=http%3A%2F%2Flocalhost%3A4000%2Fcallback&response_type=code';
+
+    const newWind = window.open(ftApiUrl);
+    const handleWindowMessage = (event: any) => {
+      if (event.origin === 'http://localhost:4000') {
+        const code = event.data.code;
+
+        if (code) {
+          window.removeEventListener('message', handleWindowMessage);
+          if (newWind) newWind.close();
+          const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/ft-redirect?code=' + code;
+          axios
+            .get(apiUrl)
+            .then((response) => {
+              console.log('Response from 42 api: ', response.data);
+              toast.success('You have successfully registred!', {
+                position: 'top-center',
+                autoClose: 2500,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'dark',
+              });
+              const jwtToken = response.data.token;
+              localStorage.setItem('jwtToken', jwtToken);
+              props.rout.push('/dashboard');
+            })
+            .catch((error) => {
+              toast.error('User not connected with 42 account', {
+                position: 'top-center',
+                autoClose: 2500,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'dark',
+              });
+              console.log('Error', error);
+            });
+        }
+      }
+    };
+    window.addEventListener('message', handleWindowMessage);
+  };
   return (
     <div className="flex flex-col w-full h-full">
       <div className="h-1/6 w-full  flex flex-col">
@@ -218,7 +272,7 @@ function Register(props: closeFunc) {
           />
         </div>
         <div className="h-[10%] w-full flex flex-row justify-center space-x-2">
-          <div className="w-1/2 h-full">
+          <div className="w-1/2 h-full" onClick={handleFtClick}>
             <SimpleButton buttonType="button" icon={QuaranteDeux} icon2={blackQuarante} />
           </div>
           <div className="w-[50%] h-full">

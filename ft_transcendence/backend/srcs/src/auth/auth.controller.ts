@@ -9,6 +9,7 @@ import {
   UploadedFile,
   ParseFilePipeBuilder,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto';
@@ -39,14 +40,15 @@ export class AuthController {
   googleAuthRedirect(@Req() req) {
     return this.authService.googleLogin(req.user as User);
   }
-  @Get('ft')
-  @UseGuards(FtOauthGuard)
-  ftAuth() {}
 
   @Get('ft-redirect')
   @UseGuards(FtOauthGuard)
   ftAuthRedirect(@Req() req) {
-    return this.authService.ftLogin(req.user as User);
+    try {
+      return this.authService.ftLogin(req.user as User);
+    } catch (e) {
+      new UnauthorizedException('Invalid authorization grant');
+    }
   }
 
   @UseGuards(JwtGuard)
