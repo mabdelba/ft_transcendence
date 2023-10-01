@@ -1,20 +1,24 @@
+"use client"
 import Profil from '../components/forms/Profil';
 import Avatar from '../../public/avatar.svg';
 import LastMatch from '../components/forms/LastMatch';
 import NewGame from '../components/forms/NewGame';
 import Achievement from '../components/shapes/Achievement';
 import LatestAchiev from '../components/forms/LatestAchiev';
+import { useAppSelector } from '../../redux-store/hooks';
 
 function Dashboard() {
-
-  const firstName = 'Mohamed';
-  const lastName = 'Abdelbar';
-  const login = 'mabdelba';
-  const matchPlayed = 12;
-  const winPercent = 72;
-  const level = 2;
-  const percentage = 53;
-  const online = true;
+  const profile = useAppSelector((state) => state.profileReducer);
+  const {
+    firstName,
+    lastName,
+    login,
+    matchPlayed,
+    winPercent,
+    level,
+    percentage,
+    online,
+    } = profile;
 
   return (
     <main className='w-screen h-screen font-Orbitron NeonShadow '>
