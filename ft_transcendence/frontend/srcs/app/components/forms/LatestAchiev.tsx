@@ -37,7 +37,7 @@ const divArray = achievement?.map((achiev: any) => achiev.name) || [];
         <div className="w-full h-3/4 px-5 md:px-10 pb-10 grid grid-rows-3 grid-cols-2 md:grid-rows-2 md:grid-cols-3 gap-4">
           {divArray.map((divName: any) => (
             <div>
-              <Achievement name={divName} />
+              <Achievement name={divName} color={true} />
             </div>
           ))}
         </div>
