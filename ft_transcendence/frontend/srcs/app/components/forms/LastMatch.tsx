@@ -1,5 +1,6 @@
 import alien from "../../../public/alien.svg"
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 type newType ={
 
@@ -7,11 +8,24 @@ type newType ={
 }
 
 function LastMatch(props : newType){
-
-    const myLogin = 'ahel-bah';
-    const oppLogin = 'ktbatou';
-    var myRes = 12;
-    var oppRes = 18;
+    const [matchData, setMatchData] = useState<any>(null);
+    async function getMatch(){
+        const lastMatchUrl = 'http://localhost:3000/api/atari-pong/v1/profile/last-match-played';
+        const token = localStorage.getItem('jwtToken');
+        const config = {
+        headers: { Authorization: `Bearer ${token}` },
+        };
+        const response = await fetch(lastMatchUrl, config);
+        const data = await response.json();
+        setMatchData(data);
+    }
+    useEffect(() => {
+        getMatch();
+    }, []);
+    const myLogin = matchData ? matchData.me : 'ahel-bah';
+    const oppLogin = matchData ? matchData.other : 'ahel-bah';
+    var myRes = matchData ? matchData.myScore : 0;
+    var oppRes = matchData ? matchData.otherScore : 0;
     var expression = "You Won!";
     if(oppRes == myRes)
         expression = "Draw!";
