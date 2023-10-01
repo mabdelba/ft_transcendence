@@ -5,21 +5,26 @@ import LastMatch from '../components/forms/LastMatch';
 import NewGame from '../components/forms/NewGame';
 import Achievement from '../components/shapes/Achievement';
 import LatestAchiev from '../components/forms/LatestAchiev';
-import { useAppSelector } from '../../redux-store/hooks';
-
+import { useAppSelector, useAppDispatch } from '../../redux-store/hooks';
+import { fetchProfile, profileSelector } from '../../redux-store/profile/profileSlice';
+import { useEffect } from 'react';
 function Dashboard() {
-  const profile = useAppSelector((state) => state.profileReducer);
+  const dispatch = useAppDispatch();
+  const selectedProfile = useAppSelector(profileSelector);
+  useEffect(() => {
+    dispatch(fetchProfile());
+  }, []);
   const {
     firstName,
     lastName,
     login,
-    matchPlayed,
-    winPercent,
+    numberOfGamesPlayed,
     level,
-    percentage,
-    online,
-    } = profile;
-
+    numberOfGamesWon
+    } = selectedProfile.profile;
+  const winPercent = 72;
+  const percentage = 53;
+  const online = true;
   return (
     <main className='w-screen h-screen font-Orbitron NeonShadow '>
       <div className='w-full h-[8%] pl-12 font-semibold flex justify-start items-center text-3xl'>
@@ -33,7 +38,7 @@ function Dashboard() {
               firstname={firstName}
               lastname={lastName}
               login={login}
-              matchPlayed={matchPlayed}
+              matchPlayed={numberOfGamesPlayed}
               winPercent={winPercent}
               level={level}
               percentage={percentage}
@@ -41,7 +46,7 @@ function Dashboard() {
             />
           </div>
           <div className='w-full h-[40%]'>
-            <LastMatch matchPlayed={matchPlayed}/>
+            <LastMatch matchPlayed={numberOfGamesPlayed}/>
           </div>
         </div>
         <div className='h-full w-[40%] space-y-12  flex flex-col '>

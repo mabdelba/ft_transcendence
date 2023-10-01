@@ -1,39 +1,59 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface ProfileState {
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { RootState } from '../store';
+interface Profile {
   firstName: string;
   lastName: string;
   login: string;
-  matchPlayed: number;
+  numberOfGamesPlayed: number;
   winPercent: number;
   level: number;
   percentage: number;
   online: boolean;
+  numberOfGamesWon: number;
+  avatar: string;
+}
+
+export interface ProfileState {
+  loading: boolean;
+  hasErrors: boolean | string;
+  profile: Profile;
 }
 
 const initialState: ProfileState = {
-  firstName: '',
-  lastName: '',
-  login: '',
-  matchPlayed: 0,
-  winPercent: 0,
-  level: 0,
-  percentage: 0,
-  online: false,
+  loading: false,
+  hasErrors: '',
+  profile: {} as Profile,
 };
+
+const profileUrl = 'http://localhost:3000/api/atari-pong/v1/user/me';
+
+export const fetchProfile = createAsyncThunk('profile/fetchProfile',
+async () =>{
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    const response = await axios.get(profileUrl, config);
+    return response.data;
+  } catch (error) {
+    return error;
+  }
+  }
+);
 
 const profileSlice = createSlice({
   name: 'profile',
   initialState,
-  reducers: {
-    setProfile(state, action: PayloadAction<ProfileState>) {
-      return {
-        ...state,
-        ...action.payload,
-      };
-    },
+  reducers: { },
+  extraReducers: (builder) => {
+    builder
+    .addCase(fetchProfile.fulfilled, (state, action) => {
+      state.profile = action.payload;
+    })
   },
 });
 
-export const { setProfile } = profileSlice.actions;
+export const profileSelector = (state: RootState) => state.profileReducer;
 export default profileSlice.reducer;
