@@ -26,10 +26,9 @@ function Dashboard() {
     numberOfGamesWon
     } = selectedProfile.profile;
 
-  const level0 = 2.53;
   var winPercent = 50;
   if(numberOfGamesPlayed != 0)
-    winPercent = ((numberOfGamesWon * 100) / numberOfGamesPlayed);
+    winPercent = Math.floor((numberOfGamesWon * 100) / numberOfGamesPlayed);
   const online = true;
   const lev = Math.floor(level);
   const percentage = Math.floor((level - lev) * 100);
