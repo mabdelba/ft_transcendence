@@ -18,14 +18,29 @@ export class ProfileService {
     if (!matchesPlayedByUser) {
       return null;
     }
-    const player1 = await getUserFromId(matchesPlayedByUser.player1Id);
-    const player2 = await getUserFromId(matchesPlayedByUser.player2Id);
+    const me = await getUserFromId(
+      matchesPlayedByUser.player1Id == user.id
+        ? matchesPlayedByUser.player1Id
+        : matchesPlayedByUser.player2Id,
+    );
+    const other = await getUserFromId(
+      matchesPlayedByUser.player2Id == user.id
+        ? matchesPlayedByUser.player1Id
+        : matchesPlayedByUser.player2Id,
+    );
+
     return {
       id: matchesPlayedByUser.id,
-      player1: player1.login,
-      player2: player2.login,
-      score1: matchesPlayedByUser.scoreOfPlayer1,
-      score2: matchesPlayedByUser.scoreOfPlayer2,
+      me: me.login,
+      other: other.login,
+      myScore:
+        me.id == matchesPlayedByUser.player1Id
+          ? matchesPlayedByUser.scoreOfPlayer1
+          : matchesPlayedByUser.scoreOfPlayer2,
+      otherScore:
+        other.id == matchesPlayedByUser.player1Id
+          ? matchesPlayedByUser.scoreOfPlayer1
+          : matchesPlayedByUser.scoreOfPlayer2,
     };
   }
 
