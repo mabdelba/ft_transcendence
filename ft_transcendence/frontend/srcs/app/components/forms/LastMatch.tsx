@@ -1,3 +1,4 @@
+import { data } from "autoprefixer";
 import alien from "../../../public/alien.svg"
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -22,8 +23,8 @@ function LastMatch(props : newType){
     useEffect(() => {
         getMatch();
     }, []);
-    const myLogin = matchData ? matchData.me : 'ahel-bah';
-    const oppLogin = matchData ? matchData.other : 'ahel-bah';
+    const myLogin = matchData ? matchData.me : '';
+    const oppLogin = matchData ? matchData.other : '';
     var myRes = matchData ? matchData.myScore : 0;
     var oppRes = matchData ? matchData.otherScore : 0;
     var expression = "You Won!";
