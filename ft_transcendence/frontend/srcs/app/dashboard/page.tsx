@@ -3,33 +3,32 @@ import Profil from '../components/forms/Profil';
 import Avatar from '../../public/avatar.svg';
 import LastMatch from '../components/forms/LastMatch';
 import NewGame from '../components/forms/NewGame';
-import Achievement from '../components/shapes/Achievement';
 import LatestAchiev from '../components/forms/LatestAchiev';
 import { useAppSelector, useAppDispatch } from '../../redux-store/hooks';
-import { fetchProfile, profileSelector } from '../../redux-store/profile/profileSlice';
+import { fetchProfile, profileSelector, userOnline } from '../../redux-store/profile/profileSlice';
 import { useEffect } from 'react';
 
-
 function Dashboard() {
-
   const dispatch = useAppDispatch();
   const selectedProfile = useAppSelector(profileSelector);
-  useEffect(() => {
-    dispatch(fetchProfile());
-  }, []);
   const {
     firstName,
     lastName,
     login,
     numberOfGamesPlayed,
     level,
-    numberOfGamesWon
+    numberOfGamesWon,
+    state
     } = selectedProfile.profile;
+
+  useEffect(() => {
+    dispatch(userOnline());
+    dispatch(fetchProfile());
+  }, [state]);
 
   var winPercent = 50;
   if(numberOfGamesPlayed != 0)
     winPercent = Math.floor((numberOfGamesWon * 100) / numberOfGamesPlayed);
-  const online = true;
   const lev = Math.floor(level);
   const percentage = Math.floor((level - lev) * 100);
   
@@ -50,7 +49,7 @@ function Dashboard() {
               winPercent={winPercent}
               level={lev}
               percentage={percentage}
-              online={online}
+              state={state}
             />
           </div>
           <div className='w-full md:h-[40%] h-40'>

@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { TwoFactorAuthModule } from './two-factor-auth/two-factor-auth.module';
 import { ProfileModule } from './profile/profile.module';
+import { StateGateway } from './state/state.gateway';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { ProfileModule } from './profile/profile.module';
     ProfileModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, StateGateway],
 })
 export class AppModule {}

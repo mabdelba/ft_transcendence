@@ -4,7 +4,7 @@ import Image  from 'next/image';
 import Percent from '../shapes/Percent';
 import online from '../../../public/online.svg';
 import offline from '../../../public/offline.svg';
-import { useState } from 'react';
+import ingame from '../../../public/ingame.svg';
 
 type profileProp = {
 
@@ -12,7 +12,7 @@ type profileProp = {
 	firstname: string;
 	lastname: string;
 	login: string;
-	online: boolean;
+	state: number;
 	level: number;
 	percentage: number;
 	matchPlayed: number;
@@ -25,7 +25,27 @@ function Profil(props: profileProp) {
 	const percentage = `${props.percentage}%`;
 	const win = `${props.winPercent}%`;
 	const lose = `${100 - props.winPercent}%`;
-	
+	let state;
+	let stateImage;
+	switch (props.state)
+	{
+		case 0:
+			state = "Offline";
+			stateImage = offline;
+			break;
+		case 1:
+			state = "Online";
+			stateImage = online;
+			break;
+		case 2:
+			state = 'In Game';
+			stateImage = ingame;
+			break;
+		default:
+			state = "Offline";
+			stateImage = offline;
+			break;
+	}
 
 	return (
 
@@ -40,8 +60,8 @@ function Profil(props: profileProp) {
 					</div>
 					<div className='h-1/3 w-full -green-500 flex flex-row items-center pt-1.5'>
 						LvL {props.level} - {props.percentage}%		-	 
-						<Image src={props.online? online : offline} alt="online" className='h-[95%] ml-2 mr-1'/>
-						  {props.online ? 'Online' : 'Offline'}
+						<Image src={stateImage} alt="online" className='h-[95%] ml-2 mr-1'/>
+						  {state}
 					</div>
 					<div className='h-1/3 w-full -pink-500 pt-1.5'>
 						<Percent  width1={percentage} firstColor='bg-white' bord={true}/>

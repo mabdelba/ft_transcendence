@@ -11,7 +11,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id                      Int      @id @default(autoincrement())
   login                   String   @unique
@@ -22,6 +21,7 @@ model User {
   avatar                  String?
   twoFaActive             Boolean  @default(false)
   twoFaSecret             String?
+  state                   Int @default(0)
 
   level                   Float    @default(0)
   numberOfGamesPlayed     Int      @default(0)
