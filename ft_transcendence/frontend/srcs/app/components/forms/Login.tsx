@@ -15,7 +15,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
 type closeFunc = {
-  
   handler: any;
   rout: any;
 };
