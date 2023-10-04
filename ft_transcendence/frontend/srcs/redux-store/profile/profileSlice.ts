@@ -32,8 +32,7 @@ const initialState: ProfileState = {
 
 const profileUrl = 'http://localhost:3000/api/atari-pong/v1/user/me';
 
-export const fetchProfile = createAsyncThunk('profile/fetchProfile',
-async () =>{
+export const fetchProfile = createAsyncThunk('profile/fetchProfile', async () => {
   try {
     const token = localStorage.getItem('jwtToken');
     const config = {
@@ -65,12 +64,11 @@ async () =>{
 const profileSlice = createSlice({
   name: 'profile',
   initialState,
-  reducers: { },
+  reducers: {},
   extraReducers: (builder) => {
-    builder
-    .addCase(fetchProfile.fulfilled, (state, action) => {
+    builder.addCase(fetchProfile.fulfilled, (state, action) => {
       state.profile = action.payload;
-    })
+    });
   },
 });
 

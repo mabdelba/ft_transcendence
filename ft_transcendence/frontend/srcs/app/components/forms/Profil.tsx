@@ -1,6 +1,6 @@
 'use client';
 import Avatar from '../../../public/avatar.svg';
-import Image  from 'next/image';
+import Image from 'next/image';
 import Percent from '../shapes/Percent';
 import online from '../../../public/online.svg';
 import offline from '../../../public/offline.svg';
@@ -8,16 +8,15 @@ import ingame from '../../../public/ingame.svg';
 import { useEffect, useState } from 'react';
 
 type profileProp = {
-
-	avatar: string;
-	firstname: string;
-	lastname: string;
-	login: string;
-	state: number;
-	level: number;
-	percentage: number;
-	matchPlayed: number;
-	winPercent: number;             
+  avatar: string;
+  firstname: string;
+  lastname: string;
+  login: string;
+  state: number;
+  level: number;
+  percentage: number;
+  matchPlayed: number;
+  winPercent: number;
 };
 
 function Profil(props: profileProp) {
