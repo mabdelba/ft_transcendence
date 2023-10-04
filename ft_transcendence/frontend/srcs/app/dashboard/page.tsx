@@ -1,16 +1,18 @@
 "use client"
 import Profil from '../components/forms/Profil';
-import Avatar from '../../public/avatar.svg';
 import LastMatch from '../components/forms/LastMatch';
 import NewGame from '../components/forms/NewGame';
 import LatestAchiev from '../components/forms/LatestAchiev';
 import { useAppSelector, useAppDispatch } from '../../redux-store/hooks';
 import { fetchProfile, profileSelector, userOnline } from '../../redux-store/profile/profileSlice';
+import { profileAvatar, avatarSelector } from '../../redux-store/profile/avatarSlice';
 import { useEffect } from 'react';
 
 function Dashboard() {
   const dispatch = useAppDispatch();
   const selectedProfile = useAppSelector(profileSelector);
+  const selectedAvatar = useAppSelector(avatarSelector);
+  const avatar = selectedAvatar.url;
   const {
     firstName,
     lastName,
@@ -24,6 +26,7 @@ function Dashboard() {
   useEffect(() => {
     dispatch(userOnline());
     dispatch(fetchProfile());
+    dispatch(profileAvatar());
   }, [state]);
 
   var winPercent = 50;
@@ -41,7 +44,7 @@ function Dashboard() {
         <div className='md:h-full h-auto w-full md:w-[60%]  space-y-6 xl:space-y-12 flex flex-col -red-600'>
           <div className='w-full md:h-[60%] h-auto'>
             <Profil
-              avatar={Avatar}
+              avatar={avatar}
               firstname={firstName}
               lastname={lastName}
               login={login}

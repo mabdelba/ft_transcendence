@@ -22,11 +22,13 @@ export interface ProfileState {
   profile: Profile;
 }
 
+
 const initialState: ProfileState = {
   loading: false,
   hasErrors: '',
   profile: {} as Profile,
 };
+
 
 const profileUrl = 'http://localhost:3000/api/atari-pong/v1/user/me';
 
@@ -43,6 +45,8 @@ async () =>{
     return error;
   }
 });
+
+
 
 export const userOnline = createAsyncThunk('profile/userOnline',
 async () =>{
@@ -69,6 +73,7 @@ const profileSlice = createSlice({
     })
   },
 });
+
 
 export const profileSelector = (state: RootState) => state.profileReducer;
 export default profileSlice.reducer;

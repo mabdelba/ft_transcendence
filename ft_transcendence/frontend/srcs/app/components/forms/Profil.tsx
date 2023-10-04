@@ -5,6 +5,7 @@ import Percent from '../shapes/Percent';
 import online from '../../../public/online.svg';
 import offline from '../../../public/offline.svg';
 import ingame from '../../../public/ingame.svg';
+import { useEffect, useState } from 'react';
 
 type profileProp = {
 
@@ -20,8 +21,6 @@ type profileProp = {
 };
 
 function Profil(props: profileProp) {
-
-
 	const percentage = `${props.percentage}%`;
 	const win = `${props.winPercent}%`;
 	const lose = `${100 - props.winPercent}%`;
@@ -48,11 +47,10 @@ function Profil(props: profileProp) {
 	}
 
 	return (
-
 		<div className="h-full w-full flex flex-col  justify-center items-center NeonShadowBord">
 			<div className='h-1/2 w-full flex flex-row items-center '>
 				<div className='w-1/4 h-[50%] flex justify-end  '>
-					<Image src={props.avatar} alt='avatar' className='w-auto h-auto'/>
+					<Image src={props.avatar} alt='avatar' className='w-auto h-auto' width='50' height='50'/>
 				</div>
 				<div className='w-3/4 h-[40%] flex flex-col justify-center items-start px-2 text-xs md:text-sm xl:text-lg'>
 					<div className='h-1/3 w-full -slate-700'>
