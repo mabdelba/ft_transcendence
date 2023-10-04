@@ -112,6 +112,11 @@ function Login(props: closeFunc) {
                 theme: 'dark',
               });
               const jwtToken = response.data.token;
+              axios.get('http://localhost:3000/api/atari-pong/v1/auth/ft-avatar', {
+                headers: {
+                  Authorization: `Bearer ${jwtToken}`,
+                },
+              });
               localStorage.setItem('jwtToken', jwtToken);
               props.rout.push('/dashboard');
             })
@@ -135,7 +140,6 @@ function Login(props: closeFunc) {
   };
 
   return (
-    // <div className="w-full h-full">
     <>
       <div className="w-full h-[30%]">
         <div className="flex justify-end items-center h-1/5 w-full ">
@@ -202,7 +206,6 @@ function Login(props: closeFunc) {
         </div>
       </form>
     </>
-    // </div>
   );
 }
 

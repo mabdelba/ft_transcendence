@@ -6,6 +6,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
+import axios from 'axios';
 
 @Injectable({})
 export class AuthService {
@@ -80,6 +81,19 @@ export class AuthService {
       return {
         token: await this.getToken(user.id, user.login),
       };
+  }
+
+  async uploadFtAvatar(req: User) {
+    try {
+      const response = await axios.get(req.avatar, { responseType: 'arraybuffer' });
+      const imageBuffer = Buffer.from(response.data);
+      const fileName = req.login;
+      const filePath = `public/avatars/${fileName}.jpg`;
+      require('fs').writeFileSync(filePath, imageBuffer);
+      return { message: 'Image uploaded successfully' };
+    } catch (error) {
+      return { error: 'Error uploading image' };
+    }
   }
 
   async ftLogin(req: User) {

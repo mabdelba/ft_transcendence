@@ -18,10 +18,11 @@ import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { imageFileFilter } from './utils';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private prisma: PrismaService) {}
 
   @Post('register')
   register(@Body() dto: RegisterDto) {
@@ -65,7 +66,8 @@ export class AuthController {
       }),
     }),
   )
-  uploadFile(
+  async uploadFile(
+    @Req() req,
     @UploadedFile(
       new ParseFilePipeBuilder().addFileTypeValidator({ fileType: /(jpg|jpeg|png|gif)$/ }).build({
         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -73,6 +75,20 @@ export class AuthController {
     )
     avatar: Express.Multer.File,
   ) {
+    await this.prisma.user.update({
+      where: {
+        login: req.user['login'],
+      },
+      data: {
+        avatar: avatar.path,
+      },
+    });
     return avatar.path;
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('ft-avatar')
+  async uploadImage(@Req() req) {
+    return this.authService.uploadFtAvatar(req.user as User);
   }
 }
