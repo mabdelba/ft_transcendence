@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { RootState } from '../store';
+import io from 'socket.io-client';
+
 interface Profile {
   firstName: string;
   lastName: string;
@@ -9,7 +11,7 @@ interface Profile {
   winPercent: number;
   level: number;
   percentage: number;
-  online: boolean;
+  state: number;
   numberOfGamesWon: number;
   avatar: string;
 }
@@ -36,6 +38,20 @@ export const fetchProfile = createAsyncThunk('profile/fetchProfile', async () =>
     };
     const response = await axios.get(profileUrl, config);
     return response.data;
+  } catch (error) {
+    return error;
+  }
+});
+
+export const userOnline = createAsyncThunk('profile/userOnline', async () => {
+  try {
+    const token = localStorage.getItem('jwtToken');
+    io('http://localhost:3000', {
+      transports: ['websocket'],
+      auth: {
+        token: token,
+      },
+    });
   } catch (error) {
     return error;
   }
