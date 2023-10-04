@@ -116,7 +116,7 @@ function Login(props: closeFunc) {
                 headers: {
                   Authorization: `Bearer ${jwtToken}`,
                 },
-              })
+              });
               localStorage.setItem('jwtToken', jwtToken);
               props.rout.push('/dashboard');
             })
@@ -137,7 +137,6 @@ function Login(props: closeFunc) {
       }
     };
     window.addEventListener('message', handleWindowMessage);
-    
   };
 
   return (

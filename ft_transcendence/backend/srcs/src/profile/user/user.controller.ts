@@ -25,9 +25,7 @@ export class UserController {
       res.set('Content-Type', 'image/jpeg');
       return new StreamableFile(file);
     } else {
-      const file = createReadStream(
-        join(__dirname, `../../../public/avatars/avatar.jpg`),
-      );
+      const file = createReadStream(join(__dirname, `../../../public/avatars/avatar.jpg`));
       res.set('Content-Type', 'image/jpeg');
       return new StreamableFile(file);
     }

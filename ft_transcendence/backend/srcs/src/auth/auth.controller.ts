@@ -20,7 +20,6 @@ import { diskStorage } from 'multer';
 import { imageFileFilter } from './utils';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService, private prisma: PrismaService) {}
@@ -67,7 +66,8 @@ export class AuthController {
       }),
     }),
   )
-  async uploadFile(@Req() req,
+  async uploadFile(
+    @Req() req,
     @UploadedFile(
       new ParseFilePipeBuilder().addFileTypeValidator({ fileType: /(jpg|jpeg|png|gif)$/ }).build({
         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,

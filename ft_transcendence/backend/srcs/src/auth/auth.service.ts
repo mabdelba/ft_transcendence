@@ -84,16 +84,16 @@ export class AuthService {
   }
 
   async uploadFtAvatar(req: User) {
-       try {
-          const response = await axios.get(req.avatar, { responseType: 'arraybuffer' });
-          const imageBuffer = Buffer.from(response.data);
-          const fileName = req.login;
-          const filePath = `public/avatars/${fileName}.jpg`; 
-          require('fs').writeFileSync(filePath, imageBuffer);
-          return { message: 'Image uploaded successfully' };
-        } catch (error) {
-          return { error: 'Error uploading image' };
-        }
+    try {
+      const response = await axios.get(req.avatar, { responseType: 'arraybuffer' });
+      const imageBuffer = Buffer.from(response.data);
+      const fileName = req.login;
+      const filePath = `public/avatars/${fileName}.jpg`;
+      require('fs').writeFileSync(filePath, imageBuffer);
+      return { message: 'Image uploaded successfully' };
+    } catch (error) {
+      return { error: 'Error uploading image' };
+    }
   }
 
   async ftLogin(req: User) {
@@ -133,8 +133,6 @@ export class AuthService {
       throw e;
     }
   }
-
- 
 
   getToken(userId: number, userLogin: string): Promise<string> {
     const payload = { login: userLogin, sub: userId };
