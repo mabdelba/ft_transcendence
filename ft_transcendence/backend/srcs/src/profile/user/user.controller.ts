@@ -15,11 +15,13 @@ export class UserController {
   getMe(@Req() req: Request) {
     return this.userService.getMe(req.user as User);
   }
-  
+
   @UseGuards(JwtGuard)
   @Get('avatar')
   getFile(@Req() req: Request, @Res({ passthrough: true }) res: Response): StreamableFile {
-    const file = createReadStream(join(__dirname, `../../../public/avatars/${((req.user) as User).login}.jpg`));
+    const file = createReadStream(
+      join(__dirname, `../../../public/avatars/${(req.user as User).login}.jpg`),
+    );
     res.set('Content-Type', 'image/jpeg');
     return new StreamableFile(file);
   }

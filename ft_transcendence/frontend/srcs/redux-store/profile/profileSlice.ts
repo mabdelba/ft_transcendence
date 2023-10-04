@@ -22,13 +22,11 @@ export interface ProfileState {
   profile: Profile;
 }
 
-
 const initialState: ProfileState = {
   loading: false,
   hasErrors: '',
   profile: {} as Profile,
 };
-
 
 const profileUrl = 'http://localhost:3000/api/atari-pong/v1/user/me';
 
@@ -45,21 +43,19 @@ export const fetchProfile = createAsyncThunk('profile/fetchProfile', async () =>
   }
 });
 
-
-
-export const userOnline = createAsyncThunk('profile/userOnline',
-async () =>{
+export const userOnline = createAsyncThunk('profile/userOnline', async () => {
   try {
     const token = localStorage.getItem('jwtToken');
-    io('http://localhost:3000', {transports: ['websocket'], 
+    io('http://localhost:3000', {
+      transports: ['websocket'],
       auth: {
-        token: token
-      }})
+        token: token,
+      },
+    });
   } catch (error) {
     return error;
   }
 });
-
 
 const profileSlice = createSlice({
   name: 'profile',
@@ -71,7 +67,6 @@ const profileSlice = createSlice({
     });
   },
 });
-
 
 export const profileSelector = (state: RootState) => state.profileReducer;
 export default profileSlice.reducer;

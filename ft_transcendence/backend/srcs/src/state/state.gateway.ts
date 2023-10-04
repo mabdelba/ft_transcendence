@@ -1,10 +1,14 @@
 import { UseGuards } from '@nestjs/common';
-import { WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtGuard } from 'src/auth/guards';
 import { PrismaService } from 'src/prisma/prisma.service';
 import jwtDecode from 'jwt-decode';
-
 
 @WebSocketGateway()
 export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -18,13 +22,12 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
       where: {
         login: decoded['login'],
       },
-      data:
-        {
-          state: 1,
-        },
+      data: {
+        state: 1,
+      },
     });
   }
-  
+
   @UseGuards(JwtGuard)
   async handleDisconnect(client: any) {
     const jwtToken = client.handshake.auth.token;
@@ -33,10 +36,9 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
       where: {
         login: decoded['login'],
       },
-      data:
-        {
-          state: 0,
-        },
+      data: {
+        state: 0,
+      },
     });
   }
 }

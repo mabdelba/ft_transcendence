@@ -13,15 +13,8 @@ function Dashboard() {
   const selectedProfile = useAppSelector(profileSelector);
   const selectedAvatar = useAppSelector(avatarSelector);
   const avatar = selectedAvatar.url;
-  const {
-    firstName,
-    lastName,
-    login,
-    numberOfGamesPlayed,
-    level,
-    numberOfGamesWon,
-    state
-    } = selectedProfile.profile;
+  const { firstName, lastName, login, numberOfGamesPlayed, level, numberOfGamesWon, state } =
+    selectedProfile.profile;
 
   useEffect(() => {
     dispatch(userOnline());
@@ -29,8 +22,8 @@ function Dashboard() {
     dispatch(profileAvatar());
   }, [state]);
 
-  var winPercent = 50;
-  if(numberOfGamesPlayed != 0)
+  let winPercent = 50;
+  if (numberOfGamesPlayed != 0)
     winPercent = Math.floor((numberOfGamesWon * 100) / numberOfGamesPlayed);
   const lev = Math.floor(level);
   const percentage = Math.floor((level - lev) * 100);
