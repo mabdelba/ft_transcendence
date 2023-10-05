@@ -100,7 +100,6 @@ function Login(props: closeFunc) {
           axios
             .get(apiUrl)
             .then((response) => {
-              console.log('Response from 42 api: ', response.data);
               toast.success('You have successfully registred!', {
                 position: 'top-center',
                 autoClose: 2500,

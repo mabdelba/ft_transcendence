@@ -16,7 +16,7 @@ export class ProfileService {
       },
     });
     if (!matchesPlayedByUser) {
-      return null;
+      return { id: null, me: null, other: null, myScore: null, otherScore: null };
     }
     const me = await getUserFromId(
       matchesPlayedByUser.player1Id == user.id
