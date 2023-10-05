@@ -24,7 +24,7 @@ function Invit(props: newType) {
 
   const handleClick = () => {
 
-    router.push("/achievements");
+    router.push("/achievements"); 
   } 
   return (
     <div className="h-full w-full flex flex-col font-Orbitron NeonShadow">

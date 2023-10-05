@@ -20,9 +20,9 @@ function Pdp(props: newType) {
         <button
           type="button"
           onClick={props.handleClick}
-          className="w-[50px] h-[50px] md:w-[105px] md:h-[105px] NeonShadowBord flex items-center justify-center"
+          className="h-[50px] w-[50px] sm:w-[70px] sm:h-[70px] lg:w-[90px] lg:h-[90px] 2xl:w-[105px] 2xl:h-[105px] NeonShadowBord flex items-center justify-center"
         >
-          <Image src={props.image} alt="profil" className="h-auto w-auto" />
+          <Image src={props.image} alt="profil" className='w-auto h-auto' width='50' height='50' />
         </button>
         {props.name}
       </div>
