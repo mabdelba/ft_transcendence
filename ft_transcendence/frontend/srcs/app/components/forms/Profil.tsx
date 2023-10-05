@@ -50,7 +50,7 @@ function Profil(props: profileProp) {
       <div className="h-1/2 w-full flex flex-row items-center ">
         <div className='w-[7%]  xl:w-[12.5%] h-[50%]  ' ></div>
         <div className="w-[18%] lg:pr-4 xl:pr-0 xl:w-[12.5%] h-[50%] flex justify-center items-center ">
-          <Pdp name={''} color={false} image={props.avatar} />
+          <Pdp name={''} color={false} image={(props.avatar)? props.avatar : Avatar} />
         </div>
         <div className="w-[75%] h-[40%] flex flex-col justify-center items-start px-2 text-xs md:text-sm xl:text-lg">
           <div className="h-1/3 w-full -slate-700">
