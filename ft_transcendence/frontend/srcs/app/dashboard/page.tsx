@@ -6,6 +6,7 @@ import LatestAchiev from '../components/forms/LatestAchiev';
 import { useAppSelector, useAppDispatch } from '../../redux-store/hooks';
 import { fetchProfile, profileSelector, userOnline } from '../../redux-store/profile/profileSlice';
 import { profileAvatar, avatarSelector } from '../../redux-store/profile/avatarSlice';
+import alien from "../../public/alien.svg";
 import { useEffect } from 'react';
 
 function Dashboard() {
