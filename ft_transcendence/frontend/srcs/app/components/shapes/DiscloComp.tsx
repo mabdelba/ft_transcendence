@@ -18,6 +18,7 @@ type newType = {
 };
 
 function DiscloComp(props: newType) {
+
   return (
     <div className="w-full h-auto  border ">
       <div className="w-full font-Orbitron  NeonShadowBord">
