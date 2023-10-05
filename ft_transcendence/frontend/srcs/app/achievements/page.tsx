@@ -38,6 +38,8 @@ function Achievements() {
             textColor="text-white NeonShadow"
             Color={true}
             hoverColor="hover:text-[#00B2FF] hover:blueShadow"
+            isFriend={false}
+            image=""
           />
         </div>
         <div className="w-full h-auto ">
@@ -47,6 +49,8 @@ function Achievements() {
             textColor="white NeonShadow"
             Color={false}
             hoverColor="hover:text-[#FF0742] hover:redShadow"
+            isFriend={false}
+            image=""
           />
         </div>
       </div>

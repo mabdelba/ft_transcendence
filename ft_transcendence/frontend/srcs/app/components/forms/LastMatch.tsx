@@ -2,6 +2,7 @@ import { data } from 'autoprefixer';
 import alien from '../../../public/alien.svg';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import Pdp from '../shapes/Pdp';
 
 type newType = {
   matchPlayed: number;
@@ -43,13 +44,9 @@ function LastMatch(props: newType) {
         </div>
       ) : (
         <div className="w-full h-[65%]  flex flex-row ">
-          <div className="w-[33%] h-full flex flex-col justify-start items-end ">
-            <div className="w-[50%] h-[45%] mr-5 NeonShadowBord flex justify-center items-center">
-              <Image src={alien} alt="alien" />
-            </div>
-            <div className="w-[69%] h-[30%] flex justify-center items-center blueShadow text-xs lg:text-2xl text-[#00B2FF]">
-              {myLogin}
-            </div>
+          <div className="h-full w-[18%]"></div>
+          <div className="w-[15%] h-[67%] flex flex-col justify-start items-end ">
+            <Pdp name={myLogin} color={true} image={alien} />
           </div>
           <div className="w-[34%] h-[55%]  NeonShadow text-sm lg:text-3xl flex flex-col justify-around items-center">
             <div>
@@ -57,13 +54,8 @@ function LastMatch(props: newType) {
             </div>
             <div>{expression}</div>
           </div>
-          <div className="w-[33%] h-full flex flex-col justify-start items-start">
-            <div className="w-[50%] h-[45%] ml-5 NeonShadowBord flex justify-center items-center">
-              <Image src={alien} alt="alien" />
-            </div>
-            <div className="w-[69%] h-[30%]  flex justify-center items-center redShadow text-xs lg:text-2xl text-[#FF0742]">
-              {oppLogin}
-            </div>
+          <div className="w-[15%] h-[67%] flex  justify-start items-start">
+            <Pdp name={oppLogin} color={false} image={alien} />
           </div>
         </div>
       )}
