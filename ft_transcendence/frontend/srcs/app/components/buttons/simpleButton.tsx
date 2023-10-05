@@ -8,6 +8,7 @@ type ButtonProps = {
   icon2?: string;
   content?: string;
   buttonType: 'button' | 'reset' | 'submit' | undefined;
+  handleClick?: any;
 };
 
 function SimpleButton(props: ButtonProps) {
@@ -20,6 +21,7 @@ function SimpleButton(props: ButtonProps) {
   }
   return (
     <button
+      onClick={props.handleClick}
       type={props.buttonType}
       onMouseEnter={(event) => handleEnter()}
       onMouseLeave={(event) => handleLeave()}
