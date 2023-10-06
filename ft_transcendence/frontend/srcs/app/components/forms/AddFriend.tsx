@@ -71,7 +71,7 @@ function AddFriend(props: newType){
                     {
                         !flag ? 
                         <SimpleButton content="Add friend" buttonType="button" />:
-                        <div className="bg-[#272727] NeonShadowBord text-[#FF0742] redShadow  transition-all duration-500 text-sm md:text-lg lg:text-xl h-full w-full  font-Orbitron flex justify-center items-center">
+                        <div className="bg-[#272727] redShadowBord text-[#00B2FF] redShadow  transition-all duration-500 text-sm md:text-lg lg:text-xl h-full w-full  font-Orbitron flex justify-center items-center">
                             Requested
                         </div>
                     }
