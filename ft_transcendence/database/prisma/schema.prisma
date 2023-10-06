@@ -33,9 +33,8 @@ model User {
   blockedList             User[]   @relation("blocked")
   blockedBy               User[]   @relation("blocked")
 
-  senderFriendRequestId   Int?
-  senderFriendRequests    User?    @relation("friendRequest", fields: [senderFriendRequestId], references: [id])
-  recieverFriendRequest   User[]   @relation("friendRequest")
+  sendFriendRequestsTo      User[] @relation("friendReq")
+  recievedFriendRequestsBy  User[] @relation("friendReq")
 
   gamesAsPlayer1          Game[]   @relation("player1")
   gamesAsPlayer2          Game[]   @relation("player2")
