@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TwoFactorAuthModule } from './two-factor-auth/two-factor-auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { StateGateway } from './state/state.gateway';
+import { AchievementsModule } from './achievements/achievements.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { StateGateway } from './state/state.gateway';
     }),
     TwoFactorAuthModule,
     ProfileModule,
+    AchievementsModule,
   ],
   controllers: [AppController],
   providers: [AppService, StateGateway],
