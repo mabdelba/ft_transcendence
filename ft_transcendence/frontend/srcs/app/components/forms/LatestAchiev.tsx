@@ -3,7 +3,14 @@ import Image from 'next/image';
 import NoAchiev from '../../../public/noAchiev.svg';
 import { useEffect, useState } from 'react';
 
-function LatestAchiev() {
+
+type newType ={
+
+  login: string;
+}
+
+function LatestAchiev(props: newType) {
+
   let limiter = 1;
   const [achievement, setAchievement] = useState<any>(null);
 
@@ -37,7 +44,7 @@ function LatestAchiev() {
       ) : (
         <div className="w-full h-3/4 px-1 xl:px-10 pb-10 grid grid-rows-2 grid-cols-3  gap-1 2xl:gap-4">
           {divArray.map((divName: any) => (
-            <div>
+            <div key={divName}>
               <Achievement name={divName} color={true} />
             </div>
           ))}

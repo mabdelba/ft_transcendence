@@ -50,7 +50,7 @@ function Dashboard() {
             />
           </div>
           <div className="w-full md:h-[40%] h-40">
-            <LastMatch matchPlayed={numberOfGamesPlayed} />
+            <LastMatch matchPlayed={numberOfGamesPlayed} login={login}/>
           </div>
         </div>
         <div className="md:h-full h-auto w-full md:w-[40%] space-y-6  xl:space-y-12 flex flex-col -yellow-300">
@@ -58,7 +58,7 @@ function Dashboard() {
             <NewGame />
           </div>
           <div className="w-full md:h-[60%] h-auto">
-            <LatestAchiev />
+            <LatestAchiev login={login}/>
           </div>
         </div>
       </div>

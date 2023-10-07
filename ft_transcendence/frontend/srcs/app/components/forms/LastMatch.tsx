@@ -5,7 +5,9 @@ import { useEffect, useState } from 'react';
 import Pdp from '../shapes/Pdp';
 
 type newType = {
+  
   matchPlayed: number;
+  login: string;
 };
 
 function LastMatch(props: newType) {

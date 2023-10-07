@@ -39,7 +39,7 @@ function DiscloComp(props: newType) {
                 } gap-1 2xl:gap-4`}
               >
                 {props.divArray.map((divName: any) => (
-                  <div>
+                  <div key={divName}>
                     {props.isFriend ? (
                       <Pdp
                         name={divName}

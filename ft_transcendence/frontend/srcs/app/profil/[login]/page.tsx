@@ -41,7 +41,7 @@ function UserProfil(props: newType){
 			  />
 			</div>
 			<div className="w-full md:h-[40%] h-40">
-			  <LastMatch matchPlayed={12} />
+			  <LastMatch matchPlayed={12} login={props.params.login} />
 			</div>
 		  </div>
 		  <div className="md:h-full h-auto w-full md:w-[40%] space-y-6  xl:space-y-12 flex flex-col -yellow-300">
@@ -49,7 +49,7 @@ function UserProfil(props: newType){
 			  <AddFriend state={Case} login={props.params.login} setState={setCase} />
 			</div>
 			<div className="w-full md:h-[60%] h-auto">
-			  <LatestAchiev />
+			  <LatestAchiev login={props.params.login}/>
 			</div>
 		  </div>
 		</div>
