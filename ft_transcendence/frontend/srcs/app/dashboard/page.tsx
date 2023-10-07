@@ -28,7 +28,7 @@ function Dashboard() {
     user = {
       firstName: 'Loading',
       lastName: 'Loading',
-      login: 'Loading',
+      login: '',
       level: 0,
       matchPlayed: 0,
       winPercent: 50,

@@ -1,5 +1,5 @@
 'use client';
-import Avatar from '../../../public/avatar.svg';
+import alien from '../../../public/alien.svg';
 import Image from 'next/image';
 import Percent from '../shapes/Percent';
 import online from '../../../public/online.svg';
@@ -8,7 +8,6 @@ import ingame from '../../../public/ingame.svg';
 import { useEffect, useState } from 'react';
 import Pdp from '../shapes/Pdp';
 import axios from 'axios';
-import { get } from 'http';
 
 
 type profileProp = {
@@ -17,6 +16,27 @@ type profileProp = {
 
 function Profil(props: profileProp) {
   let [profile, setProfile] = useState<any>(null);
+  let [userAvatar, setUserAvatar] = useState(alien);
+  async function getUserAvatar(login: string) {
+    if (login !== '')
+    {
+
+      const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}`, },
+        responseType: 'blob',
+        body: { userLogin: login}
+      };
+      let user = await axios.post('http://localhost:3000/api/atari-pong/v1/user/avatar',{ userLogin: login }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}`, },
+        responseType: 'blob',
+      });
+        const imageBlob = URL.createObjectURL(user.data) as string;
+        setUserAvatar(imageBlob) ;
+    }
+  }
+  useEffect(() => {
+    getUserAvatar(props.login);
+  }, [props.login]);
   async function getProfile()
   {
     if (props.login)
@@ -46,14 +66,13 @@ function Profil(props: profileProp) {
     profile = {
       firstName: 'Loading',
       lastName: 'Loading',
-      login: 'Loading',
+      login: '',
       level: 0,
       matchPlayed: 0,
       winPercent: 50,
       numberOfGamesPlayed: 0,
       numberOfGamesWon: 0,
       state: 0,
-      avatar: Avatar,
     };
   }
   if (profile.numberOfGamesPlayed != 0)
@@ -86,7 +105,7 @@ function Profil(props: profileProp) {
       <div className="h-1/2 w-full flex flex-row items-center ">
         <div className='w-[7%]  xl:w-[12.5%] h-[50%]  ' ></div>
         <div className="w-[18%] lg:pr-4 xl:pr-0 xl:w-[12.5%] h-[50%] flex justify-center items-center ">
-          <Pdp name={''} color={false} image={(profile.avatar)? profile.avatar : Avatar} />
+          <Pdp name={''} color={false} image={userAvatar} />
         </div>
         <div className="w-[75%] h-[40%] flex flex-col justify-center items-start px-2 text-xs md:text-sm xl:text-lg">
           <div className="h-1/3 w-full -slate-700">
