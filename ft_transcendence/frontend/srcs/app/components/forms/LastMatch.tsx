@@ -1,8 +1,7 @@
-import { data } from 'autoprefixer';
 import alien from '../../../public/alien.svg';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import Pdp from '../shapes/Pdp';
+import axios from 'axios';
 
 type newType = {
   
@@ -11,20 +10,22 @@ type newType = {
 };
 
 function LastMatch(props: newType) {
-  const [matchData, setMatchData] = useState<any>(null);
-  async function getMatch() {
+  let [matchData, setMatchData] = useState<any>(null);
+  function getMatch() {
     const lastMatchUrl = 'http://localhost:3000/api/atari-pong/v1/profile/last-match-played';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
-    const response = await fetch(lastMatchUrl, config);
-    const data = await response.json();
-    setMatchData(data);
+    axios.post(lastMatchUrl, { userLogin: props.login }, config).then((res) => {
+      setMatchData(res.data);
+    }
+    );
   }
   useEffect(() => {
     getMatch();
-  }, []);
+  }, [props.login]);
+  
   const myLogin = matchData ? matchData.me : '';
   const oppLogin = matchData ? matchData.other : '';
   const myRes = matchData ? matchData.myScore : 0;

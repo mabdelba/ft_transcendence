@@ -2,7 +2,7 @@ import Achievement from '../shapes/Achievement';
 import Image from 'next/image';
 import NoAchiev from '../../../public/noAchiev.svg';
 import { useEffect, useState } from 'react';
-
+import axios from 'axios';
 
 type newType ={
 
@@ -20,16 +20,16 @@ function LatestAchiev(props: newType) {
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
-    const response = await fetch(lastAchievUrl, config);
-    const data = await response.json();
-    setAchievement(data[0].achievements);
+    axios.post(lastAchievUrl, { userLogin: props.login }, config).then((res) => {
+      setAchievement(res.data);
+    }
+    );
   }
   useEffect(() => {
     getAchievements();
-  }, []);
+  }, [props.login]);
   const divArray = achievement?.map((achiev: any) => achiev.name) || [];
   if (divArray[0] == null) limiter = 0;
-  // const  divArray = Array.from({ length: limiter }, (_, index) => index + 1);
 
   return (
     <div className="h-full w-full flex flex-col NeonShadowBord">

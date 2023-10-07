@@ -11,6 +11,12 @@ import { getUserFromLogin } from 'src/utils/get-user-from-id';
 export class UserController {
   constructor(private userService: UserService) {}
   @UseGuards(JwtGuard)
+  @Get('me-from-token')
+  getMeFromToken(@Req() req: Request) {
+    return req.user as User;
+  }
+
+  @UseGuards(JwtGuard)
   @Post('me')
   getMe(@Body() dto: { userLogin: string }) {
     return this.userService.getMe(dto.userLogin);
