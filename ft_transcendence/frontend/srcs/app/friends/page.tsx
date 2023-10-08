@@ -52,11 +52,11 @@ function Friends() {
 
   useEffect(() => {
     getFriend();
-  }, [friendsList]);
+  }, []);
 
   useEffect(() => {
     getReq();
-  }, [requests]);
+  }, []);
 
   const deleteFriend = () => {
     // setFriendsList(friendsList.filter((str) => str !== userName));
@@ -66,7 +66,7 @@ function Friends() {
       headers: { Authorization: `Bearer ${token}` },
     };
     axios
-      .post(url, { friendid: userId }, conf)
+      .post(url, { friendId: userId }, conf)
       .then((response) => {
         console.log('response ', response);
       })
@@ -94,7 +94,7 @@ function Friends() {
       headers: { Authorization: `Bearer ${token}` },
     };
     axios
-      .post(url, { friendid: userId }, conf)
+      .post(url, { userId: userId }, conf)
       .then((response) => {
         console.log('response ', response);
       })
@@ -121,7 +121,7 @@ function Friends() {
       headers: { Authorization: `Bearer ${token}` },
     };
     axios
-      .post(url, { friendid: userId }, conf)
+      .post(url, { senderId: userId }, conf)
       .then((response) => {
         console.log('response ', response);
       })
@@ -149,7 +149,7 @@ function Friends() {
       headers: { Authorization: `Bearer ${token}` },
     };
     axios
-      .post(url, { friendid: userId }, conf)
+      .post(url, { senderId: userId }, conf)
       .then((response) => {
         console.log('response ', response);
       })
