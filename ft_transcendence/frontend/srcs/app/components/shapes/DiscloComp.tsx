@@ -50,7 +50,7 @@ function DiscloComp(props: newType) {
                             props.setOpen(true);
                             props.setLogin(divName.login);
                             props.setUserId(divName.id);
-                            // props.setAvatar(divName.avatar);
+                            props.setAvatar(divName.avatar);
                           }}
                         />
                       ) : (
