@@ -2,7 +2,7 @@ import { PrismaClient, User } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export  async function getUserFromId(id: number): Promise<User | null> {
+export async function getUserFromId(id: number): Promise<User | null> {
   const user = await prisma.user.findUnique({
     where: {
       id: id,
@@ -11,10 +11,10 @@ export  async function getUserFromId(id: number): Promise<User | null> {
   return user;
 }
 
-export  async function getUserFromLogin(login: string): Promise<User | null> {
+export async function getUserFromLogin(login: string): Promise<User | null> {
   const user = await prisma.user.findUnique({
     where: {
-      login
+      login,
     },
   });
   return user;

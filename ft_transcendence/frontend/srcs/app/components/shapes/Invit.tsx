@@ -5,7 +5,7 @@ import Pdp from './Pdp';
 import SimpleButton from '../buttons/simpleButton';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {useRouter} from "next/navigation"
+import { useRouter } from 'next/navigation';
 
 type newType = {
   closeModal?: any;
@@ -19,13 +19,11 @@ type newType = {
 };
 
 function Invit(props: newType) {
-
   const router = useRouter();
 
   const handleClick = () => {
-
-    router.push(`/profil/${props.login}`); 
-  } 
+    router.push(`/profil/${props.login}`);
+  };
   return (
     <div className="h-full w-full flex flex-col font-Orbitron NeonShadow">
       <div className="flex justify-end items-center h-[15%] w-full ">
@@ -35,7 +33,10 @@ function Invit(props: newType) {
       </div>
       <div className="w-full  flex justify-center h-[25%] items-center">Friend request</div>
       <div className="h-1/2 w-full flex flex-row ">
-        <div className="h-full w-1/2 flex justify-center items-center hover:bg-slate-800 hover:bg-opacity-5 hover:font-extrabold" onClick={handleClick}  >
+        <div
+          className="h-full w-1/2 flex justify-center items-center hover:bg-slate-800 hover:bg-opacity-5 hover:font-extrabold"
+          onClick={handleClick}
+        >
           <Pdp name={props.login} color={props.Color} image={props.avatar} />
         </div>
         <div className="h-[90%] pt-2 w-[40%] flex flex-col justify-center pr-4 space-y-3">
