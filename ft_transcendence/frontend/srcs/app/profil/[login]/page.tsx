@@ -29,15 +29,7 @@ function UserProfil(props: newType){
 		  <div className="md:h-full h-auto w-full md:w-[60%]  space-y-6 xl:space-y-12 flex flex-col -red-600">
 			<div className="w-full md:h-[60%] h-auto">
 			  <Profil
-				avatar={alien}
-				firstname={firstName}
-				lastname={lastName}
 				login={props.params.login}
-				matchPlayed={12}
-				winPercent={50}
-				level={3}
-				percentage={40}
-				state={1}
 			  />
 			</div>
 			<div className="w-full md:h-[40%] h-40">

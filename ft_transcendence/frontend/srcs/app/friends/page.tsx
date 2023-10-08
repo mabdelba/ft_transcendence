@@ -1,29 +1,79 @@
 'use client';
+
 import Pdp from '../components/shapes/Pdp';
 import alien from '../../public/alien.svg';
 import blueAchiev from '../../public/blueAchiev.svg';
 import DiscloComp from '../components/shapes/DiscloComp';
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import Invit from '../components/shapes/Invit';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import { error } from 'console';
 
 function Friends() {
-	const [requests, setRequest] = useState(['aelabid', 'ktbatou']);
-	const [friendsList, setFriendsList] = useState([
-		'waelhamd',
-		'mabdelba',
-		'ahel-bah',
-		'waelhamd',
-		'mabdelba',
-		'ahel-bah',
-		'mabdelba',
-	]);
+
+
+	const getReq = () => {
+		
+		const urlreq = "http://localhost:3000/api/atari-pong/v1/friend/friend-requests-list";
+		const token = localStorage.getItem('jwtToken');
+		const config = {
+			headers: { Authorization: `Bearer ${token}` },
+		};
+		axios.get(urlreq, config).then((response) => {
+			// console.log("friend request from : ", response.data.recievedFriendRequestsBy);
+			setRequest(response.data.recievedFriendRequestsBy);
+		})
+		.catch((error) => {
+			console.log("Error from backend", error);
+		})
+	}
+
+	const getFriend = () => {
+
+		const urlreq = "http://localhost:3000/api/atari-pong/v1/friend/friend-list";
+		const token = localStorage.getItem('jwtToken');
+		const config = {
+			headers: { Authorization: `Bearer ${token}` },
+		};
+		axios.get(urlreq, config).then((response) => {
+			// console.log("friend list from : ", response.data.friends);
+			setFriendsList(response.data.friends);
+		})
+		.catch((error) => {
+			console.log("Error from backend", error);
+		})
+	}
+	const [requests, setRequest] = useState<any>(null);
+	
+	const [friendsList, setFriendsList] = useState<any>(null);
+
+	useEffect(()=> {
+		getFriend();
+	}, [friendsList]);
+
+	useEffect(() => {
+		getReq();
+	}, [requests]);
 
 	const deleteFriend = () =>{
+		
+		// setFriendsList(friendsList.filter((str) => str !== userName));
+		const url = "http://localhost:3000/api/atari-pong/v1/friend/remove-friend";
+		const token = localStorage.getItem('jwtToken');
+		const conf = {
+			headers: { Authorization: `Bearer ${token}` },
+		};
+		axios.post(url, {"friendid": userId} ,conf).then((response) => {
 
-		setFriendsList(friendsList.filter((str) => str !== userName));
+			console.log("response ", response );
+		})
+		.catch((error)=> {
+
+			console.log("error " ,error);
+		})
 		toast.error(`${userName} has been deleted from your friend list!`, {
 			position: 'top-center',
 			autoClose: 2500,
@@ -39,8 +89,21 @@ function Friends() {
 
 	const blockFriend = () =>{
 
-		setFriendsList(friendsList.filter((str) => str !== userName));
-		toast.error(`You blocke ${userName}!`, {
+		// setFriendsList(friendsList.filter((str) => str !== userName));
+		const url = "http://localhost:3000/api/atari-pong/v1/friend/block-user";
+		const token = localStorage.getItem('jwtToken');
+		const conf = {
+			headers: { Authorization: `Bearer ${token}` },
+		};
+		axios.post(url, {"friendid": userId} ,conf).then((response) => {
+
+			console.log("response ", response );
+		})
+		.catch((error)=> {
+
+			console.log("error " ,error);
+		})
+		toast.error(`You blocked ${userName}!`, {
 			position: 'top-center',
 			autoClose: 2500,
 			hideProgressBar: false,
@@ -53,7 +116,20 @@ function Friends() {
 		setOpenFriend(false);
 	}
 	const deleteRequest = () => {
-		setRequest(requests.filter((str) => str !== userName));
+		// setRequest(requests.filter((str) => str !== userName));
+		const url = "http://localhost:3000/api/atari-pong/v1/friend/reject-friend-request";
+		const token = localStorage.getItem('jwtToken');
+		const conf = {
+			headers: { Authorization: `Bearer ${token}` },
+		};
+		axios.post(url, {"friendid": userId} ,conf).then((response) => {
+
+			console.log("response ", response );
+		})
+		.catch((error)=> {
+
+			console.log("error " ,error);
+		})
 		toast.error(`Friend request from ${userName} has been deleted!`, {
 			position: 'top-center',
 			autoClose: 2500,
@@ -68,9 +144,20 @@ function Friends() {
 	};
 
 	const acceptRequest = () => {
-		setRequest(requests.filter((str) => str !== userName));
-		friendsList.push(userName);
-		setFriendsList(friendsList);
+		// setRequest(requests.filter((str) => str !== userName));
+		const url = "http://localhost:3000/api/atari-pong/v1/friend/accept-friend-request";
+		const token = localStorage.getItem('jwtToken');
+		const conf = {
+			headers: { Authorization: `Bearer ${token}` },
+		};
+		axios.post(url, {"friendid": userId} ,conf).then((response) => {
+
+			console.log("response ", response );
+		})
+		.catch((error)=> {
+
+			console.log("error " ,error);
+		})
 		toast.success(`New friend ${userName} added successfully!`, {
 			position: 'top-center',
 			autoClose: 2500,
@@ -83,7 +170,7 @@ function Friends() {
 		});
 		setOpen(false);
 	};
-	const [variable, setVariable] = useState(false);
+	const [userId, setUserId] = useState<any>(null);
 	const [userName, setUserName] = useState('');
 	const [open, setOpen] = useState(false);
 	const [openFriend, setOpenFriend] = useState(false);
@@ -112,6 +199,7 @@ function Friends() {
 							isFriend={true}
 							setOpen={setOpen}
 							setLogin={setUserName}
+							setUserId={setUserId}
 						/>
 					</div>
 					<div className="w-full h-auto ">
@@ -125,6 +213,7 @@ function Friends() {
 							isFriend={true}
 							setOpen={setOpenFriend}
 							setLogin={setUserName}
+							setUserId={setUserId}
 						/>
 					</div>
 				</div>
