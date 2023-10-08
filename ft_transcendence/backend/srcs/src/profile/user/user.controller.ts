@@ -23,6 +23,12 @@ export class UserController {
   }
 
   @UseGuards(JwtGuard)
+  @Post('check-relation')
+  getRelation(@Req() req: Request, @Body() dto: { userLogin: string }) {
+    return this.userService.getRelation(req.user as User, dto.userLogin);
+  }
+
+  @UseGuards(JwtGuard)
   @Post('avatar')
   async getAvatar(@Body() dto: { userLogin: string }, @Res({ passthrough: true }) res: Response) {
     if (dto.userLogin) {
