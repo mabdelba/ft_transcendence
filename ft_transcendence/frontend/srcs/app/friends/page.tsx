@@ -59,7 +59,10 @@ function Friends() {
   }, []);
 
   const deleteFriend = () => {
-    // setFriendsList(friendsList.filter((str) => str !== userName));
+    const elementToDelete = friendsList.findIndex((obj: any) => obj.id === userId);
+    if (elementToDelete !== -1) {
+      friendsList.splice(elementToDelete, 1);
+    }
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/remove-friend';
     const token = localStorage.getItem('jwtToken');
     const conf = {
@@ -87,7 +90,10 @@ function Friends() {
   };
 
   const blockFriend = () => {
-    // setFriendsList(friendsList.filter((str) => str !== userName));
+    const elementToDelete = friendsList.findIndex((obj: any) => obj.id === userId);
+    if (elementToDelete !== -1) {
+      friendsList.splice(elementToDelete, 1);
+    }
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/block-user';
     const token = localStorage.getItem('jwtToken');
     const conf = {
@@ -114,7 +120,12 @@ function Friends() {
     setOpenFriend(false);
   };
   const deleteRequest = () => {
-    // setRequest(requests.filter((str) => str !== userName));
+
+    const elementToDelete = requests.findIndex((obj: any) => obj.id === userId);
+    if (elementToDelete !== -1) {
+      requests.splice(elementToDelete, 1);
+    }
+
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/reject-friend-request';
     const token = localStorage.getItem('jwtToken');
     const conf = {
@@ -142,7 +153,13 @@ function Friends() {
   };
 
   const acceptRequest = () => {
-    // setRequest(requests.filter((str) => str !== userName));
+
+    const elementToDelete = requests.findIndex((obj: any) => obj.id === userId);
+    if (elementToDelete !== -1) {
+      requests.splice(elementToDelete, 1);
+    }
+    const newObject = {id: userId, login: userName, avatar: userAvatar};
+    friendsList.push(newObject);
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/accept-friend-request';
     const token = localStorage.getItem('jwtToken');
     const conf = {
@@ -169,6 +186,7 @@ function Friends() {
     setOpen(false);
   };
   const [userId, setUserId] = useState<any>(null);
+  const [userAvatar, setUserAvatar] = useState<any>(null);
   const [userName, setUserName] = useState('');
   const [open, setOpen] = useState(false);
   const [openFriend, setOpenFriend] = useState(false);
@@ -198,6 +216,7 @@ function Friends() {
               setOpen={setOpen}
               setLogin={setUserName}
               setUserId={setUserId}
+              setAvatar={setUserAvatar}
             />
           </div>
           <div className="w-full h-auto ">
@@ -212,6 +231,7 @@ function Friends() {
               setOpen={setOpenFriend}
               setLogin={setUserName}
               setUserId={setUserId}
+              setAvatar={setUserAvatar}
             />
           </div>
         </div>
