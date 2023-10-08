@@ -9,9 +9,9 @@ type newType = {
 };
 
 function LastMatch(props: newType) {
-  let [matchData, setMatchData] = useState<any>(null);
-  let [userAvatar, setUserAvatar] = useState(alien);
-  let [otherAvatar, setOtherAvatar] = useState(alien);
+  const [matchData, setMatchData] = useState<any>(null);
+  const [userAvatar, setUserAvatar] = useState(alien);
+  const [otherAvatar, setOtherAvatar] = useState(alien);
   function getMatch() {
     const lastMatchUrl = 'http://localhost:3000/api/atari-pong/v1/profile/last-match-played';
     const token = localStorage.getItem('jwtToken');
@@ -20,24 +20,25 @@ function LastMatch(props: newType) {
     };
     axios.post(lastMatchUrl, { userLogin: props.login }, config).then((res) => {
       setMatchData(res.data);
-    }
-    );
+    });
   }
   async function getUserAvatar(login: string, flag: boolean = true) {
-    if (login !== '')
-    {
-
+    if (login !== '') {
       const config = {
-        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}`, },
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
         responseType: 'blob',
-        body: { userLogin: login}
+        body: { userLogin: login },
       };
-      let user = await axios.post('http://localhost:3000/api/atari-pong/v1/user/avatar',{ userLogin: login }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}`, },
-        responseType: 'blob',
-      });
-        const imageBlob = URL.createObjectURL(user.data) as string;
-        flag ? setUserAvatar(imageBlob) : setOtherAvatar(imageBlob);
+      const user = await axios.post(
+        'http://localhost:3000/api/atari-pong/v1/user/avatar',
+        { userLogin: login },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+          responseType: 'blob',
+        },
+      );
+      const imageBlob = URL.createObjectURL(user.data) as string;
+      flag ? setUserAvatar(imageBlob) : setOtherAvatar(imageBlob);
     }
   }
   useEffect(() => {
@@ -45,11 +46,9 @@ function LastMatch(props: newType) {
     getUserAvatar(props.login);
   }, [props.login]);
   useEffect(() => {
-    if (matchData && matchData.other)
-    getUserAvatar(matchData.other, false);
+    if (matchData && matchData.other) getUserAvatar(matchData.other, false);
   }, [matchData]);
 
-  
   const myLogin = matchData ? matchData.me : '';
   const oppLogin = matchData ? matchData.other : '';
   const myRes = matchData ? matchData.myScore : 0;

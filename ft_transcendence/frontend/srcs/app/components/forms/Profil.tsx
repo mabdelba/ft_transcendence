@@ -9,44 +9,43 @@ import { useEffect, useState } from 'react';
 import Pdp from '../shapes/Pdp';
 import axios from 'axios';
 
-
 type profileProp = {
   login: string;
 };
 
 function Profil(props: profileProp) {
   let [profile, setProfile] = useState<any>(null);
-  let [userAvatar, setUserAvatar] = useState(alien);
+  const [userAvatar, setUserAvatar] = useState(alien);
   async function getUserAvatar(login: string) {
-    if (login !== '')
-    {
-
+    if (login !== '') {
       const config = {
-        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}`, },
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
         responseType: 'blob',
-        body: { userLogin: login}
+        body: { userLogin: login },
       };
-      let user = await axios.post('http://localhost:3000/api/atari-pong/v1/user/avatar',{ userLogin: login }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}`, },
-        responseType: 'blob',
-      });
-        const imageBlob = URL.createObjectURL(user.data) as string;
-        setUserAvatar(imageBlob) ;
+      const user = await axios.post(
+        'http://localhost:3000/api/atari-pong/v1/user/avatar',
+        { userLogin: login },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+          responseType: 'blob',
+        },
+      );
+      const imageBlob = URL.createObjectURL(user.data) as string;
+      setUserAvatar(imageBlob);
     }
   }
   useEffect(() => {
     getUserAvatar(props.login);
   }, [props.login]);
-  async function getProfile()
-  {
-    if (props.login)
-    {
+  async function getProfile() {
+    if (props.login) {
       const url = 'http://localhost:3000/api/atari-pong/v1/user/me';
       const token = localStorage.getItem('jwtToken');
       const config = {
         headers: { Authorization: `Bearer ${token}` },
       };
-      let user = await axios.post(url, { userLogin: props.login }, config);
+      const user = await axios.post(url, { userLogin: props.login }, config);
       setProfile(user.data);
     }
   }
@@ -60,9 +59,8 @@ function Profil(props: profileProp) {
   let lose = '50%';
   let state;
   let stateImage;
-  
-  if (!profile)
-  {
+
+  if (!profile) {
     profile = {
       firstName: 'Loading',
       lastName: 'Loading',
@@ -73,7 +71,6 @@ function Profil(props: profileProp) {
       numberOfGamesPlayed: 0,
       numberOfGamesWon: 0,
       state: 0,
-      avatar: alien,
     };
   }
   if (profile.numberOfGamesPlayed != 0)
@@ -104,9 +101,9 @@ function Profil(props: profileProp) {
   return (
     <div className="h-full w-full flex flex-col  justify-center items-center NeonShadowBord">
       <div className="h-1/2 w-full flex flex-row items-center ">
-        <div className='w-[7%]  xl:w-[12.5%] h-[50%]  ' ></div>
+        <div className="w-[7%]  xl:w-[12.5%] h-[50%]  "></div>
         <div className="w-[18%] lg:pr-4 xl:pr-0 xl:w-[12.5%] h-[50%] flex justify-center items-center ">
-          <Pdp name={''} color={false} image={(profile.avatar)? profile.avatar : alien} />
+          <Pdp name={''} color={false} image={userAvatar} />
         </div>
         <div className="w-[75%] h-[40%] flex flex-col justify-center items-start px-2 text-xs md:text-sm xl:text-lg">
           <div className="h-1/3 w-full -slate-700">

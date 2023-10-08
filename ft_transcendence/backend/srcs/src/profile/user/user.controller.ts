@@ -25,13 +25,10 @@ export class UserController {
   @UseGuards(JwtGuard)
   @Post('avatar')
   async getAvatar(@Body() dto: { userLogin: string }, @Res({ passthrough: true }) res: Response) {
-    if (dto.userLogin)
-    {
+    if (dto.userLogin) {
       const user = await getUserFromLogin(dto.userLogin);
-      if ( user.avatar !== null) {
-        const file = createReadStream(
-          join(__dirname, `../../../public/avatars/${user.login}.jpg`),
-        );
+      if (user.avatar !== null) {
+        const file = createReadStream(join(__dirname, `../../../public/avatars/${user.login}.jpg`));
         res.set('Content-Type', 'image/jpeg');
         return new StreamableFile(file);
       } else {
@@ -39,10 +36,8 @@ export class UserController {
         res.set('Content-Type', 'image/jpeg');
         return new StreamableFile(file);
       }
+    } else {
+      return { error: 'userLogin is undefined' };
+    }
   }
-  else
-  {
-    return {error: "userLogin is undefined"};
-  }
-}
 }

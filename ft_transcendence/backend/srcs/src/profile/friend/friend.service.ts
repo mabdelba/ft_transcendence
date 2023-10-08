@@ -232,30 +232,30 @@ export class FriendService {
       };
     }
     await this.prisma.$transaction([
-     this.prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        recievedFriendRequestsBy: {
-          disconnect: {
-            id: senderId,
+      this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          recievedFriendRequestsBy: {
+            disconnect: {
+              id: senderId,
+            },
           },
         },
-      },
-    }),
-    this.prisma.user.update({
-      where: {
-        id: senderId,
-      },
-      data: {
-        sendFriendRequestsTo: {
-          disconnect: {
-            id: user.id,
+      }),
+      this.prisma.user.update({
+        where: {
+          id: senderId,
+        },
+        data: {
+          sendFriendRequestsTo: {
+            disconnect: {
+              id: user.id,
+            },
           },
         },
-      },
-    }),
+      }),
     ]);
 
     return {
@@ -348,30 +348,30 @@ export class FriendService {
       };
     }
     await this.prisma.$transaction([
-    this.prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        blockedList: {
-          connect: {
-            id: userId,
+      this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          blockedList: {
+            connect: {
+              id: userId,
+            },
           },
         },
-      },
-    }),
-    this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        blockedBy: {
-          connect: {
-            id: user.id,
+      }),
+      this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          blockedBy: {
+            connect: {
+              id: user.id,
+            },
           },
         },
-      },
-    }),
+      }),
     ]);
     this.removeFriend(user, userId);
     this.rejectFriendRequest(user, userId);
@@ -405,30 +405,30 @@ export class FriendService {
       };
     }
     await this.prisma.$transaction([
-    this.prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        blockedList: {
-          disconnect: {
-            id: userId,
+      this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          blockedList: {
+            disconnect: {
+              id: userId,
+            },
           },
         },
-      },
-    }),
-    this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        blockedBy: {
-          disconnect: {
-            id: user.id,
+      }),
+      this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          blockedBy: {
+            disconnect: {
+              id: user.id,
+            },
           },
         },
-      },
-    }),
+      }),
     ]);
     return {
       status: 200,

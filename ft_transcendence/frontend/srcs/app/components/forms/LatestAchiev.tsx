@@ -4,13 +4,11 @@ import NoAchiev from '../../../public/noAchiev.svg';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-type newType ={
-
+type newType = {
   login: string;
-}
+};
 
 function LatestAchiev(props: newType) {
-
   let limiter = 1;
   const [achievement, setAchievement] = useState<any>(null);
 
@@ -22,8 +20,7 @@ function LatestAchiev(props: newType) {
     };
     axios.post(lastAchievUrl, { userLogin: props.login }, config).then((res) => {
       setAchievement(res.data);
-    }
-    );
+    });
   }
   useEffect(() => {
     getAchievements();
