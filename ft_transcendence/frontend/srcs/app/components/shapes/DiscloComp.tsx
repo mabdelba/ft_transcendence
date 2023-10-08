@@ -8,13 +8,14 @@ type newType = {
   title: string;
   textColor: string;
   Color: boolean;
-  divArray: string[];
+  divArray: any;
   hoverColor: string;
   isFriend: boolean;
   image: string;
   setOpen?: any;
   setLogin?: any;
   setAvatar?: any;
+  setUserId?: any;
 };
 
 function DiscloComp(props: newType) {
@@ -38,17 +39,18 @@ function DiscloComp(props: newType) {
                   props.isFriend ? 'md:grid-cols-7' : 'md:grid-cols-6'
                 } gap-1 2xl:gap-4`}
               >
-                {props.divArray.map((divName: any) => (
-                  <div>
+                {props.divArray && props.divArray.map((divName: any) => (
+                  <div key={divName.id}>
                     {props.isFriend ? (
                       <Pdp
-                        name={divName}
+                        name={divName.login}
                         image={props.image}
                         color={props.Color}
                         handleClick={() => {
                           props.setOpen(true);
-                          props.setLogin(divName);
-                          // props.setAvatar(props.image);
+                          props.setLogin(divName.login);
+                          props.setUserId(divName.id);
+                          // props.setAvatar(divName.avatar);
                         }}
                       />
                     ) : (

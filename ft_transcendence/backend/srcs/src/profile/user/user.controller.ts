@@ -11,6 +11,12 @@ import { getUserFromLogin } from 'src/utils/get-user-from-id';
 export class UserController {
   constructor(private userService: UserService) {}
   @UseGuards(JwtGuard)
+  @Get('me-from-token')
+  getMeFromToken(@Req() req: Request) {
+    return req.user as User;
+  }
+
+  @UseGuards(JwtGuard)
   @Post('me')
   getMe(@Body() dto: { userLogin: string }) {
     return this.userService.getMe(dto.userLogin);
@@ -19,17 +25,24 @@ export class UserController {
   @UseGuards(JwtGuard)
   @Post('avatar')
   async getAvatar(@Body() dto: { userLogin: string }, @Res({ passthrough: true }) res: Response) {
-    const user = getUserFromLogin(dto.userLogin);
-    if ((await user).avatar !== null) {
-      const file = createReadStream(
-        join(__dirname, `../../../public/avatars/${(await user).login}.jpg`),
-      );
-      res.set('Content-Type', 'image/jpeg');
-      return new StreamableFile(file);
-    } else {
-      const file = createReadStream(join(__dirname, `../../../public/avatars/avatar.png`));
-      res.set('Content-Type', 'image/jpeg');
-      return new StreamableFile(file);
-    }
+    if (dto.userLogin)
+    {
+      const user = await getUserFromLogin(dto.userLogin);
+      if ( user.avatar !== null) {
+        const file = createReadStream(
+          join(__dirname, `../../../public/avatars/${user.login}.jpg`),
+        );
+        res.set('Content-Type', 'image/jpeg');
+        return new StreamableFile(file);
+      } else {
+        const file = createReadStream(join(__dirname, `../../../public/avatars/avatar.png`));
+        res.set('Content-Type', 'image/jpeg');
+        return new StreamableFile(file);
+      }
   }
+  else
+  {
+    return {error: "userLogin is undefined"};
+  }
+}
 }
