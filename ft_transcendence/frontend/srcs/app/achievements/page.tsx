@@ -1,5 +1,7 @@
 'use client';
 import DiscloComp from '../components/shapes/DiscloComp';
+import { useEffect } from 'react';
+import io from 'socket.io-client';
 
 function Achievements() {
   const Acquired = ['Facebook', 'Whatsapp', 'Instagram', 'Discord'];
@@ -25,6 +27,17 @@ function Achievements() {
     'X',
     'Netflix',
   ];
+  function setOnline()
+  {
+    io('http://localhost:3000', {
+      transports: ['websocket'],
+      auth: {
+        token: localStorage.getItem('jwtToken'),
+      },});
+  }
+  useEffect(() => {
+    setOnline();
+  }, []);
   return (
     <main className="w-screen h-auto md:h-screen flex flex-col font-Orbitron min-h-[480px] min-w-[280px]">
       <div className="w-full h-12 md:h-[10%] pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">

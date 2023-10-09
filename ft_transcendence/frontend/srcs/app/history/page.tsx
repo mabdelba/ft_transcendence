@@ -3,11 +3,21 @@ import Pdp from "../components/shapes/Pdp";
 import alien from "../../public/alien.svg";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { useEffect } from "react";
+import io from "socket.io-client";
 
 function History(){
-
-	
+	function setOnline()
+  {
+    io('http://localhost:3000', {
+      transports: ['websocket'],
+      auth: {
+        token: localStorage.getItem('jwtToken'),
+      },});
+  }
+  useEffect(() => {
+    setOnline();
+  }, []);
 	const Array = [{id: 0, myLogin: 'mabdelba', oppLogin: 'aelabid', myRes: 37, oppRes: 12},
 	{id: 1, myLogin: 'mabdelba', oppLogin: 'aelabid', myRes: 7, oppRes: 12},
 	{id: 2, myLogin: 'mabdelba', oppLogin: 'aelabid', myRes: 37, oppRes: 122},

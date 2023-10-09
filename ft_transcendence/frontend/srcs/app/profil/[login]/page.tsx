@@ -5,8 +5,9 @@ import LastMatch from '../../components/forms/LastMatch';
 import LatestAchiev from '../../components/forms/LatestAchiev';
 import Profil from '../../components/forms/Profil';
 import AddFriend from '../../components/forms/AddFriend';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
+import io from 'socket.io-client';
 
 type newType = {
   params: { login: string };
@@ -16,7 +17,17 @@ function UserProfil(props: newType) {
   const firstName = 'Mohamed';
   const lastName = 'Abdelbar';
   const login = 'mabdelba';
-
+  function setOnline()
+  {
+    io('http://localhost:3000', {
+      transports: ['websocket'],
+      auth: {
+        token: localStorage.getItem('jwtToken'),
+      },});
+  }
+  useEffect(() => {
+    setOnline();
+  }, []);
   const [Case, setCase] = useState(1);
   return (
     <main className="h-auto w-auto md:w-screen md:h-screen font-Orbitron NeonShadow min-h-[480px] min-w-[280px]">
