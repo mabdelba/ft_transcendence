@@ -11,8 +11,20 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { error } from 'console';
+import io from 'socket.io-client';
 
 function Friends() {
+  function setOnline()
+  {
+    io('http://localhost:3000', {
+      transports: ['websocket'],
+      auth: {
+        token: localStorage.getItem('jwtToken'),
+      },});
+  }
+  useEffect(() => {
+    setOnline();
+  }, []);
   const getReq = () => {
     const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-requests-list';
     const token = localStorage.getItem('jwtToken');
@@ -39,7 +51,6 @@ function Friends() {
     axios
       .get(urlreq, config)
       .then((response) => {
-        // console.log("friend list from : ", response.data.friends);
         setFriendsList(response.data.friends);
       })
       .catch((error) => {

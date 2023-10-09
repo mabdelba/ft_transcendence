@@ -6,6 +6,7 @@ import LatestAchiev from '../components/forms/LatestAchiev';
 import alien from '../../public/alien.svg';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import io from 'socket.io-client';
 
 function Dashboard() {
   let [user, setUser] = useState<any>(null);
@@ -18,6 +19,11 @@ function Dashboard() {
     axios.get(apiUrl, config).then((response) => {
       setUser(response.data);
     });
+    io('http://localhost:3000', {
+      transports: ['websocket'],
+      auth: {
+        token: token,
+      },});
   }
   useEffect(() => {
     getProfile();

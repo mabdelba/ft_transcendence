@@ -18,11 +18,6 @@ function Profil(props: profileProp) {
   const [userAvatar, setUserAvatar] = useState(alien);
   async function getUserAvatar(login: string) {
     if (login !== '') {
-      const config = {
-        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-        responseType: 'blob',
-        body: { userLogin: login },
-      };
       const user = await axios.post(
         'http://localhost:3000/api/atari-pong/v1/user/avatar',
         { userLogin: login },
