@@ -8,17 +8,17 @@ type newType = {
   title: string;
   textColor: string;
   Color: boolean;
-  divArray: string[];
+  divArray: any;
   hoverColor: string;
   isFriend: boolean;
   image: string;
   setOpen?: any;
   setLogin?: any;
   setAvatar?: any;
+  setUserId?: any;
 };
 
 function DiscloComp(props: newType) {
-
   return (
     <div className="w-full h-auto  border ">
       <div className="w-full font-Orbitron  NeonShadowBord">
@@ -38,24 +38,26 @@ function DiscloComp(props: newType) {
                   props.isFriend ? 'md:grid-cols-7' : 'md:grid-cols-6'
                 } gap-1 2xl:gap-4`}
               >
-                {props.divArray.map((divName: any) => (
-                  <div>
-                    {props.isFriend ? (
-                      <Pdp
-                        name={divName}
-                        image={props.image}
-                        color={props.Color}
-                        handleClick={() => {
-                          props.setOpen(true);
-                          props.setLogin(divName);
-                          // props.setAvatar(props.image);
-                        }}
-                      />
-                    ) : (
-                      <Achievement name={divName} color={props.Color} />
-                    )}
-                  </div>
-                ))}
+                {props.divArray &&
+                  props.divArray.map((divName: any) => (
+                    <div key={divName.id}>
+                      {props.isFriend ? (
+                        <Pdp
+                          name={divName.login}
+                          image={props.image}
+                          color={props.Color}
+                          handleClick={() => {
+                            props.setOpen(true);
+                            props.setLogin(divName.login);
+                            props.setUserId(divName.id);
+                            props.setAvatar(divName.avatar);
+                          }}
+                        />
+                      ) : (
+                        <Achievement name={divName} color={props.Color} />
+                      )}
+                    </div>
+                  ))}
               </Disclosure.Panel>
             </>
           )}

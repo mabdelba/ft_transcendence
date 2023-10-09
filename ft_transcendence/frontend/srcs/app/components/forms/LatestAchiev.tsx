@@ -2,8 +2,13 @@ import Achievement from '../shapes/Achievement';
 import Image from 'next/image';
 import NoAchiev from '../../../public/noAchiev.svg';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 
-function LatestAchiev() {
+type newType = {
+  login: string;
+};
+
+function LatestAchiev(props: newType) {
   let limiter = 1;
   const [achievement, setAchievement] = useState<any>(null);
 
@@ -13,16 +18,15 @@ function LatestAchiev() {
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
-    const response = await fetch(lastAchievUrl, config);
-    const data = await response.json();
-    setAchievement(data[0].achievements);
+    axios.post(lastAchievUrl, { userLogin: props.login }, config).then((res) => {
+      setAchievement(res.data);
+    });
   }
   useEffect(() => {
     getAchievements();
-  }, []);
+  }, [props.login]);
   const divArray = achievement?.map((achiev: any) => achiev.name) || [];
   if (divArray[0] == null) limiter = 0;
-  // const  divArray = Array.from({ length: limiter }, (_, index) => index + 1);
 
   return (
     <div className="h-full w-full flex flex-col NeonShadowBord">
@@ -37,7 +41,7 @@ function LatestAchiev() {
       ) : (
         <div className="w-full h-3/4 px-1 xl:px-10 pb-10 grid grid-rows-2 grid-cols-3  gap-1 2xl:gap-4">
           {divArray.map((divName: any) => (
-            <div>
+            <div key={divName}>
               <Achievement name={divName} color={true} />
             </div>
           ))}

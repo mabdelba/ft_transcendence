@@ -1,11 +1,64 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import getUserFromId from 'src/utils/get-user-from-id';
 
 @Injectable()
 export class FriendService {
   constructor(private prisma: PrismaService) {}
+  async getFriendList(user: User) {
+    const friendList = await this.prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        friends: {
+          select: {
+            id: true,
+            login: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+    return friendList;
+  }
+
+  async getFriendRequestsList(user: User) {
+    const friendRequestsList = await this.prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        recievedFriendRequestsBy: {
+          select: {
+            id: true,
+            login: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+    return friendRequestsList;
+  }
+
+  async getBlockedUserList(user: User) {
+    const blockedUserList = await this.prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        blockedList: {
+          select: {
+            id: true,
+            login: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+    return blockedUserList;
+  }
+
   async sendFriendRequest(user: User, recieverId: number) {
     const alreadyFriendsCheck = await this.prisma.user.findUnique({
       where: {
@@ -179,30 +232,30 @@ export class FriendService {
       };
     }
     await this.prisma.$transaction([
-     this.prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        recievedFriendRequestsBy: {
-          disconnect: {
-            id: senderId,
+      this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          recievedFriendRequestsBy: {
+            disconnect: {
+              id: senderId,
+            },
           },
         },
-      },
-    }),
-    this.prisma.user.update({
-      where: {
-        id: senderId,
-      },
-      data: {
-        sendFriendRequestsTo: {
-          disconnect: {
-            id: user.id,
+      }),
+      this.prisma.user.update({
+        where: {
+          id: senderId,
+        },
+        data: {
+          sendFriendRequestsTo: {
+            disconnect: {
+              id: user.id,
+            },
           },
         },
-      },
-    }),
+      }),
     ]);
 
     return {
@@ -295,31 +348,33 @@ export class FriendService {
       };
     }
     await this.prisma.$transaction([
-    this.prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        blockedList: {
-          connect: {
-            id: userId,
+      this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          blockedList: {
+            connect: {
+              id: userId,
+            },
           },
         },
-      },
-    }),
-    this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        blockedBy: {
-          connect: {
-            id: user.id,
+      }),
+      this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          blockedBy: {
+            connect: {
+              id: user.id,
+            },
           },
         },
-      },
-    }),
+      }),
     ]);
+    this.removeFriend(user, userId);
+    this.rejectFriendRequest(user, userId);
     return {
       status: 200,
       message: 'User blocked',
@@ -350,30 +405,30 @@ export class FriendService {
       };
     }
     await this.prisma.$transaction([
-    this.prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        blockedList: {
-          disconnect: {
-            id: userId,
+      this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          blockedList: {
+            disconnect: {
+              id: userId,
+            },
           },
         },
-      },
-    }),
-    this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        blockedBy: {
-          disconnect: {
-            id: user.id,
+      }),
+      this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          blockedBy: {
+            disconnect: {
+              id: user.id,
+            },
           },
         },
-      },
-    }),
+      }),
     ]);
     return {
       status: 200,

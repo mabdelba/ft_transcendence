@@ -18,6 +18,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleConnection(client: Socket) {
     const jwtToken = client.handshake.auth.token;
     const decoded = jwtDecode(jwtToken);
+    console.log('connected', decoded['login']);
     await this.prisma.user.update({
       where: {
         login: decoded['login'],
@@ -32,6 +33,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleDisconnect(client: any) {
     const jwtToken = client.handshake.auth.token;
     const decoded = jwtDecode(jwtToken);
+    console.log('disconnected');
     await this.prisma.user.update({
       where: {
         login: decoded['login'],

@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from '@prisma/client';
-import getUserFromId from 'src/utils/get-user-from-id';
+import { getUserFromId, getUserFromLogin } from 'src/utils/get-user-from-id';
 
 @Injectable()
 export class ProfileService {
   constructor(private prisma: PrismaService) {}
-  async getLastMatchPlayed(user: User) {
+  async getLastMatchPlayed(login: string) {
     const matchesPlayedByUser = await this.prisma.game.findFirst({
       where: {
-        OR: [{ player1: { login: user.login } }, { player2: { login: user.login } }],
+        OR: [{ player1: { login: login } }, { player2: { login: login } }],
       },
       orderBy: {
         dateOfGame: 'desc',
@@ -18,13 +17,14 @@ export class ProfileService {
     if (!matchesPlayedByUser) {
       return { id: null, me: null, other: null, myScore: null, otherScore: null };
     }
+    const user = getUserFromLogin(login);
     const me = await getUserFromId(
-      matchesPlayedByUser.player1Id == user.id
+      matchesPlayedByUser.player1Id == (await user).id
         ? matchesPlayedByUser.player1Id
         : matchesPlayedByUser.player2Id,
     );
     const other = await getUserFromId(
-      matchesPlayedByUser.player2Id == user.id
+      matchesPlayedByUser.player2Id == (await user).id
         ? matchesPlayedByUser.player1Id
         : matchesPlayedByUser.player2Id,
     );
@@ -44,10 +44,10 @@ export class ProfileService {
     };
   }
 
-  async getLastAchievement(user: User) {
+  async getLastAchievement(login: string) {
     const achievements = await this.prisma.user.findMany({
       where: {
-        id: user.id,
+        login,
       },
       select: {
         achievements: {
