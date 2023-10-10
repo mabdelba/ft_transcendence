@@ -8,15 +8,14 @@ import AddFriend from '../../components/forms/AddFriend';
 import { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import io from 'socket.io-client';
+import axios from 'axios';
+import { error } from 'console';
 
 type newType = {
   params: { login: string };
 };
 
 function UserProfil(props: newType) {
-  const firstName = 'Mohamed';
-  const lastName = 'Abdelbar';
-  const login = 'mabdelba';
   function setOnline()
   {
     io('http://localhost:3000', {
@@ -28,6 +27,32 @@ function UserProfil(props: newType) {
   useEffect(() => {
     setOnline();
   }, []);
+
+  const getState = () => {
+
+    const url = "http://localhost:3000/api/atari-pong/v1/user/check-relation";
+    const token = localStorage.getItem('jwtToken');
+    const conf = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+
+    axios.post(url, {userLogin: props.params.login}, conf).then((response: any) => {
+
+      if(response.data == -1 || response.data == 4 || response.data == 5)
+        setCase(1);
+      else
+        setCase(response.data);
+      // console.log("response: ", response.data);
+    }).catch((error: any) => {
+
+      console.log("error: ", error);
+    })
+  }
+
+  useEffect(()=> {
+    getState();
+  }, []);
+
   const [Case, setCase] = useState(1);
   return (
     <main className="h-auto w-auto md:w-screen md:h-screen font-Orbitron NeonShadow min-h-[480px] min-w-[280px]">

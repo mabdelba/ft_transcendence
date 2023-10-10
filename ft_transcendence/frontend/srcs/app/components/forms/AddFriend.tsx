@@ -2,7 +2,7 @@
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SimpleButton from '../buttons/simpleButton';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type newType = {
   state: number;
@@ -15,6 +15,15 @@ type newType = {
 function AddFriend(props: newType) {
   const [flag, setFlag] = useState(false);
 
+  const requestSended = () =>{
+
+    if(props.state == 3)
+      setFlag(true);
+  }
+
+  useEffect(()=> {
+    requestSended();
+  }, [])
   const handleAdd = (e: any) => {
     e.preventDefault();
     setFlag(true);
@@ -52,18 +61,18 @@ function AddFriend(props: newType) {
     <div className="h-full w-full NeonShadowBord flex flex-col ">
       <div
         className={`w-full ${
-          props.state == 2 ? 'h-1/5' : 'h-1/2'
+          (props.state == 1)? 'h-1/5' : 'h-1/2'
         } flex justify-center items-center text-xs  xl:text-xl`}
       >
         {props.state == 0
           ? `Add ${props.login} to your friends list!`
-          : props.state == 1
+          : props.state == 2
           ? `You have a friend request from ${props.login} :`
           : 'All time stats'}
       </div>
       <div
         className={`w-full ${
-          props.state == 2 ? 'h-4/5' : 'h-1/2'
+          props.state == 1 ? 'h-4/5' : 'h-1/2'
         }   flex justify-center items-start`}
       >
         {props.state == 0 ? (
@@ -76,7 +85,7 @@ function AddFriend(props: newType) {
               </div>
             )}
           </div>
-        ) : props.state == 1 ? (
+        ) : props.state == 2 ? (
           <div className="w-[70%] h-[50%] flex flex-row items-start justify-around space-x-3">
             <SimpleButton buttonType="button" content="Accept" handleClick={handleAccept} />
             <SimpleButton buttonType="button" content="Delete" handleClick={handleDelete} />
