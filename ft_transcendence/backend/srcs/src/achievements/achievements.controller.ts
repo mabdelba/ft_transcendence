@@ -1,4 +1,4 @@
-import { Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Req, UseGuards } from '@nestjs/common';
 import { AchievementsService } from './achievements.service';
 import { User } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards';
@@ -10,5 +10,17 @@ export class AchievementsController {
     @UseGuards(JwtGuard)
     checkIfAcquired(@Req() req) {
         return this.achivementsService.checkIfAchievementsAcquired(req.user as User);
+    }
+
+    @Get('all-aquired')
+    @UseGuards(JwtGuard)
+    getAllAcquired(@Req() req) {
+        return this.achivementsService.getAllAchievementsAcquired(req.user as User);
+    }
+
+    @Get('all-unacquired')
+    @UseGuards(JwtGuard)
+    getAllUnacquired(@Req() req) {
+        return this.achivementsService.getAllAchievementsUnacquired(req.user as User);
     }
 }
