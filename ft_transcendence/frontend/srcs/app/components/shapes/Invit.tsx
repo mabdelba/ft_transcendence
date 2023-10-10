@@ -12,10 +12,11 @@ type newType = {
   avatar?: any;
   login: string;
   accept: any;
-  delete: any;
+  delete?: any;
   Color: boolean;
   Content1: string;
   Content2: string;
+  flag: number;
 };
 
 function Invit(props: newType) {
@@ -31,7 +32,7 @@ function Invit(props: newType) {
           <Image src={close} alt="close" className="w-10 h-10" />
         </button>
       </div>
-      <div className="w-full  flex justify-center h-[25%] items-center">Friend request</div>
+      <div className="w-full  flex justify-center h-[25%] text-xs xl:text-lg items-center">{props.flag == 0?  'Friend request :' : props.flag == 1 ? 'You are already friends': `you have blocked ${props.login}, Click to unblock!` }</div>
       <div className="h-1/2 w-full flex flex-row ">
         <div
           className="h-full w-1/2 flex justify-center items-center hover:bg-slate-800 hover:bg-opacity-5 hover:font-extrabold"
@@ -40,8 +41,16 @@ function Invit(props: newType) {
           <Pdp name={props.login} color={props.Color} image={props.avatar} />
         </div>
         <div className="h-[90%] pt-2 w-[40%] flex flex-col justify-center pr-4 space-y-3">
-          <SimpleButton buttonType="button" content={props.Content1} handleClick={props.accept} />
-          <SimpleButton buttonType="button" content={props.Content2} handleClick={props.delete} />
+          {
+            props.flag == 2 ?
+            <div className='h-2/3  flex justify-center items-center'>
+              <SimpleButton buttonType='button' content='Unblock' handleClick={props.accept}  /> 
+            </div>:
+            <>
+            <SimpleButton buttonType="button" content={props.Content1} handleClick={props.accept} />
+            <SimpleButton buttonType="button" content={props.Content2} handleClick={props.delete} />
+            </>
+          }
         </div>
       </div>
     </div>

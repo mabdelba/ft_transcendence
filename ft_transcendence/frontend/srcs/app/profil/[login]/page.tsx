@@ -10,6 +10,8 @@ import { ToastContainer } from 'react-toastify';
 import io from 'socket.io-client';
 import axios from 'axios';
 import { error } from 'console';
+import Pdp from '../../components/shapes/Pdp';
+import { Alatsi } from 'next/font/google';
 
 type newType = {
   params: { login: string };
@@ -38,7 +40,7 @@ function UserProfil(props: newType) {
 
     axios.post(url, {userLogin: props.params.login}, conf).then((response: any) => {
 
-      if(response.data == -1 || response.data == 4 || response.data == 5)
+      if(response.data == -1 )
         setCase(1);
       else
         setCase(response.data);
@@ -55,29 +57,40 @@ function UserProfil(props: newType) {
 
   const [Case, setCase] = useState(1);
   return (
-    <main className="h-auto w-auto md:w-screen md:h-screen font-Orbitron NeonShadow min-h-[480px] min-w-[280px]">
-      <div className="w-full h-[8%] pl-6 md:pl-12 font-semibold flex justify-start items-center NeonShadow text-base xl:text-3xl">
-        {props.params.login}'s profile:
-      </div>
-      <div className=" w-full md:h-[84%] h-auto flex flex-col md:flex-row justify-center items-center px-2 md:px-12 space-y-6 md:space-y-0 md:space-x-6 xl:space-x-12 ">
-        <div className="md:h-full h-auto w-full md:w-[60%]  space-y-6 xl:space-y-12 flex flex-col -red-600">
-          <div className="w-full md:h-[60%] h-auto">
-            <Profil login={props.params.login} />
+
+    <main className="h-auto w-screen md:h-screen font-Orbitron NeonShadow min-h-[480px] min-w-[280px]">
+      {
+        (Case == 5 || Case == 4 )? 
+        <div className="w-full h-screen flex justify-center items-center ">
+          <div className='h-1/2 md:h-1/3 w-[95%] lg:w-1/3 NeonShadowBord flex flex-row justify-evenly items-center'>
+              <div className='-red-500'><Pdp name={'unavailable'} color={false} image={alien} /></div>
+              <div className='-green-500 text-xs md:text-base 2xl:text-2xl '>This user is not available</div>
+              
           </div>
-          <div className="w-full md:h-[40%] h-40">
-            <LastMatch matchPlayed={12} login={props.params.login} />
-          </div>
-        </div>
-        <div className="md:h-full h-auto w-full md:w-[40%] space-y-6  xl:space-y-12 flex flex-col -yellow-300">
-          <div className="w-full md:h-[40%] h-40">
-            <AddFriend state={Case} login={props.params.login} setState={setCase} />
-          </div>
-          <div className="w-full md:h-[60%] h-auto">
-            <LatestAchiev login={props.params.login} />
-          </div>
-        </div>
-      </div>
-      <div className="w-full h-[8%]"></div>
+        </div>:
+        (<><div className="w-full h-[8%] pl-6 md:pl-12 font-semibold flex justify-start items-center NeonShadow text-base xl:text-3xl">
+            {props.params.login}'s profile:
+          </div><div className=" w-full md:h-[84%] h-auto flex flex-col md:flex-row justify-center items-center px-2 md:px-12 space-y-6 md:space-y-0 md:space-x-6 xl:space-x-12 ">
+              <div className="md:h-full h-auto w-full md:w-[60%]  space-y-6 xl:space-y-12 flex flex-col -red-600">
+                <div className="w-full md:h-[60%] h-auto">
+                  <Profil login={props.params.login} />
+                </div>
+                <div className="w-full md:h-[40%] h-40">
+                  <LastMatch matchPlayed={12} login={props.params.login} />
+                </div>
+              </div>
+              <div className="md:h-full h-auto w-full md:w-[40%] space-y-6  xl:space-y-12 flex flex-col -yellow-300">
+                <div className="w-full md:h-[40%] h-40">
+                  <AddFriend state={Case} login={props.params.login} setState={setCase} />
+                </div>
+                <div className="w-full md:h-[60%] h-auto">
+                  <LatestAchiev login={props.params.login} />
+                </div>
+              </div>
+            </div>
+            <div className="w-full h-[8%]"></div>
+            </>)
+      }
       <ToastContainer
         position="top-center"
         autoClose={4000}

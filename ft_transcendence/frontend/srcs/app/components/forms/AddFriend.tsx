@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SimpleButton from '../buttons/simpleButton';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 type newType = {
   state: number;
@@ -14,20 +15,51 @@ type newType = {
 
 function AddFriend(props: newType) {
   const [flag, setFlag] = useState(false);
+  const [userId, setUserId] = useState<any>(null);
 
   const requestSended = () =>{
 
+    const url = "http://localhost:3000/api/atari-pong/v1/friend/getuserbylogin";
+    const token = localStorage.getItem('jwtToken');
+		const conf = {
+			headers: { Authorization: `Bearer ${token}` },
+		};
+    axios
+    .post(url, { userLogin: props.login }, conf)
+    .then((response) => {
+      setUserId(response.data.id);
+      // console.log('asidi hak l id dyalk', response.data.id);
+    })
+    .catch((error) => {
+      console.log('error ', error);
+    });
+    
     if(props.state == 3)
       setFlag(true);
   }
 
   useEffect(()=> {
     requestSended();
-  }, [])
-  const handleAdd = (e: any) => {
-    e.preventDefault();
+  }, []);
+
+  const handleAdd = () => {
+    
+		const url = 'http://localhost:3000/api/atari-pong/v1/friend/send-friend-request';
+		const token = localStorage.getItem('jwtToken');
+		const conf = {
+			headers: { Authorization: `Bearer ${token}` },
+		};
+		axios
+			.post(url, { recieverId: userId }, conf)
+			.then((response) => {
+				console.log('response ', response);
+			})
+			.catch((error) => {
+				console.log('error ', error);
+			});
     setFlag(true);
   };
+
   const handleDelete = (e: any) => {
     e.preventDefault();
     toast.error(`Friend request from ${props.login} has been deleted!`, {
@@ -54,7 +86,7 @@ function AddFriend(props: newType) {
       progress: undefined,
       theme: 'dark',
     });
-    props.setState(2);
+    props.setState(1);
   };
 
   return (
@@ -64,7 +96,7 @@ function AddFriend(props: newType) {
           (props.state == 1)? 'h-1/5' : 'h-1/2'
         } flex justify-center items-center text-xs  xl:text-xl`}
       >
-        {props.state == 0
+        {(props.state == 0 || props.state == 3)
           ? `Add ${props.login} to your friends list!`
           : props.state == 2
           ? `You have a friend request from ${props.login} :`
@@ -75,12 +107,12 @@ function AddFriend(props: newType) {
           props.state == 1 ? 'h-4/5' : 'h-1/2'
         }   flex justify-center items-start`}
       >
-        {props.state == 0 ? (
+        {(props.state == 0 || props.state == 3) ? (
           <div className="w-1/2 h-[50%]" onClick={handleAdd}>
             {!flag ? (
               <SimpleButton content="Add friend" buttonType="button" />
             ) : (
-              <div className="bg-[#272727] redShadowBord text-[#00B2FF] blueShadow  transition-all duration-500 text-sm md:text-lg lg:text-xl h-full w-full  font-Orbitron flex justify-center items-center">
+              <div className="bg-[#272727] hover:cursor-pointer redShadowBord text-[#00B2FF] blueShadow  transition-all duration-500 text-sm md:text-lg lg:text-xl h-full w-full  font-Orbitron flex justify-center items-center">
                 Requested
               </div>
             )}
