@@ -34,8 +34,8 @@ function DiscloComp(props: newType) {
                 />
               </Disclosure.Button>
               <Disclosure.Panel
-                className={`w-full h-auto px-1 xl:px-10 pb-10 grid grid-cols-3 sm:grid-cols-4 ${
-                  props.isFriend ? 'md:grid-cols-7' : 'md:grid-cols-6'
+                className={`w-full h-auto px-1 xl:px-10 pb-10 grid  sm:grid-cols-4 ${
+                  props.isFriend ? 'grid-cols-3 lg:grid-cols-7' : 'grid-cols-2 lg:grid-cols-6'
                 } gap-1 2xl:gap-4`}
               >
                 {props.divArray &&
