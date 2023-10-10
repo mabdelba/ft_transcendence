@@ -54,7 +54,7 @@ function DiscloComp(props: newType) {
                           }}
                         />
                       ) : (
-                        <Achievement name={divName} color={props.Color} />
+                        <Achievement name={divName.name} color={props.Color} />
                       )}
                     </div>
                   ))}

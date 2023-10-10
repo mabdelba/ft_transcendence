@@ -88,7 +88,7 @@ model Message {
 }
 
 model Achievement {
-  id                Int      @id @default(autoincrement())
+  id                Int      @id
   name              String   @unique
   description       String?
   level             Float

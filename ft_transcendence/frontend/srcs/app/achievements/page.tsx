@@ -1,32 +1,54 @@
 'use client';
+import axios from 'axios';
 import DiscloComp from '../components/shapes/DiscloComp';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
 function Achievements() {
-  const Acquired = ['Facebook', 'Whatsapp', 'Instagram', 'Discord'];
-  const Unacquired = [
-    'achiev 1',
-    'achiev 2',
-    'Telegram',
-    'Tik Tok',
-    'YouTube',
-    'Snapchat',
-    'X',
-    'Netflix',
-    'Telegram',
-    'Tik Tok',
-    'YouTube',
-    'Snapchat',
-    'X',
-    'Netflix',
-    'Telegram',
-    'Tik Tok',
-    'YouTube',
-    'Snapchat',
-    'X',
-    'Netflix',
-  ];
+  const [acquired, setAcquired] = useState<any>(null); //
+  const [unacquired, setUnacquired] = useState<any>(null); //
+  async function getAchievements() {
+    const acq = await axios.get('http://localhost:3000/api/atari-pong/v1/achievements/all-acquired', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
+      },
+    });
+    const unacq = await axios.get('http://localhost:3000/api/atari-pong/v1/achievements/all-unacquired', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
+      },
+    });
+    // console.log(acq.data);
+    setAcquired(acq.data.achievements);
+    setUnacquired(unacq.data);
+  }
+  useEffect(() => {
+    getAchievements();
+  }, []);
+  
+  // const Acquired = ['Facebook', 'Whatsapp', 'Instagram', 'Discord'];
+  // const Unacquired = [
+  //   'achiev 1',
+  //   'achiev 2',
+  //   'Telegram',
+  //   'Tik Tok',
+  //   'YouTube',
+  //   'Snapchat',
+  //   'X',
+  //   'Netflix',
+  //   'Telegram',
+  //   'Tik Tok',
+  //   'YouTube',
+  //   'Snapchat',
+  //   'X',
+  //   'Netflix',
+  //   'Telegram',
+  //   'Tik Tok',
+  //   'YouTube',
+  //   'Snapchat',
+  //   'X',
+  //   'Netflix',
+  // ];
   function setOnline()
   {
     io('http://localhost:3000', {
@@ -47,7 +69,7 @@ function Achievements() {
         <div className="w-full  h-auto ">
           <DiscloComp
             title="Acquired achievements"
-            divArray={Acquired}
+            divArray={acquired}
             textColor="text-white NeonShadow"
             Color={true}
             hoverColor="hover:text-[#00B2FF] hover:blueShadow"
@@ -58,7 +80,7 @@ function Achievements() {
         <div className="w-full h-auto ">
           <DiscloComp
             title="Unacquired achievements"
-            divArray={Unacquired}
+            divArray={unacquired}
             textColor="white NeonShadow"
             Color={false}
             hoverColor="hover:text-[#FF0742] hover:redShadow"
