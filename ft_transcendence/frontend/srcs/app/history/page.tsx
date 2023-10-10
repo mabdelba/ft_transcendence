@@ -5,24 +5,35 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import io from "socket.io-client";
+import axios from "axios";
 
 function History(){
 	function setOnline()
-  {
-    io('http://localhost:3000', {
-      transports: ['websocket'],
-      auth: {
+  	{
+    	io('http://localhost:3000', {
+      	transports: ['websocket'],
+      	auth: {
         token: localStorage.getItem('jwtToken'),
-      },});
+    },});
   }
   useEffect(() => {
     setOnline();
   }, []);
-	const Array = [{id: 0, myLogin: 'mabdelba', oppLogin: 'aelabid', myRes: 37, oppRes: 12},
-	{id: 1, myLogin: 'mabdelba', oppLogin: 'aelabid', myRes: 7, oppRes: 12},
-	{id: 2, myLogin: 'mabdelba', oppLogin: 'aelabid', myRes: 37, oppRes: 122},
-	{id: 3, myLogin: 'mabdelba', oppLogin: 'aelabid', myRes: 37, oppRes: 37}
-];
+  const [matches, setMatches] = useState([]);
+  async function getMatches()
+  {
+	const res = await axios.get('http://localhost:3000/api/atari-pong/v1/history', {
+		headers: {
+			'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+		}
+	});
+	setMatches(res.data);
+	// console.log(res.data);
+  }
+  useEffect(() => {
+	getMatches();
+  }, []);
+
 	let matchPlayed = Array.length;
 	let play = false;
 	if(matchPlayed != 0)
@@ -42,20 +53,20 @@ function History(){
 		  					No matches played yet
 						</div>
 	  					:
-						Array.map((obj: any) => (
+						matches.map((obj: any) => (
 							<div key={obj.id} className="w-full h-auto p-2 md:p-9 flex flex-row  ">
 								<div className="h-full w-[10%] md:w-[18%] "></div>
 								<div className="w-[15%] h-[67%] flex flex-col justify-start items-end">
-									<Pdp name={obj.myLogin} color={true} image={alien} router={router} />
+									<Pdp name={obj.me} color={true} image={alien} router={router} />
 								</div>
 								<div className="w-[50%] md:w-[34%] h-auto  NeonShadow text-sm lg:text-3xl flex flex-col justify-around items-center">
 									<div>
-										{obj.myRes} - {obj.oppRes}
+										{obj.myScore} - {obj.otherScore}
 									</div>
-									<div>{(obj.oppRes < obj.myRes) ? 'You Won!': (obj.oppRes > obj.myRes) ? 'You Lost!' : 'Draw!'}</div>
+									<div>{(obj.otherScore < obj.myScore) ? 'You Won!': (obj.otherScore > obj.myScore) ? 'You Lost!' : 'Draw!'}</div>
 								</div>
 								<div className="w-[15%] h-[67%] flex  justify-start items-start">
-									<Pdp name={obj.oppLogin} color={false} image={alien} router={router}/>
+									<Pdp name={obj.other} color={false} image={alien} router={router}/>
 								</div>
 							</div>
 						))
