@@ -10,7 +10,7 @@ type newType = {
 function Achievement(props: newType) {
   return (
     <div
-      className={`w-full h-full flex flex-col justify-center items-center text-xs 2xl:text-lg ${
+      className={`w-full h-full flex flex-col justify-center items-center text-center  text-[7px] sm:text-[8px] 2xl:text-[15px] ${
         props.color ? 'blueShadow text-[#00B2FF]' : 'text-[#FF0742] redShadow'
       }`}
     >
