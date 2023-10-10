@@ -12,7 +12,7 @@ export class AchievementsController {
         return this.achivementsService.checkIfAchievementsAcquired(req.user as User);
     }
 
-    @Get('all-aquired')
+    @Get('all-acquired')
     @UseGuards(JwtGuard)
     getAllAcquired(@Req() req) {
         return this.achivementsService.getAllAchievementsAcquired(req.user as User);

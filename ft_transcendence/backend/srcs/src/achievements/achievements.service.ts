@@ -15,6 +15,7 @@ export class AchievementsService {
             select: {
                 achievements: {
                     select: {
+                        id: true,
                         name: true,
                         description: true,
                     }
