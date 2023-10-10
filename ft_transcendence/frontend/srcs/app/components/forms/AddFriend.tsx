@@ -40,7 +40,7 @@ function AddFriend(props: newType) {
 
   useEffect(()=> {
     requestSended();
-  }, []);
+  }, [props.state]);
 
   const handleAdd = () => {
     

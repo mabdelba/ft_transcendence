@@ -44,7 +44,6 @@ function UserProfil(props: newType) {
         setCase(1);
       else
         setCase(response.data);
-      // console.log("response: ", response.data);
     }).catch((error: any) => {
 
       console.log("error: ", error);
