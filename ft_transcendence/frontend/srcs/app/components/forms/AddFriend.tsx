@@ -60,8 +60,21 @@ function AddFriend(props: newType) {
     setFlag(true);
   };
 
-  const handleDelete = (e: any) => {
-    e.preventDefault();
+  const handleDelete = () => {
+   
+    const url = 'http://localhost:3000/api/atari-pong/v1/friend/reject-friend-request';
+		const token = localStorage.getItem('jwtToken');
+		const conf = {
+			headers: { Authorization: `Bearer ${token}` },
+		};
+		axios
+			.post(url, { senderId: userId }, conf)
+			.then((response) => {
+				console.log('response ', response);
+			})
+			.catch((error) => {
+				console.log('error ', error);
+			});
     toast.error(`Friend request from ${props.login} has been deleted!`, {
       position: 'top-center',
       autoClose: 2500,
@@ -74,8 +87,21 @@ function AddFriend(props: newType) {
     });
     props.setState(0);
   };
-  const handleAccept = (e: any) => {
-    e.preventDefault();
+  const handleAccept = () => {
+    
+    const url = 'http://localhost:3000/api/atari-pong/v1/friend/accept-friend-request';
+		const token = localStorage.getItem('jwtToken');
+		const conf = {
+			headers: { Authorization: `Bearer ${token}` },
+		};
+		axios
+			.post(url, { senderId: userId }, conf)
+			.then((response) => {
+				console.log('response ', response);
+			})
+			.catch((error) => {
+				console.log('error ', error);
+			});
     toast.success(`New friend ${props.login} added successfully!`, {
       position: 'top-center',
       autoClose: 2500,
