@@ -33,6 +33,7 @@ function Profil(props: profileProp) {
   useEffect(() => {
     getUserAvatar(props.login);
   }, [props.login]);
+  
   async function getProfile() {
     if (props.login) {
       const url = 'http://localhost:3000/api/atari-pong/v1/user/me';
@@ -47,6 +48,7 @@ function Profil(props: profileProp) {
   useEffect(() => {
     getProfile();
   }, [props.login]);
+
   let winPercent = 50;
   let percentage = 0;
   let percentageChar = '0%';

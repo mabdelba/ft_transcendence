@@ -19,15 +19,14 @@ function LatestAchiev(props: newType) {
       headers: { Authorization: `Bearer ${token}` },
     };
     axios.post(lastAchievUrl, { userLogin: props.login }, config).then((res) => {
-      setAchievement(res.data);
+      setAchievement(res.data[0]);
     });
   }
   useEffect(() => {
     getAchievements();
   }, [props.login]);
-  const divArray = achievement?.map((achiev: any) => achiev.name) || [];
+  const divArray = achievement?.achievements?.map((achiev: any) => achiev.name) || [];
   if (divArray[0] == null) limiter = 0;
-
   return (
     <div className="h-full w-full flex flex-col NeonShadowBord">
       <div className="w-full h-1/4 flex xl:justify-start justify-center xl:pl-10 items-center text-base xl:text-3xl">
