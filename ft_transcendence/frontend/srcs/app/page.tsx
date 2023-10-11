@@ -27,6 +27,13 @@ export default function Home() {
   };
 
   const router = useRouter();
+  function checkToken() {
+    const token = localStorage.getItem('jwtToken');
+    if (token) {
+      router.push('/dashboard');
+    }
+  }
+  checkToken();
 
   return (
     <>

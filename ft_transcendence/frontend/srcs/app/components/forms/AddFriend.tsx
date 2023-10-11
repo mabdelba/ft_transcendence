@@ -11,70 +11,68 @@ type newType = {
   reqArray?: string[];
   friendArray?: string[];
   setState?: any;
+  router: any;
 };
 
 function AddFriend(props: newType) {
   const [flag, setFlag] = useState(false);
   const [userId, setUserId] = useState<any>(null);
 
-  const requestSended = () =>{
-
-    const url = "http://localhost:3000/api/atari-pong/v1/friend/getuserbylogin";
+  const requestSended = () => {
+    const url = 'http://localhost:3000/api/atari-pong/v1/friend/getuserbylogin';
     const token = localStorage.getItem('jwtToken');
-		const conf = {
-			headers: { Authorization: `Bearer ${token}` },
-		};
+    const conf = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
     axios
-    .post(url, { userLogin: props.login }, conf)
-    .then((response) => {
-      setUserId(response.data.id);
-      // console.log('asidi hak l id dyalk', response.data.id);
-    })
-    .catch((error) => {
-      console.log('error ', error);
-    });
-    
-    if(props.state == 3)
-      setFlag(true);
-  }
+      .post(url, { userLogin: props.login }, conf)
+      .then((response) => {
+        setUserId(response.data.id);
+        // console.log('asidi hak l id dyalk', response.data.id);
+      })
+      .catch((error) => {
+        console.log('error ', error);
+      });
 
-  useEffect(()=> {
-    requestSended();
+    if (props.state == 3) setFlag(true);
+  };
+
+  useEffect(() => {
+    if (!localStorage.getItem('jwtToken')) props.router.push('/');
+    else requestSended();
   }, [props.state]);
 
   const handleAdd = () => {
-    
-		const url = 'http://localhost:3000/api/atari-pong/v1/friend/send-friend-request';
-		const token = localStorage.getItem('jwtToken');
-		const conf = {
-			headers: { Authorization: `Bearer ${token}` },
-		};
-		axios
-			.post(url, { recieverId: userId }, conf)
-			.then((response) => {
-				console.log('response ', response);
-			})
-			.catch((error) => {
-				console.log('error ', error);
-			});
+    const url = 'http://localhost:3000/api/atari-pong/v1/friend/send-friend-request';
+    const token = localStorage.getItem('jwtToken');
+    const conf = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    axios
+      .post(url, { recieverId: userId }, conf)
+      .then((response) => {
+        console.log('response ', response);
+      })
+      .catch((error) => {
+        console.log('error ', error);
+      });
     setFlag(true);
   };
 
   const handleDelete = () => {
-   
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/reject-friend-request';
-		const token = localStorage.getItem('jwtToken');
-		const conf = {
-			headers: { Authorization: `Bearer ${token}` },
-		};
-		axios
-			.post(url, { senderId: userId }, conf)
-			.then((response) => {
-				console.log('response ', response);
-			})
-			.catch((error) => {
-				console.log('error ', error);
-			});
+    const token = localStorage.getItem('jwtToken');
+    const conf = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    axios
+      .post(url, { senderId: userId }, conf)
+      .then((response) => {
+        console.log('response ', response);
+      })
+      .catch((error) => {
+        console.log('error ', error);
+      });
     toast.error(`Friend request from ${props.login} has been deleted!`, {
       position: 'top-center',
       autoClose: 2500,
@@ -88,20 +86,19 @@ function AddFriend(props: newType) {
     props.setState(0);
   };
   const handleAccept = () => {
-    
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/accept-friend-request';
-		const token = localStorage.getItem('jwtToken');
-		const conf = {
-			headers: { Authorization: `Bearer ${token}` },
-		};
-		axios
-			.post(url, { senderId: userId }, conf)
-			.then((response) => {
-				console.log('response ', response);
-			})
-			.catch((error) => {
-				console.log('error ', error);
-			});
+    const token = localStorage.getItem('jwtToken');
+    const conf = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    axios
+      .post(url, { senderId: userId }, conf)
+      .then((response) => {
+        console.log('response ', response);
+      })
+      .catch((error) => {
+        console.log('error ', error);
+      });
     toast.success(`New friend ${props.login} added successfully!`, {
       position: 'top-center',
       autoClose: 2500,
@@ -114,15 +111,19 @@ function AddFriend(props: newType) {
     });
     props.setState(1);
   };
-  const [profile, setProfile] = useState<any>({firstName: 'loading', lastName: 'loading', login: '', level:0, matchPlayed: 0,
-  winPercent: 50,
-  numberOfGamesPlayed: 0,
-  numberOfGamesWon: 0,
-  state: 0,
-});
+  const [profile, setProfile] = useState<any>({
+    firstName: 'loading',
+    lastName: 'loading',
+    login: '',
+    level: 0,
+    matchPlayed: 0,
+    winPercent: 50,
+    numberOfGamesPlayed: 0,
+    numberOfGamesWon: 0,
+    state: 0,
+  });
 
   const getUserData = async () => {
-
     const url = 'http://localhost:3000/api/atari-pong/v1/user/me';
     const token = localStorage.getItem('jwtToken');
     const config = {
@@ -130,20 +131,20 @@ function AddFriend(props: newType) {
     };
     const user = await axios.post(url, { userLogin: props.login }, config);
     setProfile(user.data);
-  }
+  };
 
-  useEffect(()=> {
-
-    getUserData();
+  useEffect(() => {
+    if (!localStorage.getItem('jwtToken')) props.router.push('/');
+    else getUserData();
   }, [props.login]);
   return (
     <div className="h-full w-full NeonShadowBord flex flex-col ">
       <div
         className={`w-full ${
-          (props.state == 1)? 'h-1/5' : 'h-1/2'
+          props.state == 1 ? 'h-1/5' : 'h-1/2'
         } flex justify-center items-center text-xs  xl:text-xl`}
       >
-        {(props.state == 0 || props.state == 3)
+        {props.state == 0 || props.state == 3
           ? `Add ${props.login} to your friends list!`
           : props.state == 2
           ? `You have a friend request from ${props.login} :`
@@ -154,7 +155,7 @@ function AddFriend(props: newType) {
           props.state == 1 ? 'h-4/5' : 'h-1/2'
         }   flex justify-center items-start`}
       >
-        {(props.state == 0 || props.state == 3) ? (
+        {props.state == 0 || props.state == 3 ? (
           <div className="w-1/2 h-[50%]" onClick={handleAdd}>
             {!flag ? (
               <SimpleButton content="Add friend" buttonType="button" />

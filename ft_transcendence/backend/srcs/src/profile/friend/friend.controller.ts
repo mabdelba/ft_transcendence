@@ -61,8 +61,7 @@ export class FriendController {
 
   @Post('getuserbylogin')
   @UseGuards(JwtGuard)
-  async getUserById(@Body() dto: { userLogin: string }){
-
-    return  await getUserFromLogin(dto.userLogin);
+  async getUserById(@Body() dto: { userLogin: string }) {
+    return await getUserFromLogin(dto.userLogin);
   }
 }

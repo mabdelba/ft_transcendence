@@ -8,16 +8,22 @@ function Achievements() {
   const [acquired, setAcquired] = useState<any>(null); //
   const [unacquired, setUnacquired] = useState<any>(null); //
   async function getAchievements() {
-    const acq = await axios.get('http://localhost:3000/api/atari-pong/v1/achievements/all-acquired', {
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
+    const acq = await axios.get(
+      'http://localhost:3000/api/atari-pong/v1/achievements/all-acquired',
+      {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
+        },
       },
-    });
-    const unacq = await axios.get('http://localhost:3000/api/atari-pong/v1/achievements/all-unacquired', {
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
+    );
+    const unacq = await axios.get(
+      'http://localhost:3000/api/atari-pong/v1/achievements/all-unacquired',
+      {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
+        },
       },
-    });
+    );
     // console.log(acq.data);
     setAcquired(acq.data.achievements);
     setUnacquired(unacq.data);
@@ -25,7 +31,7 @@ function Achievements() {
   useEffect(() => {
     getAchievements();
   }, []);
-  
+
   // const Acquired = ['Facebook', 'Whatsapp', 'Instagram', 'Discord'];
   // const Unacquired = [
   //   'achiev 1',
@@ -49,13 +55,13 @@ function Achievements() {
   //   'X',
   //   'Netflix',
   // ];
-  function setOnline()
-  {
+  function setOnline() {
     io('http://localhost:3000', {
       transports: ['websocket'],
       auth: {
         token: localStorage.getItem('jwtToken'),
-      },});
+      },
+    });
   }
   useEffect(() => {
     setOnline();
