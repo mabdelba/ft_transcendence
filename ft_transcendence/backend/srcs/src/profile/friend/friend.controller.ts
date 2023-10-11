@@ -3,6 +3,7 @@ import { FriendService } from './friend.service';
 import { JwtGuard } from 'src/auth/guards';
 import { User } from '@prisma/client';
 import { Request } from 'express';
+import { getUserFromLogin } from 'src/utils/get-user-from-id';
 
 @Controller('friend')
 export class FriendController {
@@ -56,5 +57,12 @@ export class FriendController {
   @UseGuards(JwtGuard)
   unblockUser(@Req() req: Request, @Body() dto: { userId: number }) {
     return this.friendService.unblockUser(req.user as User, dto.userId);
+  }
+
+  @Post('getuserbylogin')
+  @UseGuards(JwtGuard)
+  async getUserById(@Body() dto: { userLogin: string }){
+
+    return  await getUserFromLogin(dto.userLogin);
   }
 }
