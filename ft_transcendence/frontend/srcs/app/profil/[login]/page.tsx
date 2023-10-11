@@ -53,8 +53,10 @@ function UserProfil(props: newType) {
   useEffect(()=> {
     getState();
   }, []);
-
   const [Case, setCase] = useState(1);
+
+
+
   return (
 
     <main className="h-auto w-screen md:h-screen font-Orbitron NeonShadow min-h-[480px] min-w-[280px]">

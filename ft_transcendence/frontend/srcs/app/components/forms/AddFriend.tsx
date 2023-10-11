@@ -114,7 +114,28 @@ function AddFriend(props: newType) {
     });
     props.setState(1);
   };
+  const [profile, setProfile] = useState<any>({firstName: 'loading', lastName: 'loading', login: '', level:0, matchPlayed: 0,
+  winPercent: 50,
+  numberOfGamesPlayed: 0,
+  numberOfGamesWon: 0,
+  state: 0,
+});
 
+  const getUserData = async () => {
+
+    const url = 'http://localhost:3000/api/atari-pong/v1/user/me';
+    const token = localStorage.getItem('jwtToken');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    const user = await axios.post(url, { userLogin: props.login }, config);
+    setProfile(user.data);
+  }
+
+  useEffect(()=> {
+
+    getUserData();
+  }, [props.login]);
   return (
     <div className="h-full w-full NeonShadowBord flex flex-col ">
       <div
@@ -152,19 +173,19 @@ function AddFriend(props: newType) {
           <div className="w-[70%] h-[90%] flex flex-col justify-center space-y-4 text-xs md:text-base xl:text-xl">
             <div className="flex flex-row justify-between">
               Matches played
-              <div>17</div>
+              <div>{profile.numberOfGamesPlayed}</div>
             </div>
             <div className="flex flex-row justify-between">
               Matches won
-              <div>10</div>
+              <div>{profile.numberOfGamesWon}</div>
             </div>
             <div className="flex flex-row justify-between">
               Matches lost
-              <div>7</div>
+              <div>{profile.numberOfGamesPlayed - profile.numberOfGamesWon}</div>
             </div>
             <div className="flex flex-row justify-between">
-              Total achievements
-              <div>9</div>
+              Level
+              <div>{profile.level}</div>
             </div>
           </div>
         )}
