@@ -8,14 +8,12 @@ import SearchLogo from '../../../public/searchLogo.svg';
 
 function SearchBar() {
   return (
-    <Disclosure as='search'>
+    <Disclosure as='search' className="w-full h-full font-Orbitron ">
       {/* <Disclosure.Button className="absolute top-4 right-4 inline-flex items-center peer justify-center rounded-md p-2 text-gray-800 hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white group">
         Dashboard
       </Disclosure.Button> */}
-      <div className='flex'>
-        <MenuButton icon={Logo} content='Atari&nbsp;pong' path='/'>
-        </MenuButton>
-        <SearchInput icon={SearchLogo} holder='Search  . . .' />
+      <div className='flex h-full'>
+        <SearchInput icon={SearchLogo} holder='Search ...' />
       </div>
     </Disclosure>
   );

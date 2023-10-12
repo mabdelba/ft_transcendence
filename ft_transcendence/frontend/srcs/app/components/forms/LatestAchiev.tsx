@@ -29,7 +29,7 @@ function LatestAchiev(props: newType) {
   if (divArray[0] == null) limiter = 0;
   return (
     <div className="h-full w-full flex flex-col NeonShadowBord">
-      <div className="w-full h-1/4 flex xl:justify-start justify-center xl:pl-10 items-center text-base xl:text-3xl">
+      <div className="w-full h-1/4 flex xl:justify-start justify-center xl:pl-10 items-center text-sm base:text-base 2xl:text-2xl">
         Latest achievements
       </div>
       {limiter == 0 ? (

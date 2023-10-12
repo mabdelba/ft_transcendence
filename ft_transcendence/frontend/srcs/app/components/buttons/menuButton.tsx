@@ -18,18 +18,19 @@ function MenuButton(props: ButtonProps) {
     setHoverBool(false);
   }
   return (
+    
     <Link
       href={props.path}
       onMouseEnter={(event) => handleEnter()}
       onMouseLeave={(event) => handleLeave()}
-      className={`flex  text-white min-w-max transition-all duration-500 md:text-lg lg:text-xl font-Orbitron md:px-8 md:min-w-[295px]`}
+      className={`flex border-r-[3px]  w-full h-full justify-center items-center text-white  transition-all duration-500 md:text-lg lg:text-xl font-Orbitron md:px-8  2xl-2`}
     >
-      <div className='m-auto '>
+      <div className='flex w-auto'>
         {props.icon && (
-          <Image src={props.icon} alt="logo" />
+          <Image src={props.icon} alt="logo" className='m-auto '/>
         )}
       </div>
-      <div className='p-4 m-auto NeonShadow font-bold text-2xl hidden md:block'>
+      <div className=' NeonShadow font-bold text-base  2xl:text-2xl hidden size0:block'>
         {props.content}
       </div>
     </Link>

@@ -12,12 +12,12 @@ import SideBarButton from '../buttons/sideBarButton';
 
 function SideBar() {
   return (
-	<Disclosure as='nav' className='fixed hidden md:block w-[298px]'>
+	<Disclosure as='nav' className='w-full h-full -green-500'>
 	{/* <Disclosure.Button className="absolute top-4 right-4 inline-flex items-center peer justify-center rounded-md p-2 text-gray-800 hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white group">
 		Dashboard
 	</Disclosure.Button> */}
-	<div className='flex h-[100vh] NeonShadow'>
-		<div className='pt-8'>
+	<div className='flex h-full w-full NeonShadow justify-center'>
+		<div className='pt-8 w-full -red-600'>
 			<SideBarButton icon={Dashboard} content='Dashboard' path='/dashboard' />
 			<SideBarButton icon={Achievements} content="Achievements" path='/achievements' />
 			<SideBarButton icon={Friends} content='Friends' path='/friends' />
@@ -25,7 +25,7 @@ function SideBar() {
 			<SideBarButton icon={History} content='History' path='/history' />
 			<SideBarButton icon={Settings} content='Settings' path='/settings' />
 		</div>
-		<div className='border-r-[3px] lineshad'></div>
+		<div className='border-r-[3px] h-auto lineshad'></div>
 	</div>
 	</Disclosure>
   );
