@@ -160,6 +160,21 @@ body {
   box-shadow: 0px -4px 25px 0px rgba(255, 255, 255, 0.50), 0px 0px 24px 0px #FFF inset;
 }
 
+
+.lineshad{
+  background: #FFF;
+  box-shadow: 0px 0px 25px 0px #FFF, 0px 0px 20px 0px #FFF;
+}
+
+.hide {
+  border-color: transparent;
+}
+
+.parent:hover .hide {
+  transition: 700ms;
+  border-color: #FFF;
+  box-shadow: 0px 0px 25px 0px #FFF, 0px 0px 20px 0px #FFF;
+}
 .Register {
   border: 3px solid #FFFFFF;
   box-shadow: 0px 0px 10px 0px #FFFFFF;
