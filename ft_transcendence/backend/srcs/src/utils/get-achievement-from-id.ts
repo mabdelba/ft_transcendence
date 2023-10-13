@@ -10,4 +10,3 @@ export async function getAchievementFromId(id: number): Promise<Achievement | nu
   });
   return achievement;
 }
-

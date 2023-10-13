@@ -8,15 +8,12 @@ type newType = {
   image: string;
   handleClick?: any;
   router?: any;
-  
 };
 
 function Pdp(props: newType) {
-
-  const viewProfile = () =>{
-
+  const viewProfile = () => {
     props.router.push(`/profil/${props.name}`);
-  }
+  };
   return (
     <div
       className={`w-full h-full flex flex-col justify-center items-center text-xs md:text-base 3xl:text-lg ${

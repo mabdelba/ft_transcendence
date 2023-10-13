@@ -6,44 +6,50 @@ import axios from 'axios';
 type newType = {
   matchPlayed: number;
   login: string;
+  router: any;
 };
 
 function LastMatch(props: newType) {
   const [matchData, setMatchData] = useState<any>(null);
   const [userAvatar, setUserAvatar] = useState(alien);
   const [otherAvatar, setOtherAvatar] = useState(alien);
-  function getMatch() {
+  async function getMatch() {
     const lastMatchUrl = 'http://localhost:3000/api/atari-pong/v1/profile/last-match-played';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
-    axios.post(lastMatchUrl, { userLogin: props.login }, config).then((res) => {
+    try {
+      const res = await axios.post(lastMatchUrl, { userLogin: props.login }, config);
       setMatchData(res.data);
-    });
+    } catch (err) {
+      props.router.push('/');
+    }
   }
   async function getUserAvatar(login: string, flag: boolean = true) {
     if (login !== '') {
-      const config = {
-        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-        responseType: 'blob',
-        body: { userLogin: login },
-      };
-      const user = await axios.post(
-        'http://localhost:3000/api/atari-pong/v1/user/avatar',
-        { userLogin: login },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-          responseType: 'blob',
-        },
-      );
-      const imageBlob = URL.createObjectURL(user.data) as string;
-      flag ? setUserAvatar(imageBlob) : setOtherAvatar(imageBlob);
+      try {
+        const user = await axios.post(
+          'http://localhost:3000/api/atari-pong/v1/user/avatar',
+          { userLogin: login },
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+            responseType: 'blob',
+          },
+        );
+        const imageBlob = URL.createObjectURL(user.data) as string;
+        flag ? setUserAvatar(imageBlob) : setOtherAvatar(imageBlob);
+      } catch (err) {
+        props.router.push('/');
+      }
     }
   }
   useEffect(() => {
-    getMatch();
-    getUserAvatar(props.login);
+    if (!localStorage.getItem('jwtToken')) props.router.push('/');
+    else {
+      getMatch();
+      getUserAvatar(props.login);
+    }
   }, [props.login]);
   useEffect(() => {
     if (matchData && matchData.other) getUserAvatar(matchData.other, false);

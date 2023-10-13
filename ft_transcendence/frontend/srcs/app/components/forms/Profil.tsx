@@ -11,6 +11,7 @@ import axios from 'axios';
 
 type profileProp = {
   login: string;
+  router: any;
 };
 
 function Profil(props: profileProp) {
@@ -18,22 +19,27 @@ function Profil(props: profileProp) {
   const [userAvatar, setUserAvatar] = useState(alien);
   async function getUserAvatar(login: string) {
     if (login !== '') {
-      const user = await axios.post(
-        'http://localhost:3000/api/atari-pong/v1/user/avatar',
-        { userLogin: login },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-          responseType: 'blob',
-        },
-      );
-      const imageBlob = URL.createObjectURL(user.data) as string;
-      setUserAvatar(imageBlob);
+      try {
+        const user = await axios.post(
+          'http://localhost:3000/api/atari-pong/v1/user/avatar',
+          { userLogin: login },
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+            responseType: 'blob',
+          },
+        );
+        const imageBlob = URL.createObjectURL(user.data) as string;
+        setUserAvatar(imageBlob);
+      } catch (err) {
+        props.router.push('/');
+      }
     }
   }
   useEffect(() => {
-    getUserAvatar(props.login);
+    if (!localStorage.getItem('jwtToken')) props.router.push('/');
+    else getUserAvatar(props.login);
   }, [props.login]);
-  
+
   async function getProfile() {
     if (props.login) {
       const url = 'http://localhost:3000/api/atari-pong/v1/user/me';
@@ -41,12 +47,17 @@ function Profil(props: profileProp) {
       const config = {
         headers: { Authorization: `Bearer ${token}` },
       };
-      const user = await axios.post(url, { userLogin: props.login }, config);
-      setProfile(user.data);
+      try {
+        const user = await axios.post(url, { userLogin: props.login }, config);
+        setProfile(user.data);
+      } catch (err) {
+        props.router.push('/');
+      }
     }
   }
   useEffect(() => {
-    getProfile();
+    if (!localStorage.getItem('jwtToken')) props.router.push('/');
+    else getProfile();
   }, [props.login]);
 
   let winPercent = 50;

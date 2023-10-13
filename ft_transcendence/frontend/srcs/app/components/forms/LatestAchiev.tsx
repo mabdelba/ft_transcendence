@@ -6,6 +6,7 @@ import axios from 'axios';
 
 type newType = {
   login: string;
+  router: any;
 };
 
 function LatestAchiev(props: newType) {
@@ -18,12 +19,18 @@ function LatestAchiev(props: newType) {
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
-    axios.post(lastAchievUrl, { userLogin: props.login }, config).then((res) => {
-      setAchievement(res.data[0]);
-    });
+    axios
+      .post(lastAchievUrl, { userLogin: props.login }, config)
+      .then((res) => {
+        setAchievement(res.data[0]);
+      })
+      .catch((err) => {
+        props.router.push('/');
+      });
   }
   useEffect(() => {
-    getAchievements();
+    if (!localStorage.getItem('jwtToken')) props.router.push('/');
+    else getAchievements();
   }, [props.login]);
   const divArray = achievement?.achievements?.map((achiev: any) => achiev.name) || [];
   if (divArray[0] == null) limiter = 0;
