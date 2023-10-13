@@ -13,6 +13,10 @@ import axios from 'axios';
 import { error } from 'console';
 import io from 'socket.io-client';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+
+
+const OptionBar = dynamic(() => import('../components/forms/OptionBar'), {ssr: false});
 
 function Friends() {
   const router = useRouter();
@@ -262,71 +266,72 @@ function Friends() {
 
   return (
     <>
-      <main className="w-screen h-auto md:h-screen flex flex-col font-Orbitron min-h-[480px] min-w-[280px]">
-        <div className="w-full h-12 md:h-[10%] pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
-          Friends
-        </div>
-        <div className="w-full h-auto flex flex-col px-0  md:px-12 space-y-8 md:space-y-12 ">
-          <div className="w-full  h-auto ">
-            <DiscloComp
-              title="Friend requests"
-              divArray={requests}
-              textColor="text-[#FF0742] redShadow"
-              Color={false}
-              hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
-              image={alien}
-              isFriend={true}
-              setOpen={setOpen}
-              setLogin={setUserName}
-              setUserId={setUserId}
-              setAvatar={setUserAvatar}
-            />
+      <OptionBar flag={2}>
+        <main className="w-full h-auto md:h-full flex flex-col font-Orbitron min-h-[480px] min-w-[280px]">
+          <div className="w-full h-12 md:h-[10%] pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
+            Friends
           </div>
-          <div className="w-full h-auto ">
-            <DiscloComp
-              title="Friends list"
-              divArray={friendsList}
-              textColor="text-[#00B2FF] blueShadow"
-              Color={true}
-              hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
-              image={alien}
-              isFriend={true}
-              setOpen={setOpenFriend}
-              setLogin={setUserName}
-              setUserId={setUserId}
-              setAvatar={setUserAvatar}
-            />
+          <div className="w-full h-auto flex flex-col px-0  md:px-12 space-y-8 md:space-y-12 ">
+            <div className="w-full  h-auto ">
+              <DiscloComp
+                title="Friend requests"
+                divArray={requests}
+                textColor="text-[#FF0742] redShadow"
+                Color={false}
+                hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
+                image={alien}
+                isFriend={true}
+                setOpen={setOpen}
+                setLogin={setUserName}
+                setUserId={setUserId}
+                setAvatar={setUserAvatar}
+              />
+            </div>
+            <div className="w-full h-auto ">
+              <DiscloComp
+                title="Friends list"
+                divArray={friendsList}
+                textColor="text-[#00B2FF] blueShadow"
+                Color={true}
+                hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
+                image={alien}
+                isFriend={true}
+                setOpen={setOpenFriend}
+                setLogin={setUserName}
+                setUserId={setUserId}
+                setAvatar={setUserAvatar}
+              />
+            </div>
+            <div className="w-full h-auto ">
+              <DiscloComp
+                title="Blocked list"
+                divArray={blockedList}
+                textColor="text-[#FF0742] redShadow"
+                Color={false}
+                hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
+                image={alien}
+                isFriend={true}
+                setOpen={setOpenBlock}
+                setLogin={setUserName}
+                setUserId={setUserId}
+                setAvatar={setUserAvatar}
+              />
+            </div>
           </div>
-          <div className="w-full h-auto ">
-            <DiscloComp
-              title="Blocked list"
-              divArray={blockedList}
-              textColor="text-[#FF0742] redShadow"
-              Color={false}
-              hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
-              image={alien}
-              isFriend={true}
-              setOpen={setOpenBlock}
-              setLogin={setUserName}
-              setUserId={setUserId}
-              setAvatar={setUserAvatar}
-            />
-          </div>
-        </div>
-        <ToastContainer
-          position="top-center"
-          autoClose={4000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-        />
-      </main>
-
+          <ToastContainer
+            position="top-center"
+            autoClose={4000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+          />
+        </main>
+      </OptionBar>
       {/* request */}
       <Transition appear show={open} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>

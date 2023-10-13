@@ -13,6 +13,7 @@ import { error } from 'console';
 import Pdp from '../../components/shapes/Pdp';
 import { Alatsi } from 'next/font/google';
 import { useRouter } from 'next/navigation';
+import OptionBar from '../../components/forms/OptionBar';
 
 type newType = {
   params: { login: string };
@@ -58,9 +59,10 @@ function UserProfil(props: newType) {
   const [Case, setCase] = useState(1);
 
   return (
-    <main className="h-auto w-screen md:h-screen font-Orbitron NeonShadow min-h-[480px] min-w-[280px]">
+    <OptionBar flag={2}>
+      <main className="h-auto w-full md:h-full font-Orbitron NeonShadow min-h-[480px] min-w-[280px]">
       {Case == 5 || Case == 4 ? (
-        <div className="w-full h-screen flex justify-center items-center ">
+        <div className="w-full h-full flex justify-center items-center ">
           <div className="h-1/2 md:h-1/3 w-[95%] lg:w-1/3 NeonShadowBord flex flex-row justify-evenly items-center">
             <div className="-red-500">
               <Pdp name={'unavailable'} color={false} image={alien} />
@@ -114,6 +116,7 @@ function UserProfil(props: newType) {
         theme="dark"
       />
     </main>
+    </OptionBar>
   );
 }
 

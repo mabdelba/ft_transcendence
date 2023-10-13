@@ -6,7 +6,7 @@ import { useState } from 'react';
 type ButtonProps = {
   icon?: string;
   content?: string;
-  path?: any;
+  path: any;
 };
 
 function MenuButton(props: ButtonProps) {

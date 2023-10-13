@@ -2,8 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Providers } from '../redux-store/provider';
-import SearchBar from './components/shapes/searchBar';
-import SideBar from './components/shapes/sideBar';
+
 
 const inter = Inter({ subsets: ['latin'] });
 

@@ -8,6 +8,7 @@ type ButtonProps = {
 	icon?: string;
 	content?: string;
 	path?: any;
+	drp: boolean;
   };
 
 function SearchBar(props: ButtonProps) {
@@ -24,7 +25,7 @@ function SearchBar(props: ButtonProps) {
 					{props.content}
 				</div>
 			</div>
-			<div className='border-b-[3px] hide  w-[85%]'></div>
+			<div className={`border-b-[3px] ${props.drp ? '' : 'hide'}  w-[85%]`}></div>
 		</div>
 
 	</Link>
