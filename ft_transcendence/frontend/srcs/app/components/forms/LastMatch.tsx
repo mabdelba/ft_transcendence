@@ -67,7 +67,7 @@ function LastMatch(props: newType) {
 
   return (
     <div className="w-full h-full  flex flex-col NeonShadowBord">
-      <div className="w-full h-[35%] flex justify-start items-center pl-10 text-sm lg:text-2xl">
+      <div className="w-full h-[35%] flex justify-start items-center pl-10 text-sm base:text-base 2xl:text-2xl">
         <h1>Last match stats</h1>
       </div>
       {play ? (
@@ -80,7 +80,7 @@ function LastMatch(props: newType) {
           <div className="w-[15%] h-[67%] flex flex-col justify-start items-end ">
             <Pdp name={myLogin} color={true} image={userAvatar} />
           </div>
-          <div className="w-[34%] h-[55%]  NeonShadow text-sm lg:text-3xl flex flex-col justify-around items-center">
+          <div className="w-[34%] h-[55%]  NeonShadow text-sm base:text-base 2xl:text-2xl flex flex-col justify-around items-center">
             <div>
               {myRes} - {oppRes}
             </div>

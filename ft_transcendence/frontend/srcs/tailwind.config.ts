@@ -19,6 +19,8 @@ const config: Config = {
       screens: {
         size0: '1044px',
         size1: '1438px',
+        base: '1270px',
+        def: '770px',
       },
     },
   },
