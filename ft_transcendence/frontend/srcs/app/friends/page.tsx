@@ -41,7 +41,6 @@ function Friends() {
     axios
       .get(urlreq, config)
       .then((response) => {
-        // console.log("friend request from : ", response.data.recievedFriendRequestsBy);
         setRequest(response.data.recievedFriendRequestsBy);
       })
       .catch((error) => {
@@ -87,19 +86,25 @@ function Friends() {
   const [blockedList, setBlockedList] = useState<any>(null);
 
   useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) router.push('/');
-    else getFriend();
+    const token = localStorage.getItem('jwtToken');
+		if (!token) router.push('/');
+		else {
+			const decodedToken = JSON.parse(atob(token.split('.')[1]));
+			const exp = decodedToken.exp;
+			const current_time = Date.now() / 1000;
+			if (exp < current_time) {
+				localStorage.removeItem('jwtToken');
+				router.push('/');
+			}
+    else
+    {
+      getFriend();
+      getReq();
+      getBlocked();
+    } 
+  }
   }, []);
 
-  useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) router.push('/');
-    else getReq();
-  }, []);
-
-  useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) router.push('/');
-    else getBlocked();
-  }, []);
 
   const deleteFriend = () => {
     const elementToDelete = friendsList.findIndex((obj: any) => obj.id === userId);

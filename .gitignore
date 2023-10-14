@@ -3,6 +3,7 @@ dist
 node_modules
 build
 test.js
+i.html
 
 # Logs
 logs

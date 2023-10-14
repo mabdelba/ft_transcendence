@@ -23,7 +23,8 @@ function LastMatch(props: newType) {
       const res = await axios.post(lastMatchUrl, { userLogin: props.login }, config);
       setMatchData(res.data);
     } catch (err) {
-      props.router.push('/');
+      console.log(err);
+      // props.router.push('/');
     }
   }
   async function getUserAvatar(login: string, flag: boolean = true) {
@@ -40,15 +41,25 @@ function LastMatch(props: newType) {
         const imageBlob = URL.createObjectURL(user.data) as string;
         flag ? setUserAvatar(imageBlob) : setOtherAvatar(imageBlob);
       } catch (err) {
-        props.router.push('/');
+        console.log(err);
+        // props.router.push('/');
       }
     }
   }
   useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) props.router.push('/');
-    else {
+    const token = localStorage.getItem('jwtToken');
+		if (!token) props.router.push('/');
+		else {
+			const decodedToken = JSON.parse(atob(token.split('.')[1]));
+			const exp = decodedToken.exp;
+			const current_time = Date.now() / 1000;
+			if (exp < current_time) {
+				localStorage.removeItem('jwtToken');
+				props.router.push('/');
+			} else {
       getMatch();
       getUserAvatar(props.login);
+    }
     }
   }, [props.login]);
   useEffect(() => {

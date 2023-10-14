@@ -38,8 +38,17 @@ function AddFriend(props: newType) {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) props.router.push('/');
-    else requestSended();
+    const token = localStorage.getItem('jwtToken');
+		if (!token) props.router.push('/');
+		else {
+			const decodedToken = JSON.parse(atob(token.split('.')[1]));
+			const exp = decodedToken.exp;
+			const current_time = Date.now() / 1000;
+			if (exp < current_time) {
+				localStorage.removeItem('jwtToken');
+				props.router.push('/');
+			} else requestSended();
+    }
   }, [props.state]);
 
   const handleAdd = () => {
@@ -134,8 +143,17 @@ function AddFriend(props: newType) {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) props.router.push('/');
-    else getUserData();
+    const token = localStorage.getItem('jwtToken');
+		if (!token) props.router.push('/');
+		else {
+			const decodedToken = JSON.parse(atob(token.split('.')[1]));
+			const exp = decodedToken.exp;
+			const current_time = Date.now() / 1000;
+			if (exp < current_time) {
+				localStorage.removeItem('jwtToken');
+				props.router.push('/');
+			} else getUserData();
+    }
   }, [props.login]);
   return (
     <div className="h-full w-full NeonShadowBord flex flex-col ">
