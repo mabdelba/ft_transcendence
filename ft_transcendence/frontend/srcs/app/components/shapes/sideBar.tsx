@@ -12,9 +12,14 @@ import SideBarButton from '../buttons/sideBarButton';
 import SimpleButton from '../buttons/simpleButton';
 import logOut from "../../../public/log-out.svg";
 import logOutblack from "../../../public/log-out2.svg"
-
+import { useRouter } from 'next/navigation';
 
 function SideBar({flag}: {flag: number}) {
+	const router = useRouter();
+	function handleLogOutClick() {
+		localStorage.removeItem('jwtToken');
+		router.push('/');
+	}
   return (
 	<Disclosure as='nav' className='w-full h-full -green-500'>
 	{/* <Disclosure.Button className="absolute top-4 right-4 inline-flex items-center peer justify-center rounded-md p-2 text-gray-800 hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white group">
@@ -28,7 +33,7 @@ function SideBar({flag}: {flag: number}) {
 			<SideBarButton icon={Messages} content='Messages' path='/messages' drp={flag == 3 ? true : false }/>
 			<SideBarButton icon={History} content='History' path='/history' drp={flag == 4 ? true : false }/>
 			<SideBarButton icon={Settings} content='Settings' path='/settings' drp={flag == 5 ? true : false } />
-			<div className='w-full h-20 mt-auto flex justify-center'>
+			<div className='w-full h-20 mt-auto flex justify-center' onClick={handleLogOutClick}>
 				<div className='w-[80%]'><SimpleButton flag={true} buttonType='button' icon={logOut} icon2={logOutblack} content=' Log-out'  /></div>
 			</div>
 		</div>
