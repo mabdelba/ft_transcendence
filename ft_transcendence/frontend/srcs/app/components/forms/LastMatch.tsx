@@ -11,8 +11,7 @@ type newType = {
 
 function LastMatch(props: newType) {
   const [matchData, setMatchData] = useState<any>(null);
-  const [userAvatar, setUserAvatar] = useState(alien);
-  const [otherAvatar, setOtherAvatar] = useState(alien);
+
   async function getMatch() {
     const lastMatchUrl = 'http://localhost:3000/api/atari-pong/v1/profile/last-match-played';
     const token = localStorage.getItem('jwtToken');
@@ -27,25 +26,7 @@ function LastMatch(props: newType) {
       // props.router.push('/');
     }
   }
-  async function getUserAvatar(login: string, flag: boolean = true) {
-    if (login !== '') {
-      try {
-        const user = await axios.post(
-          'http://localhost:3000/api/atari-pong/v1/user/avatar',
-          { userLogin: login },
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-            responseType: 'blob',
-          },
-        );
-        const imageBlob = URL.createObjectURL(user.data) as string;
-        flag ? setUserAvatar(imageBlob) : setOtherAvatar(imageBlob);
-      } catch (err) {
-        console.log(err);
-        // props.router.push('/');
-      }
-    }
-  }
+  
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
 		if (!token) props.router.push('/');
@@ -58,13 +39,10 @@ function LastMatch(props: newType) {
 				props.router.push('/');
 			} else {
       getMatch();
-      getUserAvatar(props.login);
     }
     }
   }, [props.login]);
-  useEffect(() => {
-    if (matchData && matchData.other) getUserAvatar(matchData.other, false);
-  }, [matchData]);
+
 
   const myLogin = matchData ? matchData.me : '';
   const oppLogin = matchData ? matchData.other : '';
@@ -89,7 +67,7 @@ function LastMatch(props: newType) {
         <div className="w-full h-[65%]  flex flex-row ">
           <div className="h-full w-[18%]"></div>
           <div className="w-[15%] h-[67%] flex flex-col justify-start items-end ">
-            <Pdp name={myLogin} color={true} image={userAvatar} />
+            <Pdp name={myLogin} color={true} />
           </div>
           <div className="w-[34%] h-[55%]  NeonShadow text-sm base:text-base 2xl:text-2xl flex flex-col justify-around items-center">
             <div>
@@ -98,7 +76,7 @@ function LastMatch(props: newType) {
             <div>{expression}</div>
           </div>
           <div className="w-[15%] h-[67%] flex  justify-start items-start">
-            <Pdp name={oppLogin} color={false} image={otherAvatar} />
+            <Pdp name={oppLogin} color={false}/>
           </div>
         </div>
       )}
