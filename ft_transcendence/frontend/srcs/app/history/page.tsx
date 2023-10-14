@@ -53,7 +53,7 @@ function History() {
 
 	return (
 		<OptionBar flag={4}>
-					<main className="w-full h-auto  flex flex-col font-Orbitron min-h-[480px] min-w-[280px]">
+			<main className="w-full h-auto  flex flex-col font-Orbitron min-h-[480px] min-w-[280px]">
 			<div className="w-[95%] h-10 md:h-24 pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
 				History
 			</div>
