@@ -16,30 +16,7 @@ type profileProp = {
 
 function Profil(props: profileProp) {
   let [profile, setProfile] = useState<any>(null);
-  const [userAvatar, setUserAvatar] = useState(alien);
-  async function getUserAvatar(login: string) {
-    if (login !== '') {
-      try {
-        const user = await axios.post(
-          'http://localhost:3000/api/atari-pong/v1/user/avatar',
-          { userLogin: login },
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-            responseType: 'blob',
-          },
-        );
-        const imageBlob = URL.createObjectURL(user.data) as string;
-        setUserAvatar(imageBlob);
-      } catch (err) {
-        props.router.push('/');
-      }
-    }
-  }
-  useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) props.router.push('/');
-    else getUserAvatar(props.login);
-  }, [props.login]);
-
+  
   async function getProfile() {
     if (props.login) {
       const url = 'http://localhost:3000/api/atari-pong/v1/user/me';
@@ -51,13 +28,24 @@ function Profil(props: profileProp) {
         const user = await axios.post(url, { userLogin: props.login }, config);
         setProfile(user.data);
       } catch (err) {
-        props.router.push('/');
+        console.log(err);
+        // props.router.push('/');
       }
     }
   }
   useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) props.router.push('/');
-    else getProfile();
+    const token = localStorage.getItem('jwtToken');
+		if (!token) props.router.push('/');
+		else {
+			const decodedToken = JSON.parse(atob(token.split('.')[1]));
+			const exp = decodedToken.exp;
+			const current_time = Date.now() / 1000;
+			if (exp < current_time) {
+				localStorage.removeItem('jwtToken');
+				props.router.push('/');
+			}
+      else getProfile();
+    }
   }, [props.login]);
 
   let winPercent = 50;
@@ -111,7 +99,7 @@ function Profil(props: profileProp) {
       <div className="h-1/2 w-full flex flex-row items-center lg:space-x-2 2xl:space-x-0">
         <div className="w-[7%]  xl:w-[12.5%] h-[50%]  "></div>
         <div className="w-[18%] xl:w-[12.5%] h-[50%] flex justify-center items-center ">
-          <Pdp name={''} color={false} image={userAvatar} />
+          <Pdp name={profile.login} color={false} router={props.router} />
         </div>
         <div className="w-[75%] h-[40%] flex flex-col justify-center items-start px-2 text-xs md:text-sm xl:text-lg">
           <div className="h-1/3 w-full -slate-700">

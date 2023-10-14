@@ -30,6 +30,14 @@ export default function Home() {
   function checkToken() {
     const token = localStorage.getItem('jwtToken');
     if (token) {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      const exp = decodedToken.exp;
+      const current_time = Date.now() / 1000;
+      if (exp < current_time) {
+        localStorage.removeItem('jwtToken');
+        router.push('/');
+      }
+      else
       router.push('/dashboard');
     }
   }

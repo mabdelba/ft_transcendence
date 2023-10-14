@@ -25,12 +25,23 @@ function LatestAchiev(props: newType) {
         setAchievement(res.data[0]);
       })
       .catch((err) => {
-        props.router.push('/');
+        console.log(err);
+        // props.router.push('/');
       });
   }
   useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) props.router.push('/');
+    const token = localStorage.getItem('jwtToken');
+		if (!token) props.router.push('/');
+		else {
+			const decodedToken = JSON.parse(atob(token.split('.')[1]));
+			const exp = decodedToken.exp;
+			const current_time = Date.now() / 1000;
+			if (exp < current_time) {
+				localStorage.removeItem('jwtToken');
+				props.router.push('/');
+			}
     else getAchievements();
+    }
   }, [props.login]);
   const divArray = achievement?.achievements?.map((achiev: any) => achiev.name) || [];
   if (divArray[0] == null) limiter = 0;

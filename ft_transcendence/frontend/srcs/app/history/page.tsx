@@ -31,8 +31,18 @@ function History() {
 		setMatches(res.data);
 	}
 	useEffect(() => {
-		if (!localStorage.getItem('jwtToken')) router.push('/');
-		else getMatches();
+		const token = localStorage.getItem('jwtToken');
+		if (!token) router.push('/');
+		else {
+			const decodedToken = JSON.parse(atob(token.split('.')[1]));
+			const exp = decodedToken.exp;
+			const current_time = Date.now() / 1000;
+			if (exp < current_time) {
+				localStorage.removeItem('jwtToken');
+				router.push('/');
+			}
+			else getMatches();
+		}
 	}, []);
 
 	let matchPlayed = Array.length;
@@ -58,7 +68,7 @@ function History() {
 							<div key={obj.id} className="w-full h-auto p-2 md:p-9 flex flex-row  ">
 								<div className="h-full w-[10%] md:w-[18%] "></div>
 								<div className="w-[15%] h-[67%] flex flex-col justify-start items-end">
-									<Pdp name={obj.me} color={true} image={alien} router={router} />
+									<Pdp name={obj.me} color={true} router={router} />
 								</div>
 								<div className="w-[50%] md:w-[34%] h-auto  NeonShadow text-sm lg:text-3xl flex flex-col justify-around items-center">
 									<div>
@@ -73,7 +83,7 @@ function History() {
 									</div>
 								</div>
 								<div className="w-[15%] h-[67%] flex  justify-start items-start">
-									<Pdp name={obj.other} color={false} image={alien} router={router} />
+									<Pdp name={obj.other} color={false} router={router} />
 								</div>
 							</div>
 						))

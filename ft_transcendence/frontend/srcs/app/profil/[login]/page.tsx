@@ -53,8 +53,18 @@ function UserProfil(props: newType) {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) router.push('/');
-    else getState();
+    const token = localStorage.getItem('jwtToken');
+		if (!token) router.push('/');
+		else {
+			const decodedToken = JSON.parse(atob(token.split('.')[1]));
+			const exp = decodedToken.exp;
+			const current_time = Date.now() / 1000;
+			if (exp < current_time) {
+				localStorage.removeItem('jwtToken');
+				router.push('/');
+			}
+      else getState();
+    }
   }, []);
   const [Case, setCase] = useState(1);
 

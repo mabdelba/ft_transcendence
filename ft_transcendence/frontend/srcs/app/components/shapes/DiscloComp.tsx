@@ -44,7 +44,6 @@ function DiscloComp(props: newType) {
                       {props.isFriend ? (
                         <Pdp
                           name={divName.login}
-                          image={props.image}
                           color={props.Color}
                           handleClick={() => {
                             props.setOpen(true);
