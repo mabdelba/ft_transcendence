@@ -38,19 +38,28 @@ class Game{
         this._createBall();
         this._createPlayers();
         this._setMouse();
-        // this._setEvents();
+        this._setEvents();
     }
-    public setSocket(socket: Socket): void{
-        this.socket = socket;
-    }
-    // private _setEvents(): void{
-    //     Events.on(this._engine, 'beforeUpdate', () => {
-    //         console.log(this.player1?.position, this.player2?.position, this.ball?.position)
-    //         if (this.player1 && this.mouse){
-    //             this.socket?.emit('move', {x: this.mouse.position.x, y: this.player1.position.y});
-    //         }
-    //     });
+    // public setSocket(socket: Socket): void{
+    //     this.socket = socket;
     // }
+    private _setEvents(): void{
+        Events.on(this._engine, 'beforeUpdate', () => {
+            // if (this.ball && this.player1 && this.player2 && this.mouse)
+            //     Matter.Body.setPosition(this.player1, {x: this.mouse.position.x, y: this.player1.position.y});
+            // Events.trigger(this._engine, 'afterUpdate');
+            if (this.player2 && this.ball && this.player1){
+                if (1){
+                    Matter.Body.setPosition(this.player2, {x: this.ball.position.x, y: this.player2.position.y});
+                    Matter.Body.setPosition(this.player1, {x: this.ball.position.x, y: this.player1.position.y});
+                }
+            }
+
+            // if (this.player1 && this.mouse){
+            //     this.socket?.emit('move', {x: this.mouse.position.x, y: this.player1.position.y});
+            // }
+        });
+    }
 
     private _setMouse(): void{
         this.mouse = Matter.Mouse.create(this._render.canvas);
@@ -71,7 +80,7 @@ class Game{
     }
 
     private _createBall(): void{
-        this.ball = Matter.Bodies.circle(this.width / 2, this.height / 2, 10 * this.scale, {restitution: 1, force: {x: 0, y: 0}, friction: 0, frictionAir: 0, frictionStatic: 0, inertia: Infinity});
+        this.ball = Matter.Bodies.circle(this.width / 2, this.height / 2, 10 * this.scale, {mass: 60, restitution: 1, force: {x: 1, y: 1}, friction: 0, frictionAir: 0, frictionStatic: 0, inertia: Infinity});
         Matter.World.add(this._world, this.ball);
     }
 
