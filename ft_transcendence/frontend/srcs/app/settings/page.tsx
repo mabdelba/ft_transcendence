@@ -64,19 +64,19 @@ function Settings() {
                 <div className="w-full h-[36%] grid grid-cols-1 def:grid-cols-2  ">
                     <div className="h-1/2 px-16 text-2xl NeonShadow" >
                         <div className="mb-4">First Name:</div>
-                        <SimpleInput holder={'First Name'}  type1={"text"} SetValue={setName} val={""} setError={setNameError}  isVerif={false} flag={true} pass={name} />
+                        <SimpleInput holder={'First Name'}  type1={"text"} SetValue={setName}  setError={setNameError}  isVerif={false} flag={true} val={name} />
                     </div>
                     <div className="h-1/2 px-16 text-2xl NeonShadow" >
                         <div className="mb-4">Last Name:</div>
-                        <SimpleInput holder={'Last Name'} type1={"text"} SetValue={setName} val={""} setError={setlastNameError} flag={true} pass={Lastname}   isVerif={false} />
+                        <SimpleInput holder={'Last Name'} type1={"text"} SetValue={setLastName}  setError={setlastNameError} flag={true} val={Lastname}   isVerif={false} />
                     </div>
-                    <div className="h-1/2 px-16 text-2xl NeonShadow" >
+                    <div className="h-1/2 px-16 text-2xl NeonShadow"  >
                         <div className="mb-4">Username:</div>
-                        <SimpleInput holder={'Username'} type1={"text"} SetValue={setName} val={""} setError={setUsernameError} flag={true} pass={username}   isVerif={false} />
+                        <SimpleInput holder={'Username'} readonly={true} type1={"text"} SetValue={setUsername}  setError={setUsernameError} flag={true} val={username}   isVerif={false} />
                     </div>
                     <div className="h-1/2 px-16 text-2xl NeonShadow" >
                         <div className="mb-4">Email:</div>
-                        <SimpleInput holder={'Email'} type1={"text"} SetValue={setName} val={""} setError={setEmailError} flag={true} pass={email}  isVerif={false} />
+                        <SimpleInput holder={'Email'} type1={"email"} SetValue={setEmail}  setError={setEmailError} flag={true} val={email}  isVerif={false} />
                     </div>
 
                 </div>
