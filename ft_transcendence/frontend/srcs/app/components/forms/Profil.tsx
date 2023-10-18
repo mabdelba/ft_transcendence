@@ -95,14 +95,14 @@ function Profil(props: profileProp) {
       break;
   }
   return (
-    <div className="h-full w-full flex flex-col  justify-center items-center NeonShadowBord">
+    <div className="h-full w-full flex flex-col  justify-center items-center NeonShadowBord ">
       <div className="h-1/2 w-full flex flex-row items-center lg:space-x-2 2xl:space-x-0">
-        <div className="w-[7%]  xl:w-[12.5%] h-[50%]  "></div>
-        <div className="w-[18%] xl:w-[12.5%] h-[50%] flex justify-center items-center ">
+        <div className="w-[10%]  xl:w-[12.5%] h-[50%]  "></div>
+        <div className="w-[15%] xl:w-[12.5%] h-[60%] flex justify-end items-center ">
           <Pdp name={profile.login} color={false} router={props.router} flag={true} />
         </div>
-        <div className="w-[75%] h-[40%] flex flex-col justify-center items-start px-2 text-xs md:text-sm xl:text-lg">
-          <div className="h-1/3 w-full -slate-700">
+        <div className="w-[75%] h-[40%] flex flex-col justify-center items-start px-2 text-[8px] md:text-sm xl:text-lg">
+          <div className="h-1/3 w-full -slate-700 flex items-end">
             {profile.firstName} {profile.lastName} - {profile.login}
           </div>
           <div className="h-1/3 w-full -green-500 flex flex-row items-center pt-1.5">
