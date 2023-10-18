@@ -61,8 +61,7 @@ function SimpleInput(props: InputProps) {
             className="h-full w-full pl-3 bg-transparent text-white outline-none placeholder-[#484848]"
             type={!showpassword ? props.type1 : props.type2}
             onChange={(event) => props.SetValue(event.target.value)}
-            value={props.flag ? props.val: undefined}
-            readOnly={props.readonly}
+            value={props.flag ? props.pass: undefined}
             
             // required
           />
