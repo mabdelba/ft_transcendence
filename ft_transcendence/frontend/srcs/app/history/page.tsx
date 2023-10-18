@@ -52,12 +52,12 @@ function History() {
 	const router = useRouter();
 
 	return (
-		<OptionBar flag={4}>
-					<main className="w-full h-auto  flex flex-col font-Orbitron min-h-[480px] min-w-[280px]">
+		// <OptionBar flag={4}>
+		<main className="w-screen h-screen  flex flex-col font-Orbitron min-h-[480px] min-w-[280px]">
 			<div className="w-[95%] h-10 md:h-24 pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
 				History
 			</div>
-			<div className="h-auto w-full flex items-start justify-center">
+			<div className=" w-screen h-full flex items-start justify-center overflow-y-auto mb-8">
 				<div className="w-[95%] h-auto NeonShadowBord ">
 					{!play ? (
 						<div className="w-full h-80 flex justify-center items-center text-base lg:text-3xl">
@@ -65,12 +65,12 @@ function History() {
 						</div>
 					) : (
 						matches.map((obj: any) => (
-							<div key={obj.id} className="w-full h-auto p-2 md:p-9 flex flex-row  ">
+							<div key={obj.id} className="w-full  p-2 md:p-9 flex flex-row  ">
 								<div className="h-full w-[10%] md:w-[18%] "></div>
 								<div className="w-[15%] h-[67%] flex flex-col justify-start items-end">
 									<Pdp name={obj.me} color={true} router={router} />
 								</div>
-								<div className="w-[50%] md:w-[34%] h-auto  NeonShadow text-sm lg:text-3xl flex flex-col justify-around items-center">
+								<div className="w-[50%] md:w-[34%]  NeonShadow text-sm lg:text-3xl flex flex-col justify-around items-center">
 									<div>
 										{obj.myScore} - {obj.otherScore}
 									</div>
@@ -91,12 +91,8 @@ function History() {
 				</div>
 			</div>
 		</main>
-		</OptionBar>
+		// </OptionBar>
 	);
 }
 
 export default History;
-
-function userRouter() {
-	throw new Error('Function not implemented.');
-}

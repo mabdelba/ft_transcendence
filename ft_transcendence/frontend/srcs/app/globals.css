@@ -172,7 +172,7 @@ body {
 
 .parent:hover .hide {
   transition: 700ms;
-  border-color: #FFF;
+  border-color: rgb(190 242 100 / var(--tw-text-opacity));
   box-shadow: 0px 0px 25px 0px #FFF, 0px 0px 20px 0px #FFF;
 }
 .Register {
