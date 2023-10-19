@@ -7,6 +7,7 @@ import Pdp from "../components/shapes/Pdp";
 import Upload from "../../public/uploadIcon.svg"
 import BlackUpload from "../../public/blackupload.svg"
 import axios from "axios";
+import Login from "../components/forms/Login";
 
 
 
@@ -53,14 +54,14 @@ function Settings() {
         getData();
     }, [])
     return (
-    // <OptionBar flag={5}>
-        <main className="w-screen h-screen   flex flex-col items-center  font-Orbitron min-h-[550px]  min-w-[280px] pb-2 ">
+    <OptionBar flag={5} userName={username}>
+        <main className="w-full h-full   flex flex-col items-center  font-Orbitron min-h-[550px]  min-w-[280px] pb-2 ">
             <div className="w-full h-[8%] pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
 				Settings
 			</div>
             <div className="w-[94%] h-auto md:h-[88%] NeonShadowBord flex flex-col items-center overflow-y-auto ">
                 <div className="w-full h-[10%] pl-6 md:pl-12 text-[#00B2FF] font-light blueShadow flex justify-start items-center text-sm xl:text-2xl -yellow-300">
-                    Personal Information
+                    Personal Informations
                 </div>
                 <div className="w-full h-auto md:h-[36%] px-4 md:px-8  xl:px-16 grid grid-cols-1 md:grid-cols-2 gap-y-8 md:gap-y-2 def:gap-y-0 md:gap-x-10 text-xs md:text-base 2xl:text-2xl  ">
                     <div className="h-1/2 min-h-[42px]  NeonShadow" >
@@ -100,8 +101,9 @@ function Settings() {
                 </div>
             </div>
         </main>
+    
+    </OptionBar>
     )
-    // </OptionBar>
 }
 
 export default Settings;

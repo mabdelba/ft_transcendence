@@ -14,14 +14,15 @@ export const metadata: Metadata = {
 };
 
 export default function rootLayout({ children }: { children: React.ReactNode }) {
+  
   return (
     
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <OptionBar userName='mabdelba' flag={0}>
+          {/* <OptionBar userName='mabdelba' flag={0}> */}
             {children}
-          </OptionBar>
+          {/* </OptionBar> */}
         </Providers>
       </body>
     </html>
