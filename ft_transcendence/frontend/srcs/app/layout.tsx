@@ -2,6 +2,8 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Providers } from '../redux-store/provider';
+import OptionBar from './components/forms/OptionBar';
+
 
 
 const inter = Inter({ subsets: ['latin'] });
@@ -16,7 +18,11 @@ export default function rootLayout({ children }: { children: React.ReactNode }) 
     
     <html lang="en">
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <OptionBar userName='mabdelba' flag={0}>
+            {children}
+          </OptionBar>
+        </Providers>
       </body>
     </html>
   );

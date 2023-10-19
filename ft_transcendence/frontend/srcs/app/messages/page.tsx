@@ -4,9 +4,8 @@ import OptionBar from "../components/forms/OptionBar";
 
 function Messages(){
 
-    return <OptionBar flag={3}>
-        <h1>Messages</h1>
-    </OptionBar>
+    return <h1 className="h-full w-full">Messages</h1>
+   
 }
 
 export default Messages;

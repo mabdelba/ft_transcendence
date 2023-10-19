@@ -15,17 +15,17 @@ function SearchBar(props: ButtonProps) {
 
 	
   return (
-	<Link href={props.path} className=' flex flex-col  w-full hover:text-lime-300  transition duration-500  pl-0 2xl:pl-8 font-Orbitron min-h-[74px] justify-center '>
+	<Link href={props.path} className=' flex flex-col   w-full h-full transition duration-500  font-Orbitron min-h-[74px] justify-center '>
 		<div className='flex flex-col justify-end parent'>
 			<div className=' flex'>
 				<div className='min-w-[76px] min-h-[74px] flex items-center'>
-					{props.icon && <Image className='h-auto w-auto m-auto ' src={props.icon} alt='icon' />}
+					{props.icon && <Image className='m-auto' src={props.icon} alt='icon' />}
 				</div>
-				<div className='my-auto text-[9px]  base:text-xs 2xl:text-lg NeonShadow size0:block hidden' >
+				<div className='my-auto text-[14.5px] pr-6 NeonShadow xl:block hidden' >
 					{props.content}
 				</div>
 			</div>
-			<div className={`border-b-[3px] ${props.drp ? '' : 'hide'}  w-[85%]`}></div>
+			{/* <div className={`border-b-[3px] ${props.drp ? '' : 'hide'}  w-[85%]`}></div> */}
 		</div>
 
 	</Link>
