@@ -85,7 +85,7 @@ export default function Home() {
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex justify-center items-center bg-transparent bg-[#282828] w-screen h-screen">
+            <div className="flex justify-center items-center bg-opacity-40 bg-[#282828] w-screen h-screen">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -119,7 +119,7 @@ export default function Home() {
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex justify-center items-center bg-transparent bg-[#282828] w-screen h-screen">
+            <div className="flex justify-center items-center bg-opacity-40 bg-[#282828] w-screen h-screen">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"

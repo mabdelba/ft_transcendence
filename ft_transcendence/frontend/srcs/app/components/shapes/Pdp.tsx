@@ -29,6 +29,7 @@ function Pdp(props: newType) {
           },
         );
         const imageBlob = URL.createObjectURL(user.data) as string;
+        console.log('hello there', imageBlob);
         setUserAvatar(imageBlob);
       } catch (err) {
         // props.router.push('/');

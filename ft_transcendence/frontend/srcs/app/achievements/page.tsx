@@ -48,8 +48,8 @@ function Achievements() {
 		setOnline();
 	}, []);
 	return (
-		// <OptionBar flag={1}>
-				<main className="w-screen h-auto md:h-screen flex flex-col font-Orbitron min-h-[480px] min-w-[280px] ">
+		<OptionBar flag={1}  userName={'login'}>
+				<main className="w-full h-auto md:h-full flex flex-col font-Orbitron min-h-[480px] min-w-[280px] ">
 					<div className="w-full h-12 md:h-[10%] pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
 						All achievements
 					</div>
@@ -78,7 +78,7 @@ function Achievements() {
 						</div>
 					</div>
 			</main>
-		// </OptionBar>
+		</OptionBar>
 	);
 }
 
