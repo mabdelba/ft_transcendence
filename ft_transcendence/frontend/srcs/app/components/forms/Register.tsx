@@ -60,7 +60,6 @@ function Register(props: closeFunc) {
       return;
     }
 
-    console.log(Data);
 
     const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/register';
     const login = Data.username;

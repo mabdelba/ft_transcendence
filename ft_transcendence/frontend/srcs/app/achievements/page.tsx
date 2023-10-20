@@ -36,17 +36,17 @@ function Achievements() {
 		getAchievements();
 	}, []);
 
-	function setOnline() {
-		io('http://localhost:3000', {
-			transports: ['websocket'],
-			auth: {
-				token: localStorage.getItem('jwtToken'),
-			},
-		});
-	}
-	useEffect(() => {
-		setOnline();
-	}, []);
+	// function setOnline() {
+	// 	io('http://localhost:3000', {
+	// 		transports: ['websocket'],
+	// 		auth: {
+	// 			token: localStorage.getItem('jwtToken'),
+	// 		},
+	// 	});
+	// }
+	// useEffect(() => {
+	// 	setOnline();
+	// }, []);
 	return (
 		<OptionBar flag={1}  userName={'login'}>
 				<main className="w-full h-auto md:h-full flex flex-col font-Orbitron min-h-[480px] min-w-[280px] ">

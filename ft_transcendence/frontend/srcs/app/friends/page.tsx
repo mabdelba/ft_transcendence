@@ -20,18 +20,18 @@ const OptionBar = dynamic(() => import('../components/forms/OptionBar'), {ssr: f
 
 function Friends() {
   const router = useRouter();
-  function setOnline() {
-    io('http://localhost:3000', {
-      transports: ['websocket'],
-      auth: {
-        token: localStorage.getItem('jwtToken'),
-      },
-    });
-  }
-  useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) router.push('/');
-    else setOnline();
-  }, []);
+  // function setOnline() {
+  //   io('http://localhost:3000', {
+  //     transports: ['websocket'],
+  //     auth: {
+  //       token: localStorage.getItem('jwtToken'),
+  //     },
+  //   });
+  // }
+  // useEffect(() => {
+  //   if (!localStorage.getItem('jwtToken')) router.push('/');
+  //   else setOnline();
+  // }, []);
   const getReq = () => {
     const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-requests-list';
     const token = localStorage.getItem('jwtToken');

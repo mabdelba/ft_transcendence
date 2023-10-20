@@ -10,6 +10,8 @@ import io from 'socket.io-client';
 import { useRouter } from 'next/navigation';
 import OptionBar from '../components/forms/OptionBar';
 import Login from '../components/forms/Login';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Dashboard() {
 	let [user, setUser] = useState<any>(null);
@@ -24,12 +26,12 @@ function Dashboard() {
 		try {
 			const res = await axios.get(apiUrl, config);
 			setUser(res.data);
-			io('http://localhost:3000', {
-				transports: ['websocket'],
-				auth: {
-					token: token,
-				},
-			});
+			// io('http://localhost:3000', {
+			// 	transports: ['websocket'],
+			// 	auth: {
+			// 		token: token,
+			// 	},
+			// });
 		} catch (err) {
 			// console.log(err);
 			router.push('/');
