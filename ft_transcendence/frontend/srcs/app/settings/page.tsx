@@ -14,6 +14,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from "next/navigation";
 import { error } from "console";
+import { set } from "husky";
 
 
 
@@ -29,6 +30,7 @@ function Settings() {
     const [name, setName] = useState('');
     const [nameError, setNameError] = useState(true);
 
+    const [Id, setId] = useState('');
     const [Lastname, setLastName] = useState('');
     const [lastnameError, setlastNameError] = useState(true);
 
@@ -61,7 +63,7 @@ function Settings() {
         };
 
         axios.get(url, config).then((response)=> {
-
+            setId(response.data.id);
             setName(response.data.firstName);
             setLastName(response.data.lastName);
             setUsername(response.data.login);
@@ -116,9 +118,15 @@ function Settings() {
             }
             if(username != Array[2]){
                 const url = "http://localhost:3000/api/atari-pong/v1/settings/update-login";
-                axios.put(url, {login: username}, config).catch((error)=> {
+                axios.put(url, {login: username}, config).then((response) => {
+                    axios.post("http://localhost:3000/api/atari-pong/v1/auth/regenerate-token", {id:Id, login: username}, config).then((response)=> {
+                        // console.log("response: ", response.data);
+                    localStorage.setItem('jwtToken', response.data);
+                });
+                }).catch((error)=> {
                     console.log("errorrrrr", error);
                 })
+                
             }
             if(email != Array[3]){
                 const url = "http://localhost:3000/api/atari-pong/v1/settings/update-email";
@@ -181,7 +189,7 @@ function Settings() {
                     </div>
                     <div className="h-1/2 min-h-[42px]  NeonShadow" >
                         <div className="mb-1 lg:mb-4">Username:</div>
-                        <SimpleInput holder={'Username'} type1={"text"} SetValue={setUsername} readonly={false} val={username} setError={setUsernameError} flag={true} regex={UserRegex}  isVerif={false} />
+                        <SimpleInput holder={'Username'} type1={"text"} SetValue={setUsername} readonly={true} val={username} setError={setUsernameError} flag={true} regex={UserRegex}  isVerif={false} />
                     </div>
                     <div className="h-1/2 min-h-[42px]  NeonShadow" >
                         <div className="mb-1 lg:mb-4">Email:</div>
