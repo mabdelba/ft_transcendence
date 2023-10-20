@@ -271,12 +271,12 @@ function Friends() {
 
   return (
     <>
-      <OptionBar flag={2}>
+      <OptionBar flag={2} userName={"login"}>
         <main className="w-full h-auto md:h-full flex flex-col font-Orbitron min-h-[480px] min-w-[280px]">
           <div className="w-full h-12 md:h-[10%] pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
             Friends
           </div>
-          <div className="w-full h-auto flex flex-col px-0  md:px-12 space-y-8 md:space-y-12 ">
+          <div className="w-full h-auto flex flex-col px-2  md:px-12 space-y-8 md:space-y-12 ">
             <div className="w-full  h-auto ">
               <DiscloComp
                 title="Friend requests"
@@ -353,7 +353,7 @@ function Friends() {
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex justify-center items-center bg-transparent bg-[#282828] w-screen h-screen">
+            <div className="flex justify-center items-center bg-opacity-40 bg-[#282828] w-screen h-screen">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -363,7 +363,7 @@ function Friends() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="min-w-[280px] min-h-[300px] h-[30%] w-full  md:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
+                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
                   <Invit
                     login={userName}
                     closeModal={closeModal}
@@ -383,7 +383,7 @@ function Friends() {
       </Transition>
       {/* Friends */}
       <Transition appear show={openFriend} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeFriendModal}>
+        <Dialog as="div" className="relative z-10 " onClose={closeFriendModal}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -396,8 +396,8 @@ function Friends() {
             <div className="fixed inset-0 bg-black bg-opacity-25" />
           </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex justify-center items-center bg-transparent bg-[#282828] w-screen h-screen">
+          <div className="fixed inset-0 overflow-y-auto ">
+            <div className="flex justify-center items-center bg-opacity-40 bg-[#282828] w-full h-full">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -407,7 +407,7 @@ function Friends() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="min-w-[280px] min-h-[300px] h-[30%] w-full  md:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
+                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
                   <Invit
                     login={userName}
                     closeModal={closeFriendModal}
@@ -442,7 +442,7 @@ function Friends() {
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex justify-center items-center bg-transparent bg-[#282828] w-screen h-screen">
+            <div className="flex justify-center items-center bg-opacity-40 bg-[#282828] w-full h-full">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -452,7 +452,7 @@ function Friends() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="min-w-[280px] min-h-[300px] h-[30%] w-full  md:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
+                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
                   <Invit
                     login={userName}
                     closeModal={closeBlockModal}
