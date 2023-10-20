@@ -12,7 +12,7 @@ import Image from "next/image";
 
 
 
-function OptionBar( {children, flag, userName, avatar}: {children : React.ReactNode, flag: number, userName: string, avatar: string}){
+function OptionBar( {children, flag, userName}: {children : React.ReactNode, flag: number, userName: string}){
 
     const [showSideBar, setShowSideBar] = useState(false);
     const [showPdp, setShowPdp] = useState(true);

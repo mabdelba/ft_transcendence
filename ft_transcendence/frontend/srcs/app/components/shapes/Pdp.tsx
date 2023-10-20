@@ -65,9 +65,9 @@ function Pdp(props: newType) {
         <button
           type="button"
           onClick={props.router ? viewProfile : props.handleClick}
-          className="h-[50px] w-[50px] sm:w-[70px] sm:h-[70px] lg:w-[90px] lg:h-[90px] 2xl:w-[105px] 2xl:h-[105px] NeonShadowBord flex items-center justify-center"
+          className="h-[50px] w-[50px] sm:w-[70px] sm:h-[70px] lg:w-[90px] lg:h-[90px] 2xl:w-[105px] 2xl:h-[105px] NeonShadowBord flex items-center justify-center overflow-hidden"
         >
-          <Image src={props.image ? props.image : userAvatar} alt="profil" className="w-auto h-auto" width="50" height="50" />
+          <Image src={props.image ? props.image : userAvatar} alt="profil" className="w-50 h-50 sm:w-[100px] " width="50" height="50" />
         </button>
         {!props.flag && props.name}
       </div>

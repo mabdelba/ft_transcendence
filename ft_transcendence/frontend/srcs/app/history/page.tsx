@@ -9,18 +9,18 @@ import axios from 'axios';
 import OptionBar from '../components/forms/OptionBar';
 
 function History() {
-	function setOnline() {
-		io('http://localhost:3000', {
-			transports: ['websocket'],
-			auth: {
-				token: localStorage.getItem('jwtToken'),
-			},
-		});
-	}
-	useEffect(() => {
-		if (!localStorage.getItem('jwtToken')) router.push('/');
-		setOnline();
-	}, []);
+	// function setOnline() {
+	// 	io('http://localhost:3000', {
+	// 		transports: ['websocket'],
+	// 		auth: {
+	// 			token: localStorage.getItem('jwtToken'),
+	// 		},
+	// 	});
+	// }
+	// useEffect(() => {
+	// 	if (!localStorage.getItem('jwtToken')) router.push('/');
+	// 	setOnline();
+	// }, []);
 	const [matches, setMatches] = useState([]);
 	async function getMatches() {
 		const res = await axios.get('http://localhost:3000/api/atari-pong/v1/history', {
