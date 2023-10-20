@@ -189,7 +189,7 @@ function Settings() {
                     </div>
                     <div className="h-1/2 min-h-[42px]  NeonShadow" >
                         <div className="mb-1 lg:mb-4">Username:</div>
-                        <SimpleInput holder={'Username'} type1={"text"} SetValue={setUsername} readonly={true} val={username} setError={setUsernameError} flag={true} regex={UserRegex}  isVerif={false} />
+                        <SimpleInput holder={'Username'} type1={"text"} SetValue={setUsername} readonly={false} val={username} setError={setUsernameError} flag={true} regex={UserRegex}  isVerif={false} />
                     </div>
                     <div className="h-1/2 min-h-[42px]  NeonShadow" >
                         <div className="mb-1 lg:mb-4">Email:</div>
