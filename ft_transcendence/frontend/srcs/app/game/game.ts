@@ -45,32 +45,21 @@ class Game{
     // }
     private _setEvents(): void{
         Events.on(this._engine, 'beforeUpdate', () => {
-            // if (this.ball && this.player1 && this.player2 && this.mouse)
-            //     Matter.Body.setPosition(this.player1, {x: this.mouse.position.x, y: this.player1.position.y});
-            // Events.trigger(this._engine, 'afterUpdate');
-            if (this.player2 && this.ball && this.player1){
-                if (1){
-                    Matter.Body.setPosition(this.player2, {x: this.ball.position.x, y: this.player2.position.y});
-                    Matter.Body.setPosition(this.player1, {x: this.ball.position.x, y: this.player1.position.y});
-                }
+            if (this.mouse && this.mouse?.position.x != this.player1?.position.x){
+                this.socket?.emit('MovePlayer', {x: this._map(this.mouse?.position.x, 0, this.width, 0, 600)});
             }
-
-            // if (this.player1 && this.mouse){
-            //     this.socket?.emit('move', {x: this.mouse.position.x, y: this.player1.position.y});
-            // }
         });
     }
 
     private _setMouse(): void{
         this.mouse = Matter.Mouse.create(this._render.canvas);
-        this.mouseConstraint = Matter.MouseConstraint.create(this._engine, {mouse: this.mouse, constraint: {stiffness: 1, render: {visible: false}}});
+        this.mouseConstraint = Matter.MouseConstraint.create(this._engine, {mouse: this.mouse});
     }
 
     private _calculateScale(): void{
         let sWidth: number = this.width / 600;
         let sHeight: number = this.height / 800;
         this.scale = sWidth < sHeight ? sWidth : sHeight;
-        console.log(this.scale);
     }
 
     private _createPlayers(): void{
@@ -80,7 +69,7 @@ class Game{
     }
 
     private _createBall(): void{
-        this.ball = Matter.Bodies.circle(this.width / 2, this.height / 2, 10 * this.scale, {mass: 60, restitution: 1, force: {x: 1, y: 1}, friction: 0, frictionAir: 0, frictionStatic: 0, inertia: Infinity});
+        this.ball = Matter.Bodies.circle(this.width / 2, this.height / 2, 10 * this.scale, {isStatic: true});
         Matter.World.add(this._world, this.ball);
     }
 
@@ -115,12 +104,17 @@ class Game{
         return [width, height];
     }
 
+    public setSocket(socket: Socket): void{
+        this.socket = socket;
+    }
+
     public start(): void{
         Matter.Runner.run(this._engine);
         Matter.Render.run(this._render);
     }
 
     public destroy(): void{
+        Matter.Events.off(this._engine, 'beforeUpdate', ()=> {});
         this._render.canvas.remove();
         Matter.Render.stop(this._render);
         Matter.Engine.clear(this._engine);
@@ -130,9 +124,9 @@ class Game{
 
     public setState(p1: Matter.Vector, p2: Matter.Vector, ball: Matter.Vector): void{
         if (this.player2 && this.ball && this.player1){
-            Body.setPosition(this.player1, p1);
-            Body.setPosition(this.player2, p2);
-            Body.setPosition(this.ball, ball);
+            Body.setPosition(this.player1, {x: this._map(p1.x, 0, 600, 0, this.width), y: this._map(p1.y, 0, 800, 0, this.height)});
+            Body.setPosition(this.player2, {x: this._map(p2.x, 0, 600, 0, this.width), y: this._map(p2.y, 0, 800, 0, this.height)});
+            Body.setPosition(this.ball, {x: this._map(ball.x, 0, 600, 0, this.width), y: this._map(ball.y, 0, 800, 0, this.height)});
         }
     }
 }
