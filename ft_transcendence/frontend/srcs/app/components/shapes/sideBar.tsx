@@ -12,6 +12,12 @@ import SideBarButton from '../buttons/sideBarButton';
 import SimpleButton from '../buttons/simpleButton';
 import logOut from "../../../public/log-out.svg";
 import logOutblack from "../../../public/log-out2.svg"
+import limeDashboard from "../../../public/limeDashboard.svg"
+import limeAchiev from "../../../public/limeAchivements.svg"
+import limeFriends from "../../../public/limeFriends.svg"
+import limeMessages from "../../../public/limeMessages.svg"
+import limeHistory from "../../../public/limeHistory.svg"
+import limeSettings from "../../../public/limeSetting.svg"
 import { useRouter } from 'next/navigation';
 
 function SideBar({flag}: {flag: number}) {
@@ -22,23 +28,20 @@ function SideBar({flag}: {flag: number}) {
 	}
   return (
 	<Disclosure as='nav' className='w-full h-full -green-500'>
-	{/* <Disclosure.Button className="absolute top-4 right-4 inline-flex items-center peer justify-center rounded-md p-2 text-gray-800 hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white group">
-		Dashboard
-	</Disclosure.Button> */}
-	<div className='flex h-full w-full NeonShadow  justify-center'>
-		<div className='pt-8 w-full -red-600 flex flex-col justify-between pb-4'>
-			<SideBarButton icon={Dashboard} content='Dashboard' path='/dashboard' drp={flag == 0 ? true : false} />
-			<SideBarButton icon={Achievements} content="Achievements" path='/achievements' drp={flag == 1 ? true : false }/>
-			<SideBarButton icon={Friends} content='Friends' path='/friends' drp={flag == 2 ? true : false } />
-			<SideBarButton icon={Messages} content='Messages' path='/messages' drp={flag == 3 ? true : false }/>
-			<SideBarButton icon={History} content='History' path='/history' drp={flag == 4 ? true : false }/>
-			<SideBarButton icon={Settings} content='Settings' path='/settings' drp={flag == 5 ? true : false } />
-			<div className='w-full h-20 mt-auto flex justify-center' onClick={handleLogOutClick}>
-				<div className='w-[80%]'><SimpleButton flag={true} buttonType='button' icon={logOut} icon2={logOutblack} content=' Log-out'  /></div>
+	
+		<div className='flex h-full w-full NeonShadow flex-col justify-between pb-2 '>
+			<div className='pt-4 xl:pt-8 w-full  -red-600 flex flex-col  pb-4 '>
+				<SideBarButton icon2={limeDashboard} icon={Dashboard} content='Dashboard' path='/dashboard' drp={flag == 0 ? true : false} />
+				<SideBarButton icon2={limeAchiev} icon={Achievements} content="Achievements" path='/achievements' drp={flag == 1 ? true : false }/>
+				<SideBarButton icon2={limeFriends} icon={Friends} content='Friends' path='/friends' drp={flag == 2 ? true : false } />
+				<SideBarButton icon2={limeMessages} icon={Messages} content='Messages' path='/messages' drp={flag == 3 ? true : false }/>
+				<SideBarButton icon2={limeHistory} icon={History} content='History' path='/history' drp={flag == 4 ? true : false }/>
+				<SideBarButton icon2={limeSettings} icon={Settings} content='Settings' path='/settings' drp={flag == 5 ? true : false } />
+			</div>
+			<div className='w-full h-[60px] mt-auto flex justify-center ' >
+				<div className='w-[80%]'><SimpleButton flag={true} buttonType='button' icon={logOut} icon2={logOutblack} content='Log-out' handleClick={handleLogOutClick} /></div>
 			</div>
 		</div>
-		<div className='border-r-[3px] h-auto lineshad'></div>
-	</div>
 	</Disclosure>
   );
 }

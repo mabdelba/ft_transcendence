@@ -162,8 +162,10 @@ body {
 
 
 .lineshad{
-  background: #FFF;
-  box-shadow: 0px 0px 25px 0px #FFF, 0px 0px 20px 0px #FFF;
+
+  /* box-shadow: 0px 0px 10px 0px #FFFFFF; */
+
+  box-shadow: 0px 0px 8px 0px #FFFFFFBF inset;
 }
 
 .hide {
@@ -179,7 +181,7 @@ body {
   border: 3px solid #FFFFFF;
   box-shadow: 0px 0px 10px 0px #FFFFFF;
 
-  box-shadow: 0px 0px 18px 0px #FFFFFFBF inset;
+  box-shadow: 0px 0px 10px 0px #FFFFFFBF inset;
 
   text-shadow: 0px 0px 5px  #FFFFFF;
 

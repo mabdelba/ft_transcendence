@@ -9,18 +9,18 @@ import axios from 'axios';
 import OptionBar from '../components/forms/OptionBar';
 
 function History() {
-	function setOnline() {
-		io('http://localhost:3000', {
-			transports: ['websocket'],
-			auth: {
-				token: localStorage.getItem('jwtToken'),
-			},
-		});
-	}
-	useEffect(() => {
-		if (!localStorage.getItem('jwtToken')) router.push('/');
-		setOnline();
-	}, []);
+	// function setOnline() {
+	// 	io('http://localhost:3000', {
+	// 		transports: ['websocket'],
+	// 		auth: {
+	// 			token: localStorage.getItem('jwtToken'),
+	// 		},
+	// 	});
+	// }
+	// useEffect(() => {
+	// 	if (!localStorage.getItem('jwtToken')) router.push('/');
+	// 	setOnline();
+	// }, []);
 	const [matches, setMatches] = useState([]);
 	async function getMatches() {
 		const res = await axios.get('http://localhost:3000/api/atari-pong/v1/history', {
@@ -52,12 +52,12 @@ function History() {
 	const router = useRouter();
 
 	return (
-		// <OptionBar flag={4}>
-		<main className="w-screen h-screen  flex flex-col font-Orbitron min-h-[480px] min-w-[280px]">
+		<OptionBar flag={4} userName={"login"}>
+		<main className="w-full h-full  flex flex-col font-Orbitron min-h-[480px] min-w-[280px]">
 			<div className="w-[95%] h-10 md:h-24 pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
 				History
 			</div>
-			<div className=" w-screen h-full flex items-start justify-center overflow-y-auto mb-8">
+			<div className=" w-full h-full flex items-start justify-center overflow-y-auto mb-8">
 				<div className="w-[95%] h-auto NeonShadowBord ">
 					{!play ? (
 						<div className="w-full h-80 flex justify-center items-center text-base lg:text-3xl">
@@ -91,7 +91,7 @@ function History() {
 				</div>
 			</div>
 		</main>
-		// </OptionBar>
+		 </OptionBar>
 	);
 }
 

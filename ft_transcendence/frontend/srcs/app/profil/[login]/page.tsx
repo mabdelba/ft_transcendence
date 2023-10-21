@@ -21,18 +21,18 @@ type newType = {
 
 function UserProfil(props: newType) {
   const router = useRouter();
-  function setOnline() {
-    io('http://localhost:3000', {
-      transports: ['websocket'],
-      auth: {
-        token: localStorage.getItem('jwtToken'),
-      },
-    });
-  }
-  useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) router.push('/');
-    setOnline();
-  }, []);
+  // function setOnline() {
+  //   io('http://localhost:3000', {
+  //     transports: ['websocket'],
+  //     auth: {
+  //       token: localStorage.getItem('jwtToken'),
+  //     },
+  //   });
+  // }
+  // useEffect(() => {
+  //   if (!localStorage.getItem('jwtToken')) router.push('/');
+  //   setOnline();
+  // }, []);
 
   const getState = () => {
     const url = 'http://localhost:3000/api/atari-pong/v1/user/check-relation';
@@ -69,8 +69,8 @@ function UserProfil(props: newType) {
   const [Case, setCase] = useState(1);
 
   return (
-    // <OptionBar flag={2}>
-      <main className="h-auto w-screen md:h-screen font-Orbitron NeonShadow min-h-[480px] min-w-[280px]">
+    <OptionBar flag={-1} userName="login">
+      <main className="h-auto w-full md:h-full font-Orbitron NeonShadow min-h-[480px] min-w-[280px]">
       {Case == 5 || Case == 4 ? (
         <div className="w-full h-full flex justify-center items-center ">
           <div className="h-1/2 md:h-1/3 w-[95%] lg:w-1/3 NeonShadowBord flex flex-row justify-evenly items-center">
@@ -126,7 +126,7 @@ function UserProfil(props: newType) {
         theme="dark"
       />
     </main>
-    // </OptionBar>
+     </OptionBar>
   );
 }
 

@@ -7,12 +7,11 @@ import alien from '../../public/alien.svg';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
-import SearchBar from '../components/shapes/searchBar';
-import SideBar from '../components/shapes/sideBar';
-import MenuButton from '../components/buttons/menuButton';
-import Logo from '../../public/logo.svg';
 import { useRouter } from 'next/navigation';
 import OptionBar from '../components/forms/OptionBar';
+import Login from '../components/forms/Login';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Dashboard() {
 	let [user, setUser] = useState<any>(null);
@@ -27,12 +26,12 @@ function Dashboard() {
 		try {
 			const res = await axios.get(apiUrl, config);
 			setUser(res.data);
-			io('http://localhost:3000', {
-				transports: ['websocket'],
-				auth: {
-					token: token,
-				},
-			});
+			// io('http://localhost:3000', {
+			// 	transports: ['websocket'],
+			// 	auth: {
+			// 		token: token,
+			// 	},
+			// });
 		} catch (err) {
 			// console.log(err);
 			router.push('/');
@@ -68,8 +67,8 @@ function Dashboard() {
 	}
 
 	return (
-		// <OptionBar flag={0}>
-			<main className="h-screen w-screen md:w-screen md:h-screen font-Orbitron NeonShadow min-h-[480px] min-w-[280px]">
+		<OptionBar flag={0}  userName={user.login}>
+			<main className="h-auto w-auto md:w-full md:h-full font-Orbitron NeonShadow min-h-[480px] min-w-[280px] ">
 						<div className="w-full h-[8%] pl-6 md:pl-12 font-semibold flex justify-start items-center NeonShadow text-base xl:text-3xl">
 							Hello {user.firstName}!
 						</div>
@@ -93,7 +92,7 @@ function Dashboard() {
 						</div>
 						<div className="w-full h-[8%]"></div>
 					</main>
-		// </OptionBar>
+		</OptionBar>
 	);
 }
 
