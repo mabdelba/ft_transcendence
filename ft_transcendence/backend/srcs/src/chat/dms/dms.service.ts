@@ -5,7 +5,7 @@ import { Socket } from "socket.io";
 
 
 @Injectable()
-export class ChatService {
+export class DmsService {
     constructor(private prisma: PrismaService) {}
     decodeToken(token: string){
         const decoded = jwtDecode(token);
@@ -18,12 +18,13 @@ export class ChatService {
         return user2 + user1;
     }
 
-    joinRoom(client: any, socket: Socket){
+    joinRoom(client: any, socket: Socket, server: any){
         const me:{login:string} = this.decodeToken(client.handshake.headers.access_token) as {login:string};
         const channel = client.handshake.query.channel;
         const otherUser = client.handshake.query.user;
-        const other = otherUser !== undefined ? this.createRoomName(me.login, otherUser) : channel;
-        client.join(other);
-        console.log(`User ${me.login} joined room ${other}`);
+        const roomName = otherUser !== undefined ? this.createRoomName(me.login, otherUser) : channel;
+        client.join(roomName);
+        console.log(`User ${me.login} joined room ${roomName}`);
+        return roomName;
     }
 }
