@@ -1,12 +1,13 @@
 'use client';
 import Pdp from '../components/shapes/Pdp';
 import alien from '../../public/alien.svg';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import OptionBar from '../components/forms/OptionBar';
+import { User, context } from '../../context/context';
 
 function History() {
 	// function setOnline() {
@@ -21,6 +22,7 @@ function History() {
 	// 	if (!localStorage.getItem('jwtToken')) router.push('/');
 	// 	setOnline();
 	// }, []);
+	const {user, setUser } = useContext(context);
 	const [matches, setMatches] = useState([]);
 	async function getMatches() {
 		const res = await axios.get('http://localhost:3000/api/atari-pong/v1/history', {
@@ -29,6 +31,9 @@ function History() {
 			},
 		});
 		setMatches(res.data);
+		const _user : User = user;
+		_user.history = res.data;
+		setUser(_user);
 	}
 	useEffect(() => {
 		const token = localStorage.getItem('jwtToken');
@@ -41,7 +46,9 @@ function History() {
 				localStorage.removeItem('jwtToken');
 				router.push('/');
 			}
-			else getMatches();
+			else if(!user.history) getMatches();
+			else
+				setMatches(user.history);
 		}
 	}, []);
 
@@ -52,7 +59,7 @@ function History() {
 	const router = useRouter();
 
 	return (
-		<OptionBar flag={4} userName={"login"}>
+		<OptionBar flag={4} >
 		<main className="w-full h-full  flex flex-col font-Orbitron min-h-[480px] min-w-[280px]">
 			<div className="w-[95%] h-10 md:h-24 pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
 				History
@@ -68,7 +75,7 @@ function History() {
 							<div key={obj.id} className="w-full  p-2 md:p-9 flex flex-row  ">
 								<div className="h-full w-[10%] md:w-[18%] "></div>
 								<div className="w-[15%] h-[67%] flex flex-col justify-start items-end">
-									<Pdp name={obj.me} color={true} router={router} />
+									<Pdp name={obj.me} color={true} router={router}  />
 								</div>
 								<div className="w-[50%] md:w-[34%]  NeonShadow text-sm lg:text-3xl flex flex-col justify-around items-center">
 									<div>
@@ -83,7 +90,7 @@ function History() {
 									</div>
 								</div>
 								<div className="w-[15%] h-[67%] flex  justify-start items-start">
-									<Pdp name={obj.other} color={false} router={router} />
+									<Pdp name={obj.other} color={false} router={router} myProfile={true} />
 								</div>
 							</div>
 						))

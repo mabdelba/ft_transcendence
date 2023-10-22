@@ -13,11 +13,13 @@ import Login from '../components/forms/Login';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { context } from '../../context/context';
+import { User } from '../../context/context'
 
 function Dashboard() {
 	const {setUser: setUser__, user} = useContext(context);
 	// let [user, setUser] = useState<any>(null);
 	const router = useRouter();
+	
 	async function getProfile() {
 		const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
 		const token = localStorage.getItem('jwtToken');
@@ -27,8 +29,18 @@ function Dashboard() {
 
 		try {
 			const res = await axios.get(apiUrl, config);
-			// setUser(res.data);
-			setUser__(res.data);
+			const user_ = await axios.post(
+				'http://localhost:3000/api/atari-pong/v1/user/avatar',
+				{ userLogin: res.data.login },
+				{
+				  headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+				  responseType: 'blob',
+				},
+			  );
+			const imageBlob = URL.createObjectURL(user_.data) as string;
+			const user : User = res.data;
+			user.avatar = imageBlob;
+			setUser__(user);
 			// io('http://localhost:3000', {
 			// 	transports: ['websocket'],
 			// 	auth: {
@@ -36,7 +48,6 @@ function Dashboard() {
 			// 	},
 			// });
 		} catch (err) {
-			// console.log(err);
 			router.push('/');
 		}
 	}
@@ -56,7 +67,7 @@ function Dashboard() {
 	}, []);
 
 	return (
-		<OptionBar flag={0}  userName={user.login || ''}>
+		<OptionBar flag={0}>
 			<main className="h-auto w-auto md:w-full md:h-full font-Orbitron NeonShadow min-h-[480px] min-w-[280px] ">
 						<div className="w-full h-[8%] pl-6 md:pl-12 font-semibold flex justify-start items-center NeonShadow text-base xl:text-3xl">
 							Hello {user.firstName}!
@@ -64,7 +75,7 @@ function Dashboard() {
 						<div className=" w-full md:h-[84%] h-auto flex flex-col md:flex-row justify-center items-center px-2 md:px-12 space-y-6 md:space-y-0 md:space-x-6 xl:space-x-12 ">
 							<div className="md:h-full h-auto w-full md:w-[60%]  space-y-6 xl:space-y-12 flex flex-col -red-600">
 								<div className="w-full md:h-[60%] h-52">
-									<Profil login={user.login || ''} router={router} />
+									<Profil  router={router} />
 								</div>
 								<div className="w-full md:h-[40%] h-40">
 									<LastMatch matchPlayed={user.numberOfGamesPlayed || 0} login={user.login || ''} router={router} />

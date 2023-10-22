@@ -20,8 +20,8 @@ type newType = {
 
 function DiscloComp(props: newType) {
   return (
-    <div className="w-full h-auto  border ">
-      <div className="w-full font-Orbitron  NeonShadowBord">
+    <div className="w-full h-auto   ">
+      <div className="w-full font-Orbitron   NeonShadowBord">
         <Disclosure>
           {({ open }) => (
             <>
@@ -44,6 +44,7 @@ function DiscloComp(props: newType) {
                       {props.isFriend ? (
                         <Pdp
                           name={divName.login}
+                          myProfile={true}
                           color={props.Color}
                           handleClick={() => {
                             props.setOpen(true);

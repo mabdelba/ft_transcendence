@@ -6,17 +6,24 @@ import Logo from "../../../public/logo.svg"
 import dynamic from "next/dynamic";
 import BurgButton from "../shapes/burgButton";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import alien from "../../../public/alien.svg"
 import Image from "next/image";
+import { context } from "../../../context/context";
+import Pdp from "../shapes/Pdp";
 
 
 
-function OptionBar( {children, flag, userName}: {children : React.ReactNode, flag: number, userName: string}){
+function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}){
 
     const [showSideBar, setShowSideBar] = useState(false);
     const [showPdp, setShowPdp] = useState(true);
+    const {user} = useContext(context);
+    // const [avatar, setAvatar] = useState(alien);
 
+    // useEffect(() =>{
+    //   setAvatar(user.avatar);
+    // });
     useEffect(() => {
       const handleResize = () => {
         if (window.innerWidth >= 640)
@@ -54,11 +61,11 @@ function OptionBar( {children, flag, userName}: {children : React.ReactNode, fla
               <Link 
               onMouseEnter={() => {setHoverBool(true)}}
               onMouseLeave={() => {setHoverBool(false)}}
-              href={`/profil/${userName}`} className="flex flex-row space-x-2 items-center min-w-[40px] w-auto justify-center  font-Orbitron font-light hover:text-lime-300 hover:font-extrabold text-xs md:text-base 2xl:text-lg pr-6">
-                <span>{userName}</span>
+              href={`/profil/${user.login}`} className="flex flex-row space-x-2 items-center min-w-[40px] w-auto justify-center  font-Orbitron font-light hover:text-lime-300 hover:font-extrabold text-xs md:text-base 2xl:text-lg pr-6">
+                <span>{user.login}</span>
                 {
                   showPdp &&
-                    <Image  alt="image" src={alien}  className={`w-10 h-10 lineshad  ${!hoverBool ? 'border-[2px]' : 'border-lime-300 border-[4px]' }  rounded-full`}/>
+                    <Image width="50" height="50"  alt="image" src={user.avatar || alien}  className={`w-10 h-10 lineshad  ${!hoverBool ? 'border-[2px]' : 'border-lime-300 border-[4px]' }  rounded-full` }/>
                 }
 
               </Link>

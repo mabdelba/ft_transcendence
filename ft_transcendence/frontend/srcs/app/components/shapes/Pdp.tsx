@@ -1,9 +1,10 @@
 'use client';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import alien from '../../../public/alien.svg';
+import {context} from '../../../context/context';
 
 
 type newType = {
@@ -13,14 +14,17 @@ type newType = {
   handleClick?: any;
   router?: any;
   flag?: boolean;
+  myProfile?: boolean
 };
 
 function Pdp(props: newType) {
+  
   const [userAvatar, setUserAvatar] = useState(alien);
+  const {user, setUser} = useContext(context);
   async function getUserAvatar(login: string) {
     if (login !== '') {
       try {
-        const user = await axios.post(
+        const user_ = await axios.post(
           'http://localhost:3000/api/atari-pong/v1/user/avatar',
           { userLogin: login },
           {
@@ -28,8 +32,7 @@ function Pdp(props: newType) {
             responseType: 'blob',
           },
         );
-        const imageBlob = URL.createObjectURL(user.data) as string;
-        console.log('hello there', imageBlob);
+        const imageBlob = URL.createObjectURL(user_.data) as string;
         setUserAvatar(imageBlob);
       } catch (err) {
         // props.router.push('/');
@@ -47,7 +50,8 @@ function Pdp(props: newType) {
 			if (exp < current_time) {
 				localStorage.removeItem('jwtToken');
 				props.router.push('/');
-			}    else getUserAvatar(props.name);
+			}   else if(props.myProfile) getUserAvatar(props.name);
+      else setUserAvatar(user.avatar)
     }
   }, [props.name]);
 
@@ -67,7 +71,7 @@ function Pdp(props: newType) {
           onClick={props.router ? viewProfile : props.handleClick}
           className="h-[50px] w-[50px] sm:w-[70px] sm:h-[70px] lg:w-[90px] lg:h-[90px] 2xl:w-[105px] 2xl:h-[105px] NeonShadowBord flex items-center justify-center overflow-hidden"
         >
-          <Image src={props.image ? props.image : userAvatar} alt="profil" className="w-50 h-50 sm:w-[100px] " width="50" height="50" />
+          <Image src={userAvatar} alt="profil" className="w-50 h-50 sm:w-[100px] " width="50" height="50" />
         </button>
         {!props.flag && props.name}
       </div>

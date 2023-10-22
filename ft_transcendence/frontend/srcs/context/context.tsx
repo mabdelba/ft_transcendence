@@ -14,9 +14,17 @@ export interface User{
     state? : number,
     level? : number,
 	matchPlayed? : number,
-	winPercent? : number,
 	numberOfGamesPlayed? : number,
 	numberOfGamesWon? : number,
+    matchData?: any,
+    LatestAchievs?: any,
+    achievements?: any,
+    unacquiredAchiev?: any,
+    friendRequestList?: any,
+    friendList?: any,
+    blockedList?: any,
+    history?: any,
+
 }
 
 export const context = createContext<{user: User; setUser: Function}>({user: {}, setUser: ()=>{}})

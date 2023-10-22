@@ -5,18 +5,21 @@ import Percent from '../shapes/Percent';
 import online from '../../../public/online.svg';
 import offline from '../../../public/offline.svg';
 import ingame from '../../../public/ingame.svg';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Pdp from '../shapes/Pdp';
 import axios from 'axios';
+import {context} from '../../../context/context';
 
 type profileProp = {
-  login: string;
+  login?: string;
+  myProfil?: boolean;
   router: any;
 };
 
 function Profil(props: profileProp) {
+
+  const {user} = useContext(context);
   let [profile, setProfile] = useState<any>(null);
-  
   async function getProfile() {
     if (props.login) {
       const url = 'http://localhost:3000/api/atari-pong/v1/user/me';
@@ -25,11 +28,10 @@ function Profil(props: profileProp) {
         headers: { Authorization: `Bearer ${token}` },
       };
       try {
-        const user = await axios.post(url, { userLogin: props.login }, config);
-        setProfile(user.data);
+        const user_ = await axios.post(url, { userLogin: props.login }, config);
+        setProfile(user_.data);
       } catch (err) {
         console.log(err);
-        // props.router.push('/');
       }
     }
   }
@@ -44,9 +46,11 @@ function Profil(props: profileProp) {
 				localStorage.removeItem('jwtToken');
 				props.router.push('/');
 			}
-      else getProfile();
+      else if (props.myProfil) getProfile();
+      else setProfile(user);
     }
-  }, [props.login]);
+  }, [props.login, user]);
+
 
   let winPercent = 50;
   let percentage = 0;
@@ -96,10 +100,10 @@ function Profil(props: profileProp) {
   }
   return (
     <div className="h-full w-full flex flex-col  justify-center items-center NeonShadowBord ">
-      <div className="h-1/2 w-full flex flex-row items-center lg:space-x-2 2xl:space-x-0">
-        <div className="w-[10%]  xl:w-[12.5%] h-[50%]  "></div>
+      <div className="h-1/2 w-full flex flex-row flex-wrap items-center lg:space-x-2 2xl:space-x-0">
+        <div className="w-[10%]  xl:w-[12.5%] h-[50%] "></div>
         <div className="w-[15%] xl:w-[12.5%] h-[60%] flex justify-end items-center ">
-          <Pdp name={profile.login} color={false} router={props.router} flag={true} />
+          <Pdp name={profile.login} color={false} router={props.router} flag={true} myProfile={props.myProfil} />
         </div>
         <div className="w-[75%] h-[40%] flex flex-col justify-center items-start px-2 text-[8px] md:text-sm xl:text-lg">
           <div className="h-1/3 w-full -slate-700 flex items-end">
