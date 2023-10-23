@@ -9,11 +9,15 @@ let game: Game | null = null;
 const gamePage = () => {
     const gameDiv = React.useRef<HTMLDivElement>(null)
     const [{width, height}, setWindowSize] = React.useState({width: 0, height: 0})
+    const [socket, setSocket] = React.useState<Socket | null>(null)
 
     React.useEffect(() => {
         if (gameDiv.current){
+            console.log('gameDiv.current');
             game = new Game(gameDiv.current);
-            game.start();
+            if (socket)
+                game.setSocket(socket)
+            game.start(); 
         }
         return () => {
             game?.destroy();
@@ -27,11 +31,23 @@ const gamePage = () => {
         window.addEventListener('resize', handleResize)
 
 
-        // let socket: Socket = io('http://localhost:3001');
-        // socket.on('connect', () => {
-        //     console.log('connected');
-        //     game?.setSocket(socket);
-        // }) 
+        let socket: Socket = io('http://localhost:3001', {
+            auth: {
+                token: localStorage.getItem('jwtToken')
+            }
+        });
+
+        socket.on('connect', () => {
+            socket.emit('NewGame', {map: 'map1'})
+            console.log('connected');
+            game?.setSocket(socket);
+        })
+
+        socket.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
+            game?.setState(data.player1, data.player2, data.ball);
+        });
+
+        setSocket(socket);
         // socket.on('state', (data: {p1: Matter.Vector, p2: Matter.Vector, ball: Matter.Vector}) => {
         //     game?.setState(data.p1, data.p2, data.ball);
         // })

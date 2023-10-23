@@ -8,6 +8,7 @@ import { TwoFactorAuthModule } from './two-factor-auth/two-factor-auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { StateGateway } from './state/state.gateway';
 import { AchievementsModule } from './achievements/achievements.module';
+import { GameGateway } from './game/game.gateway';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { AchievementsModule } from './achievements/achievements.module';
     AchievementsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, StateGateway],
+  providers: [AppService, StateGateway, GameGateway],
 })
 export class AppModule {}

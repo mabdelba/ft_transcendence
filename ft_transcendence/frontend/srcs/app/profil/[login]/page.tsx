@@ -69,7 +69,7 @@ function UserProfil(props: newType) {
   const [Case, setCase] = useState(1);
 
   return (
-    <OptionBar flag={2}>
+    <OptionBar flag={-1} userName="login">
       <main className="h-auto w-full md:h-full font-Orbitron NeonShadow min-h-[480px] min-w-[280px]">
       {Case == 5 || Case == 4 ? (
         <div className="w-full h-full flex justify-center items-center ">
@@ -89,7 +89,7 @@ function UserProfil(props: newType) {
           </div>
           <div className=" w-full md:h-[84%] h-auto flex flex-col md:flex-row justify-center items-center px-2 md:px-12 space-y-6 md:space-y-0 md:space-x-6 xl:space-x-12 ">
             <div className="md:h-full h-auto w-full md:w-[60%]  space-y-6 xl:space-y-12 flex flex-col -red-600">
-              <div className="w-full md:h-[60%] h-auto">
+              <div className="w-full md:h-[60%] h-52">
                 <Profil login={props.params.login} router={router} />
               </div>
               <div className="w-full md:h-[40%] h-40">
@@ -126,7 +126,7 @@ function UserProfil(props: newType) {
         theme="dark"
       />
     </main>
-    </OptionBar>
+     </OptionBar>
   );
 }
 
