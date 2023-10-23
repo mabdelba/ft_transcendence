@@ -3,6 +3,7 @@ import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import Achievement from '../shapes/Achievement';
 import Pdp from '../shapes/Pdp';
+import alien from '../../../public/alien.svg'
 
 type newType = {
   title: string;
@@ -45,6 +46,7 @@ function DiscloComp(props: newType) {
                         <Pdp
                           name={divName.login}
                           myProfile={true}
+                          image={divName.avatar == `public/avatars/${divName.login}.jpg` ? alien : divName.avatar}
                           color={props.Color}
                           handleClick={() => {
                             props.setOpen(true);

@@ -21,6 +21,7 @@ type newType = {
 
 function UserProfil(props: newType) {
   const router = useRouter();
+  const [numberofMatchPlayed, setNumberOfMatchPlayed] = useState(0);
   // function setOnline() {
   //   io('http://localhost:3000', {
   //     transports: ['websocket'],
@@ -34,6 +35,7 @@ function UserProfil(props: newType) {
   //   setOnline();
   // }, []);
 
+  const [otherProfileAvatar, setOtherProfileAvatar] = useState(alien);
   const getState = () => {
     const url = 'http://localhost:3000/api/atari-pong/v1/user/check-relation';
     const token = localStorage.getItem('jwtToken');
@@ -90,10 +92,10 @@ function UserProfil(props: newType) {
           <div className=" w-full md:h-[84%] h-auto flex flex-col md:flex-row justify-center items-center px-2 md:px-12 space-y-6 md:space-y-0 md:space-x-6 xl:space-x-12 ">
             <div className="md:h-full h-auto w-full md:w-[60%]  space-y-6 xl:space-y-12 flex flex-col -red-600">
               <div className="w-full md:h-[60%] h-52">
-                <Profil login={props.params.login} myProfil={true} router={router} />
+                <Profil login={props.params.login} myProfil={true} router={router} setUserAvatar={setOtherProfileAvatar} setNumberOfMatch={setNumberOfMatchPlayed} />
               </div>
               <div className="w-full md:h-[40%] h-40">
-                <LastMatch matchPlayed={12} myProfile={true} login={props.params.login} router={router} />
+                <LastMatch matchPlayed={numberofMatchPlayed} myProfile={true} pdp={otherProfileAvatar}  login={props.params.login} router={router} />
               </div>
             </div>
             <div className="md:h-full h-auto w-full md:w-[40%] space-y-6  xl:space-y-12 flex flex-col -yellow-300">

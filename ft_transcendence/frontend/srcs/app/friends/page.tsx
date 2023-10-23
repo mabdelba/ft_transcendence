@@ -1,6 +1,7 @@
 'use client';
 
 import Pdp from '../components/shapes/Pdp';
+import Photo from '../../public/42.svg'
 import alien from '../../public/alien.svg';
 import blueAchiev from '../../public/blueAchiev.svg';
 import DiscloComp from '../components/shapes/DiscloComp';
@@ -15,13 +16,14 @@ import io from 'socket.io-client';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { User, context } from '../../context/context';
+import OptionBar from '../components/forms/OptionBar';
 
 
-const OptionBar = dynamic(() => import('../components/forms/OptionBar'), {ssr: false});
 
 function Friends() {
   const router = useRouter();
   const {user, setUser} = useContext(context);
+  const [tempAvatar, setTempAvatar] = useState('');
   // function setOnline() {
   //   io('http://localhost:3000', {
   //     transports: ['websocket'],
@@ -34,6 +36,34 @@ function Friends() {
   //   if (!localStorage.getItem('jwtToken')) router.push('/');
   //   else setOnline();
   // }, []);
+  const  getImageByLogin =   async (login: string): Promise<string | null> =>  {
+
+    return new Promise<string | null>(async (resolve) => {
+
+      if(login != '')
+      {
+        await axios.post(
+          'http://localhost:3000/api/atari-pong/v1/user/avatar',
+          { userLogin: login },
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+            responseType: 'blob',
+          }
+        ).then((response) => {
+          const imageBlob = (URL.createObjectURL(response.data) as string);
+          if(imageBlob)
+            resolve(imageBlob);
+          else
+            resolve(alien);
+        }).catch(()=>{
+          // resolve(alien);
+        }
+        );
+      }
+    })
+  }
+  
+
   const getReq = () => {
     const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-requests-list';
     const token = localStorage.getItem('jwtToken');
@@ -43,6 +73,11 @@ function Friends() {
     axios
       .get(urlreq, config)
       .then((response) => {
+        response.data.recievedFriendRequestsBy.forEach((obj: any) => {
+          getImageByLogin(obj.login).then((imageBlog) => {
+            obj.avatar = imageBlog;
+          })
+        })
         setRequest(response.data.recievedFriendRequestsBy);
         const _user: User = user;
         _user.friendRequestList = response.data.recievedFriendRequestsBy;
@@ -62,6 +97,11 @@ function Friends() {
     axios
       .get(urlreq, config)
       .then((response) => {
+        response.data.friends.forEach((obj: any) => {
+          getImageByLogin(obj.login).then((imageBlog) => {
+            obj.avatar = imageBlog;
+          })
+        })
         setFriendsList(response.data.friends);
         const _user: User = user;
         _user.friendList = response.data.friends;
@@ -81,6 +121,11 @@ function Friends() {
     axios
       .get(url, config)
       .then((response) => {
+        response.data.blockedList.forEach((obj: any) => {
+          getImageByLogin(obj.login).then((imageBlog) => {
+            obj.avatar = imageBlog;
+          })
+        })
         setBlockedList(response.data.blockedList);
         const _user: User = user;
         _user.blockedList = response.data.blockedList;
@@ -401,7 +446,7 @@ function Friends() {
                   <Invit
                     login={userName}
                     closeModal={closeModal}
-                    avatar={alien}
+                    avatar={userAvatar}
                     accept={acceptRequest}
                     delete={deleteRequest}
                     Color={false}
@@ -445,7 +490,7 @@ function Friends() {
                   <Invit
                     login={userName}
                     closeModal={closeFriendModal}
-                    avatar={alien}
+                    avatar={userAvatar}
                     accept={deleteFriend}
                     delete={blockFriend}
                     Color={true}
@@ -490,7 +535,7 @@ function Friends() {
                   <Invit
                     login={userName}
                     closeModal={closeBlockModal}
-                    avatar={alien}
+                    avatar={userAvatar}
                     accept={unblockUser}
                     Color={true}
                     Content1="Delete"

@@ -30,7 +30,15 @@ function History() {
 				Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
 			},
 		});
+		res.data.forEach((obj: any) => {
+			
+			getImageByLogin(obj.other).then((imageBlog)=> {
+			
+				obj.avatar = imageBlog;
+			})
+		})
 		setMatches(res.data);
+
 		const _user : User = user;
 		_user.history = res.data;
 		setUser(_user);
@@ -52,7 +60,34 @@ function History() {
 		}
 	}, []);
 
-	let matchPlayed = Array.length;
+	const  getImageByLogin =   async (login: string): Promise<string | null> =>  {
+
+		return new Promise<string | null>(async (resolve) => {
+	
+		  if(login != '')
+		  {
+			await axios.post(
+			  'http://localhost:3000/api/atari-pong/v1/user/avatar',
+			  { userLogin: login },
+			  {
+				headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+				responseType: 'blob',
+			  }
+			).then((response) => {
+			  const imageBlob = (URL.createObjectURL(response.data) as string);
+			  if(imageBlob)
+				resolve(imageBlob);
+			  else
+				resolve(alien);
+			}).catch(()=>{
+			  // resolve(alien);
+			}
+			);
+		  }
+		})
+	  }
+
+	let matchPlayed = matches.length;
 	let play = false;
 	if (matchPlayed != 0) play = true;
 	const [userName, setUserName] = useState('');
@@ -75,7 +110,7 @@ function History() {
 							<div key={obj.id} className="w-full  p-2 md:p-9 flex flex-row  ">
 								<div className="h-full w-[10%] md:w-[18%] "></div>
 								<div className="w-[15%] h-[67%] flex flex-col justify-start items-end">
-									<Pdp name={obj.me} color={true} router={router}  />
+									<Pdp name={obj.me} color={true} router={router} image={user.avatar}  />
 								</div>
 								<div className="w-[50%] md:w-[34%]  NeonShadow text-sm lg:text-3xl flex flex-col justify-around items-center">
 									<div>
@@ -90,7 +125,7 @@ function History() {
 									</div>
 								</div>
 								<div className="w-[15%] h-[67%] flex  justify-start items-start">
-									<Pdp name={obj.other} color={false} router={router} myProfile={true} />
+									<Pdp name={obj.other} color={false} router={router} myProfile={true} image={obj.avatar == `public/avatars/${obj.other}.jpg` ? alien : obj.avatar} />
 								</div>
 							</div>
 						))

@@ -17,6 +17,7 @@ export interface User{
 	numberOfGamesPlayed? : number,
 	numberOfGamesWon? : number,
     matchData?: any,
+    otherProfileAvatar?: string;
     LatestAchievs?: any,
     achievements?: any,
     unacquiredAchiev?: any,

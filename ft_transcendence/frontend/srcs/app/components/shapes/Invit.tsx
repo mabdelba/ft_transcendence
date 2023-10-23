@@ -44,7 +44,7 @@ function Invit(props: newType) {
           className="h-full w-1/2 flex justify-center items-center hover:bg-slate-800 hover:bg-opacity-5 hover:font-extrabold"
           onClick={handleClick}
         >
-          <Pdp name={props.login} myProfile={true} color={props.Color} />
+          <Pdp name={props.login} myProfile={true} image={props.avatar} color={props.Color} />
         </div>
         <div className="h-[90%] pt-2 w-[40%] flex flex-col justify-center pr-4 space-y-3">
           {props.flag == 2 ? (

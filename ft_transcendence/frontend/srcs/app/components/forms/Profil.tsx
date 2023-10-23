@@ -14,11 +14,15 @@ type profileProp = {
   login?: string;
   myProfil?: boolean;
   router: any;
+  setUserAvatar?: Function | undefined;
+  setNumberOfMatch?: Function| undefined;
 };
 
 function Profil(props: profileProp) {
 
   const {user} = useContext(context);
+  const [userAvatar, setUserAvatar] = useState(alien);
+
   let [profile, setProfile] = useState<any>(null);
   async function getProfile() {
     if (props.login) {
@@ -30,6 +34,21 @@ function Profil(props: profileProp) {
       try {
         const user_ = await axios.post(url, { userLogin: props.login }, config);
         setProfile(user_.data);
+        {
+          props.setNumberOfMatch &&
+          props.setNumberOfMatch(user_.data.numberOfGamesPlayed );
+        }
+        const user__ = await axios.post(
+          'http://localhost:3000/api/atari-pong/v1/user/avatar',
+          { userLogin: props.login },
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+            responseType: 'blob',
+          },
+        );
+        const imageBlob = URL.createObjectURL(user__.data) as string;
+        setUserAvatar(imageBlob);
+        {props.setUserAvatar && props.setUserAvatar(imageBlob)}
       } catch (err) {
         console.log(err);
       }
@@ -103,7 +122,7 @@ function Profil(props: profileProp) {
       <div className="h-1/2 w-full flex flex-row flex-wrap items-center lg:space-x-2 2xl:space-x-0">
         <div className="w-[10%]  xl:w-[12.5%] h-[50%] "></div>
         <div className="w-[15%] xl:w-[12.5%] h-[60%] flex justify-end items-center ">
-          <Pdp name={profile.login} color={false} router={props.router} flag={true} myProfile={props.myProfil} />
+          <Pdp name={profile.login} color={false} router={props.router} flag={true} image={!props.myProfil ? user.avatar : userAvatar} />
         </div>
         <div className="w-[75%] h-[40%] flex flex-col justify-center items-start px-2 text-[8px] md:text-sm xl:text-lg">
           <div className="h-1/3 w-full -slate-700 flex items-end">
