@@ -13,8 +13,6 @@ import Image from "next/image";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from "next/navigation";
-import { error } from "console";
-import { set } from "husky";
 import { context } from "../../context/context";
 
 
@@ -54,7 +52,7 @@ function Settings() {
         setSelectFileError(true);
         console.log(e.target.files[0]);
     }
-    const {user} = useContext(context);
+    const {user, socket} = useContext(context);
     const getData = () => {
 
         const url = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
@@ -81,6 +79,11 @@ function Settings() {
     useEffect(()=> {
 
         getData();
+        if (!user.state)
+        {
+            socket.emit('online', {token: localStorage.getItem('jwtToken')} );
+            user.state = 1;
+        }
     }, [counter])
 
 
@@ -150,7 +153,6 @@ function Settings() {
                 axios.post(url, formData ,config).then((response)=>{
                 })
                 .catch((error) => {
-                    
                     console.log("error image: ", error);
                 })
             }

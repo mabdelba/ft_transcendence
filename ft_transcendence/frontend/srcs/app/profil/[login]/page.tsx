@@ -5,7 +5,7 @@ import LastMatch from '../../components/forms/LastMatch';
 import LatestAchiev from '../../components/forms/LatestAchiev';
 import Profil from '../../components/forms/Profil';
 import AddFriend from '../../components/forms/AddFriend';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import io from 'socket.io-client';
 import axios from 'axios';
@@ -14,27 +14,26 @@ import Pdp from '../../components/shapes/Pdp';
 import { Alatsi } from 'next/font/google';
 import { useRouter } from 'next/navigation';
 import OptionBar from '../../components/forms/OptionBar';
+import { context, User } from '../../../context/context';
+import { useContext } from 'react';
+
 
 type newType = {
   params: { login: string };
 };
 
 function UserProfil(props: newType) {
+  const {user, setUser, socket } = useContext(context);
   const router = useRouter();
   const [numberofMatchPlayed, setNumberOfMatchPlayed] = useState(0);
-  // function setOnline() {
-  //   io('http://localhost:3000', {
-  //     transports: ['websocket'],
-  //     auth: {
-  //       token: localStorage.getItem('jwtToken'),
-  //     },
-  //   });
-  // }
-  // useEffect(() => {
-  //   if (!localStorage.getItem('jwtToken')) router.push('/');
-  //   setOnline();
-  // }, []);
 
+  // useEffect(() => {
+  //   if (!user.state)
+  //   {
+  //     socket.emit('online', {token: localStorage.getItem('jwtToken')} );
+  //     user.state = 1;
+  //   }
+  // })
   const [otherProfileAvatar, setOtherProfileAvatar] = useState(alien);
   const getState = () => {
     const url = 'http://localhost:3000/api/atari-pong/v1/user/check-relation';
@@ -66,6 +65,11 @@ function UserProfil(props: newType) {
 				router.push('/');
 			}
       else getState();
+      if (!user.state)
+    {
+      socket.emit('online', {token: token} );
+      user.state = 1;
+    }
     }
   }, []);
   const [Case, setCase] = useState(1);

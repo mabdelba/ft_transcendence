@@ -8,12 +8,12 @@ import QuaranteDeux from '../../../public/42.svg';
 import blackQuarante from '../../../public/black42.svg';
 import seePassword from '../../../public/seePassword.svg';
 import hidePass from '../../../public/hidepass.svg';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import React from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-
+import { context } from '../../../context/context';
 type closeFunc = {
   handler: any;
   rout: any;
@@ -24,6 +24,7 @@ function Login(props: closeFunc) {
   const [password, setPassword] = useState('');
   const [Uerror, setUerror] = useState(false);
   const [Perror, setPerror] = useState(false);
+  const {socket} = useContext(context);
   const Data = { username, password };
 
   const regex = /^.+$/;
@@ -65,8 +66,8 @@ function Login(props: closeFunc) {
         });
         const jwtToken = response.data.token;
         localStorage.setItem('jwtToken', jwtToken);
+        socket.emit('online', {token: jwtToken});
         props.rout.push('/dashboard');
-        console.log('Response from server: ', response.data);
       })
       .catch((error) => {
         toast.error('Incorrect username or password!', {
