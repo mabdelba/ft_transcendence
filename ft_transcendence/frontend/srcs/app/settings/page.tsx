@@ -1,5 +1,5 @@
 'use client';
-import { use, useEffect, useState } from "react";
+import { use, useContext, useEffect, useState } from "react";
 import OptionBar from "../components/forms/OptionBar";
 import SimpleInput from "../components/inputs/simpleInput";
 import SimpleButton from "../components/buttons/simpleButton";
@@ -15,6 +15,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from "next/navigation";
 import { error } from "console";
 import { set } from "husky";
+import { context } from "../../context/context";
 
 
 
@@ -30,7 +31,7 @@ function Settings() {
     const [name, setName] = useState('');
     const [nameError, setNameError] = useState(true);
 
-    const [Id, setId] = useState('');
+    const [Id, setId] = useState(0);
     const [Lastname, setLastName] = useState('');
     const [lastnameError, setlastNameError] = useState(true);
 
@@ -53,7 +54,7 @@ function Settings() {
         setSelectFileError(true);
         console.log(e.target.files[0]);
     }
-
+    const {user} = useContext(context);
     const getData = () => {
 
         const url = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
@@ -61,20 +62,21 @@ function Settings() {
         const config = {
           headers: { Authorization: `Bearer ${token}` },
         };
+        setId(user.id || 0);
+        setName(user.firstName || '');
+        setLastName(user.lastName || '');
+        setUsername(user.login || 'empty');
+        setEmail(user.email || '');
+        const Temp = [user.firstName || '', user.lastName || '', user.login || '', user.email || ''];
+        setArray(Temp);
 
-        axios.get(url, config).then((response)=> {
-            setId(response.data.id);
-            setName(response.data.firstName);
-            setLastName(response.data.lastName);
-            setUsername(response.data.login);
-            setEmail(response.data.email);
-            const Temp = [response.data.firstName, response.data.lastName, response.data.login, response.data.email];
-            setArray(Temp);
-        })
-        .catch((error) => {
 
-            console.log("Error from server haha: ", error);
-        })
+        // axios.get(url, config).then((response)=> {
+        // })
+        // .catch((error) => {
+
+        //     console.log("Error from server haha: ", error);
+        // })
     }
     useEffect(()=> {
 
@@ -167,7 +169,7 @@ function Settings() {
     }
 
     return (
-    <OptionBar flag={5} userName={Array[2]}>
+    <OptionBar flag={5} >
         <main className="w-full h-full   flex flex-col items-center  font-Orbitron min-h-[550px]  min-w-[280px] pb-2 ">
             <div className="w-full h-[8%] pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
 				Settings
@@ -201,7 +203,7 @@ function Settings() {
                     <div className=" w-full  md:w-1/2 md:h-full h-auto  flex    flex-col ">
                         <div className="w-full h-auto  md:h-1/2  flex flex-col justify-center">
                             <div className="w-1/6 pl-2">
-                                <Pdp name={Array[2]} color={false} flag={true} />
+                                <Pdp  color={false} flag={true} image={user.avatar} name={""} />
                             </div>
                             <span className={`w-1/2 NeonShadow text-[5px] md:text-[12px]  flex font-light items-center ${selectFileError? '' : 'text-red-600 redShadow'} `}>({filename})</span>
                         </div>
