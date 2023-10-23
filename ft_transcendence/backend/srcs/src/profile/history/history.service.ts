@@ -31,6 +31,7 @@ export class HistoryService {
         id: match.id,
         me: me.login,
         other: other.login,
+        avatar: other.avatar,
         myScore: me.id == match.player1Id ? match.scoreOfPlayer1 : match.scoreOfPlayer2,
         otherScore: other.id == match.player1Id ? match.scoreOfPlayer1 : match.scoreOfPlayer2,
       };

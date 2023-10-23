@@ -1,11 +1,12 @@
 'use client';
 
 import Pdp from '../components/shapes/Pdp';
+import Photo from '../../public/42.svg'
 import alien from '../../public/alien.svg';
 import blueAchiev from '../../public/blueAchiev.svg';
 import DiscloComp from '../components/shapes/DiscloComp';
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import Invit from '../components/shapes/Invit';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -14,12 +15,15 @@ import { error } from 'console';
 import io from 'socket.io-client';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { User, context } from '../../context/context';
+import OptionBar from '../components/forms/OptionBar';
 
 
-const OptionBar = dynamic(() => import('../components/forms/OptionBar'), {ssr: false});
 
 function Friends() {
   const router = useRouter();
+  const {user, setUser} = useContext(context);
+  const [tempAvatar, setTempAvatar] = useState('');
   // function setOnline() {
   //   io('http://localhost:3000', {
   //     transports: ['websocket'],
@@ -32,6 +36,34 @@ function Friends() {
   //   if (!localStorage.getItem('jwtToken')) router.push('/');
   //   else setOnline();
   // }, []);
+  const  getImageByLogin =   async (login: string): Promise<string | null> =>  {
+
+    return new Promise<string | null>(async (resolve) => {
+
+      if(login != '')
+      {
+        await axios.post(
+          'http://localhost:3000/api/atari-pong/v1/user/avatar',
+          { userLogin: login },
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+            responseType: 'blob',
+          }
+        ).then((response) => {
+          const imageBlob = (URL.createObjectURL(response.data) as string);
+          if(imageBlob)
+            resolve(imageBlob);
+          else
+            resolve(alien);
+        }).catch(()=>{
+          // resolve(alien);
+        }
+        );
+      }
+    })
+  }
+  
+
   const getReq = () => {
     const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-requests-list';
     const token = localStorage.getItem('jwtToken');
@@ -41,7 +73,15 @@ function Friends() {
     axios
       .get(urlreq, config)
       .then((response) => {
+        response.data.recievedFriendRequestsBy.forEach((obj: any) => {
+          getImageByLogin(obj.login).then((imageBlog) => {
+            obj.avatar = imageBlog;
+          })
+        })
         setRequest(response.data.recievedFriendRequestsBy);
+        const _user: User = user;
+        _user.friendRequestList = response.data.recievedFriendRequestsBy;
+        setUser(_user);
       })
       .catch((error) => {
         console.log('Error from backend', error);
@@ -57,7 +97,15 @@ function Friends() {
     axios
       .get(urlreq, config)
       .then((response) => {
+        response.data.friends.forEach((obj: any) => {
+          getImageByLogin(obj.login).then((imageBlog) => {
+            obj.avatar = imageBlog;
+          })
+        })
         setFriendsList(response.data.friends);
+        const _user: User = user;
+        _user.friendList = response.data.friends;
+        setUser(_user);
       })
       .catch((error) => {
         console.log('Error from backend', error);
@@ -73,7 +121,15 @@ function Friends() {
     axios
       .get(url, config)
       .then((response) => {
+        response.data.blockedList.forEach((obj: any) => {
+          getImageByLogin(obj.login).then((imageBlog) => {
+            obj.avatar = imageBlog;
+          })
+        })
         setBlockedList(response.data.blockedList);
+        const _user: User = user;
+        _user.blockedList = response.data.blockedList;
+        setUser(_user);
       })
       .catch((error) => {
         console.log('Error from backend', error);
@@ -96,12 +152,15 @@ function Friends() {
 				localStorage.removeItem('jwtToken');
 				router.push('/');
 			}
-    else
+    else if(!user.friendRequestList && !user.friendList &&  !user.blockedList)
     {
       getFriend();
       getReq();
       getBlocked();
     } 
+    else{
+      setRequest(user.friendRequestList);setFriendsList(user.friendList);setBlockedList(user.blockedList);
+    }
   }
   }, []);
 
@@ -110,6 +169,9 @@ function Friends() {
     const elementToDelete = friendsList.findIndex((obj: any) => obj.id === userId);
     if (elementToDelete !== -1) {
       friendsList.splice(elementToDelete, 1);
+      const _user :User = user;
+      _user.friendList = friendsList;
+      setUser(_user);
     }
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/remove-friend';
     const token = localStorage.getItem('jwtToken');
@@ -142,6 +204,12 @@ function Friends() {
     if (elementToDelete !== -1) {
       friendsList.splice(elementToDelete, 1);
     }
+    const newObject = { id: userId, login: userName, avatar: userAvatar };
+    blockedList.push(newObject);
+    const _user : User = user;
+    _user.friendList = friendsList;
+    _user.blockedList = blockedList;
+    setUser(_user);
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/block-user';
     const token = localStorage.getItem('jwtToken');
     const conf = {
@@ -167,10 +235,14 @@ function Friends() {
     });
     setOpenFriend(false);
   };
+
   const deleteRequest = () => {
     const elementToDelete = requests.findIndex((obj: any) => obj.id === userId);
     if (elementToDelete !== -1) {
       requests.splice(elementToDelete, 1);
+      const _user : User = user;
+      _user.friendRequestList = requests;
+      setUser(_user);
     }
 
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/reject-friend-request';
@@ -206,6 +278,10 @@ function Friends() {
     }
     const newObject = { id: userId, login: userName, avatar: userAvatar };
     friendsList.push(newObject);
+    const _user: User = user;
+    _user.friendRequestList = requests;
+    _user.friendList = friendsList;
+    setUser(_user)
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/accept-friend-request';
     const token = localStorage.getItem('jwtToken');
     const conf = {
@@ -236,6 +312,9 @@ function Friends() {
     const elementToDelete = blockedList.findIndex((obj: any) => obj.id === userId);
     if (elementToDelete !== -1) {
       blockedList.splice(elementToDelete, 1);
+      const _user : User = user;
+      _user.blockedList = blockedList;
+      setUser(_user);
     }
 
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/unblock-user';
@@ -271,7 +350,7 @@ function Friends() {
 
   return (
     <>
-      <OptionBar flag={2} userName={"login"}>
+      <OptionBar flag={2} >
         <main className="w-full h-auto md:h-full flex flex-col font-Orbitron min-h-[480px] min-w-[280px]">
           <div className="w-full h-12 md:h-[10%] pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
             Friends
@@ -367,7 +446,7 @@ function Friends() {
                   <Invit
                     login={userName}
                     closeModal={closeModal}
-                    avatar={alien}
+                    avatar={userAvatar}
                     accept={acceptRequest}
                     delete={deleteRequest}
                     Color={false}
@@ -411,7 +490,7 @@ function Friends() {
                   <Invit
                     login={userName}
                     closeModal={closeFriendModal}
-                    avatar={alien}
+                    avatar={userAvatar}
                     accept={deleteFriend}
                     delete={blockFriend}
                     Color={true}
@@ -456,7 +535,7 @@ function Friends() {
                   <Invit
                     login={userName}
                     closeModal={closeBlockModal}
-                    avatar={alien}
+                    avatar={userAvatar}
                     accept={unblockUser}
                     Color={true}
                     Content1="Delete"

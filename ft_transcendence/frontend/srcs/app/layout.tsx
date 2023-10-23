@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Providers } from '../redux-store/provider';
 import OptionBar from './components/forms/OptionBar';
+import Context from '../context/context';
 
 
 
@@ -14,16 +15,17 @@ export const metadata: Metadata = {
 };
 
 export default function rootLayout({ children }: { children: React.ReactNode }) {
-  
+
   return (
     
     <html lang="en">
       <body className={inter.className}>
-        <Providers>
+        <Context>
+          {children}
+        </Context>
           {/* <OptionBar userName='mabdelba' flag={0}> */}
-            {children}
+            {/* {children} */}
           {/* </OptionBar> */}
-        </Providers>
       </body>
     </html>
   );

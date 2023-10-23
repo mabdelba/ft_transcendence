@@ -1,15 +1,18 @@
 'use client';
 import axios from 'axios';
 import DiscloComp from '../components/shapes/DiscloComp';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client';
 // import OptionBar from '../components/forms/OptionBar'
 import dynamic from 'next/dynamic';
+import { User, context } from '../../context/context';
 
 
 const OptionBar = dynamic(() => import('../components/forms/OptionBar'), {ssr: false});
 
 function Achievements() {
+
+	const {user, setUser} = useContext(context);
 	const [acquired, setAcquired] = useState<any>(null); //
 	const [unacquired, setUnacquired] = useState<any>(null); //
 	async function getAchievements() {
@@ -31,9 +34,18 @@ function Achievements() {
 		);
 		setAcquired(acq.data.achievements);
 		setUnacquired(unacq.data);
+		const _user : User = user;
+		_user.achievements = acq.data.achievements;
+		_user.unacquiredAchiev = unacq.data;
+		setUser(_user);
 	}
 	useEffect(() => {
-		getAchievements();
+		if(user.achievements && user.unacquiredAchiev)
+		{
+			setAcquired(user.achievements);
+			setUnacquired(user.unacquiredAchiev);
+		}
+		else getAchievements();
 	}, []);
 
 	// function setOnline() {
@@ -48,7 +60,7 @@ function Achievements() {
 	// 	setOnline();
 	// }, []);
 	return (
-		<OptionBar flag={1}  userName={'login'}>
+		<OptionBar flag={1} >
 				<main className="w-full h-auto md:h-full flex flex-col font-Orbitron min-h-[480px] min-w-[280px] ">
 					<div className="w-full h-12 md:h-[10%] pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
 						All achievements
@@ -60,7 +72,7 @@ function Achievements() {
 								divArray={acquired}
 								textColor="text-white NeonShadow"
 								Color={true}
-								hoverColor="hover:text-[#00B2FF] hover:blueShadow"
+								hoverColor="hover:text-[#00B2FF]  hover:blueShadow"
 								isFriend={false}
 								image=""
 							/>
