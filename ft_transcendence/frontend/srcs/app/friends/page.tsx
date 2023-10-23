@@ -22,8 +22,9 @@ import OptionBar from '../components/forms/OptionBar';
 
 function Friends() {
   const router = useRouter();
-  const {user, setUser} = useContext(context);
+  const {user, setUser, socket} = useContext(context);
   const [tempAvatar, setTempAvatar] = useState('');
+
   // function setOnline() {
   //   io('http://localhost:3000', {
   //     transports: ['websocket'],
@@ -81,8 +82,8 @@ function Friends() {
         setRequest(response.data.recievedFriendRequestsBy);
         const _user: User = user;
         _user.friendRequestList = response.data.recievedFriendRequestsBy;
-        setUser(_user);
-      })
+          setUser(_user);
+        })
       .catch((error) => {
         console.log('Error from backend', error);
       });
@@ -160,6 +161,11 @@ function Friends() {
     } 
     else{
       setRequest(user.friendRequestList);setFriendsList(user.friendList);setBlockedList(user.blockedList);
+    }
+    if (!user.state)
+    {
+      socket.emit('online', {token: token} );
+      user.state = 1;
     }
   }
   }, []);

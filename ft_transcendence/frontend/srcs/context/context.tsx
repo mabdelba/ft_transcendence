@@ -1,5 +1,8 @@
 'use client'
 import { createContext, useState } from "react"
+import { Socket } from "socket.io";
+
+import { io } from "socket.io-client";
 
 export interface User{
     id? : number,
@@ -28,12 +31,16 @@ export interface User{
 
 }
 
-export const context = createContext<{user: User; setUser: Function}>({user: {}, setUser: ()=>{}})
+export const context = createContext<{user: User; setUser: Function, socket: any}>({user: {}, setUser: ()=>{}, socket: {}});
 
 const Context = ({children}: {children: React.ReactNode}) => {
     const [user, setUser] = useState<User>({});
+    const socket = io('http://localhost:3000', {
+        transports: ['websocket'],
+    });
+
     return (
-        <context.Provider value={{user, setUser}}>
+        <context.Provider value={{user, setUser, socket}}>
             {children}
         </context.Provider>
     );

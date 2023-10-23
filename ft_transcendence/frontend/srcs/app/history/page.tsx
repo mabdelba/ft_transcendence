@@ -22,7 +22,7 @@ function History() {
 	// 	if (!localStorage.getItem('jwtToken')) router.push('/');
 	// 	setOnline();
 	// }, []);
-	const {user, setUser } = useContext(context);
+	const {user, setUser, socket } = useContext(context);
 	const [matches, setMatches] = useState([]);
 	async function getMatches() {
 		const res = await axios.get('http://localhost:3000/api/atari-pong/v1/history', {
@@ -57,6 +57,11 @@ function History() {
 			else if(!user.history) getMatches();
 			else
 				setMatches(user.history);
+			if (!user.state)
+			{
+				socket.emit('online', {token: token} );
+				user.state = 1;
+			}
 		}
 	}, []);
 

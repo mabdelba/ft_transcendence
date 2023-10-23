@@ -19,6 +19,7 @@ function Dashboard() {
 	const {setUser: setUser__, user} = useContext(context);
 	// let [user, setUser] = useState<any>(null);
 	const router = useRouter();
+	const {socket} = useContext(context);
 	
 	async function getProfile() {
 		const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
@@ -26,7 +27,6 @@ function Dashboard() {
 		const config = {
 			headers: { Authorization: `Bearer ${token}` },
 		};
-
 		try {
 			const res = await axios.get(apiUrl, config);
 			const user_ = await axios.post(
@@ -40,13 +40,12 @@ function Dashboard() {
 			const imageBlob = URL.createObjectURL(user_.data) as string;
 			const user : User = res.data;
 			user.avatar = imageBlob;
+			if (!user.state)
+			{
+				socket.emit('online', {token: localStorage.getItem('jwtToken')} );
+				user.state = 1;
+			}
 			setUser__(user);
-			// io('http://localhost:3000', {
-			// 	transports: ['websocket'],
-			// 	auth: {
-			// 		token: token,
-			// 	},
-			// });
 		} catch (err) {
 			router.push('/');
 		}
