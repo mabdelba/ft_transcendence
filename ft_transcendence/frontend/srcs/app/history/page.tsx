@@ -10,20 +10,10 @@ import OptionBar from '../components/forms/OptionBar';
 import { User, context } from '../../context/context';
 
 function History() {
-	// function setOnline() {
-	// 	io('http://localhost:3000', {
-	// 		transports: ['websocket'],
-	// 		auth: {
-	// 			token: localStorage.getItem('jwtToken'),
-	// 		},
-	// 	});
-	// }
-	// useEffect(() => {
-	// 	if (!localStorage.getItem('jwtToken')) router.push('/');
-	// 	setOnline();
-	// }, []);
+	
 	const {user, setUser, socket } = useContext(context);
 	const [matches, setMatches] = useState([]);
+
 	async function getMatches() {
 		const res = await axios.get('http://localhost:3000/api/atari-pong/v1/history', {
 			headers: {
@@ -43,6 +33,7 @@ function History() {
 		_user.history = res.data;
 		setUser(_user);
 	}
+	
 	useEffect(() => {
 		const token = localStorage.getItem('jwtToken');
 		if (!token) router.push('/');
