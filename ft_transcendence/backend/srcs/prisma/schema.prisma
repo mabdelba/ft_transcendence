@@ -56,10 +56,10 @@ model UserMutedInChannel {
   id                Int      @id @default(autoincrement())
   dateBegin         DateTime @default(now())
   dateEnd           DateTime
-  userId            Int
-  user              User     @relation(fields: [userId], references: [id])
-  channelId         Int
-  channel           Channel  @relation(fields: [channelId], references: [id])
+  userLogin         String
+  user              User     @relation(fields: [userLogin], references: [login])
+  channelName       String
+  channel           Channel  @relation(fields: [channelName], references: [name])
 }
 
 model Channel {
@@ -70,8 +70,8 @@ model Channel {
   banned            User[]    @relation("bannedFromChannel")
   muted             UserMutedInChannel[]
   admins            User[]    @relation("adminOfChannel")
-  ownerId           Int
-  owner             User      @relation("ownerOfChannel", fields: [ownerId], references: [id])
+  ownerLogin        String
+  owner             User      @relation("ownerOfChannel", fields: [ownerLogin], references: [login])
   messages          Message[]
 }
 
@@ -79,12 +79,12 @@ model Message {
   id                    Int      @id @default(autoincrement())
   text                  String
   dateOfSending         DateTime @default(now())
-  senderId              Int
-  senderUser            User     @relation("sender", fields: [senderId], references: [id])
-  recieverUserId        Int?
-  recieverUser          User?    @relation("reciever", fields: [recieverUserId], references: [id])
-  recieverchannelId     Int?
-  channel               Channel? @relation(fields: [recieverchannelId], references: [id])
+  sender                String
+  senderUser            User     @relation("sender", fields: [sender], references: [login])
+  reciever              String?
+  recieverUser          User?    @relation("reciever", fields: [reciever], references: [login])
+  recieverchannel       String?
+  channel               Channel? @relation(fields: [recieverchannel], references: [name])
 }
 
 model Achievement {
