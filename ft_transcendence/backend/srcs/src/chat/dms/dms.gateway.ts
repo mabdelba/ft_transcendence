@@ -4,6 +4,7 @@ import { JwtGuard } from "src/auth/guards";
 import { Server, Socket, Namespace } from 'socket.io';
 import jwtDecode from 'jwt-decode';
 import { DmsService } from "./dms.service";
+import { subscribe } from "diagnostics_channel";
 
 
 
@@ -15,13 +16,29 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     io: Namespace;
 
     async handleConnection(client: any, room: String, socket: Socket) {
-        this.dmsService.joinRoom(client, socket, this.io.server);
+        console.log('connected');
+        // this.dmsService.joinRoom(client, socket, this.io.server);
     }
     handleDisconnect(client: any) {
         console.log('disconnected');
     }
-    @SubscribeMessage('message')
-    handleMessage(@MessageBody() data: string, @ConnectedSocket() client: Socket){
-        client.to('aelabimabdelba').emit('message', data);
+    @SubscribeMessage('join-room')
+    handleJoinRoom(@MessageBody() data: {roomName: string, user: string}, @ConnectedSocket() client: Socket){
+        this.dmsService.joinRoom(data, false, client);
     }
+
+    @SubscribeMessage('message')
+    async handleMessage(@MessageBody() data: {senderLogin: string, receiverLogin: string, text: string}, @ConnectedSocket() client: Socket){
+        if (!this.dmsService.checkUsers(data.senderLogin, data.receiverLogin)) return;
+        client.to(this.dmsService.createRoomName(data.receiverLogin, data.senderLogin)).emit('message', data);
+        await this.dmsService.saveMessage(client, data);
+    }
+
+    @SubscribeMessage('get-messages')
+    async handleGetMessages(@MessageBody() data: {senderLogin: string, receiverLogin: string}, @ConnectedSocket() client: Socket){
+        if (!this.dmsService.checkUsers(data.senderLogin, data.receiverLogin)) return;
+        // const messages = await this.dmsService.getMessages(data.senderLogin, data.receiverLogin);
+        // client.emit('get-messages', messages);
+    }
+
 }

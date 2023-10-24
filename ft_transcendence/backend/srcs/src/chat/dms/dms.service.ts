@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import jwtDecode from 'jwt-decode';
 import { Socket } from "socket.io";
+import { async } from "rxjs";
 
 
 @Injectable()
@@ -18,13 +19,43 @@ export class DmsService {
         return user2 + user1;
     }
 
-    joinRoom(client: any, socket: Socket, server: any){
-        const me:{login:string} = this.decodeToken(client.handshake.headers.access_token) as {login:string};
-        const channel = client.handshake.query.channel;
-        const otherUser = client.handshake.query.user;
-        const roomName = otherUser !== undefined ? this.createRoomName(me.login, otherUser) : channel;
-        client.join(roomName);
-        console.log(`User ${me.login} joined room ${roomName}`);
-        return roomName;
+    joinRoom(data: any, isChannel: boolean, client: Socket){
+        client.join(data.roomName);
+        console.log(`User ${data.user} joined room ${data.roomName}`);
+        // return roomName;
+    }
+
+    async saveMessage(client: any,data: any){
+        console.log(`User ${data.senderLogin} sent message to ${data.receiverLogin}`);
+        await this.prisma.message.create({
+            data: {
+                text: data.text,
+                senderUser: {
+                    connect: {
+                        login: data.senderLogin
+                    }
+                },
+                recieverUser: {
+                    connect: {
+                        login: data.receiverLogin
+                    }
+            }
+            }
+        });
+    }
+
+    async checkUsers(senderLogin: string, receiverLogin: string){
+        const sender = await this.prisma.user.findUnique({
+            where: {
+                login: senderLogin
+            }
+        });
+        const receiver = await this.prisma.user.findUnique({
+            where: {
+                login: receiverLogin
+            }
+        });
+        if (!sender || !receiver) return false;
+        return true;
     }
 }
