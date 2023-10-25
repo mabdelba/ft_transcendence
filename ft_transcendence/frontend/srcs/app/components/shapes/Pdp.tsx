@@ -20,6 +20,11 @@ type newType = {
 function Pdp(props: newType) {
   
   const [userAvatar, setUserAvatar] = useState(alien);
+
+  useEffect(()=> {
+
+    setUserAvatar(props.image);
+  }, [props.image])
   const {user, setUser} = useContext(context);
   // async function getUserAvatar(login: string) {
   //   if (login !== '') {
@@ -71,7 +76,7 @@ function Pdp(props: newType) {
           onClick={props.router ? viewProfile : props.handleClick}
           className="h-[50px] w-[50px] sm:w-[70px] sm:h-[70px] lg:w-[90px] lg:h-[90px] 2xl:w-[105px] 2xl:h-[105px] NeonShadowBord flex items-center justify-center overflow-hidden"
         >
-          <Image src={props.image || alien} alt="profil" className="w-50 h-50 sm:w-[100px] " width="50" height="50" />
+          <Image src={userAvatar || alien} alt="profil" className="w-50 h-50 sm:w-[100px] " width="50" height="50" />
         </button>
         {!props.flag && props.name}
       </div>

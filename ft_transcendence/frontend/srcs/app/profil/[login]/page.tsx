@@ -72,7 +72,7 @@ function UserProfil(props: newType) {
     }
     }
   }, []);
-  const [Case, setCase] = useState(1);
+  const [Case, setCase] = useState(-2);
 
   return (
     <OptionBar flag={-1} >

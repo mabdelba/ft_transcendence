@@ -62,12 +62,20 @@ function LatestAchiev(props: newType) {
       <div className="w-full h-1/4 flex xl:justify-start justify-center xl:pl-10 items-center text-sm base:text-base 2xl:text-2xl">
         Latest achievements
       </div>
-      {limiter == 0 ? (
+      {
+        !achievement ?
+        <div className=" flex flex-col space-y-2 w-full h-[80%] items-center justify-center">
+        <h1>Loading</h1>
+        <div className="spinner"></div>
+        </div> 
+      :
+        limiter == 0 ? (
         <div className="w-full h-1/2 flex flex-col text-2xl justify-center items-center">
           <Image src={NoAchiev} alt="Achievement" />
           No achievements
         </div>
-      ) : (
+      ) :
+       (
         <div className="w-full h-3/4 px-1 xl:px-10 pb-10 grid grid-rows-2 grid-cols-3  gap-1 2xl:gap-4">
           {divArray.map((divName: any) => (
             <div key={divName}>
