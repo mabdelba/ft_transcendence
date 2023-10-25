@@ -66,50 +66,7 @@ function Achievements() {
 	
 	}, [status, status1])
 	
-	// async function getAchievements() {
-	// 	const acq = await axios.get(
-	// 		'http://localhost:3000/api/atari-pong/v1/achievements/all-acquired',
-	// 		{
-	// 			headers: {
-	// 				Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
-	// 			},
-	// 		},
-	// 	);
-	// 	const unacq = await axios.get(
-	// 		'http://localhost:3000/api/atari-pong/v1/achievements/all-unacquired',
-	// 		{
-	// 			headers: {
-	// 				Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
-	// 			},
-	// 		},
-	// 	);
-	// 	setAcquired(acq.data.achievements);
-	// 	setUnacquired(unacq.data);
-	// 	const _user : User = user;
-	// 	_user.achievements = acq.data.achievements;
-	// 	_user.unacquiredAchiev = unacq.data;
-	// 	setUser(_user);
-	// }
-	// useEffect(() => {
-	// 	if(user.achievements && user.unacquiredAchiev)
-	// 	{
-	// 		setAcquired(user.achievements);
-	// 		setUnacquired(user.unacquiredAchiev);
-	// 	}
-	// 	else getAchievements();
-	// }, []);
-
-	// function setOnline() {
-	// 	io('http://localhost:3000', {
-	// 		transports: ['websocket'],
-	// 		auth: {
-	// 			token: localStorage.getItem('jwtToken'),
-	// 		},
-	// 	});
-	// }
-	// useEffect(() => {
-	// 	setOnline();
-	// }, []);
+	
 	return (
 		<OptionBar flag={1} >
 				<main className="w-full h-auto md:h-full flex flex-col font-Orbitron min-h-[480px] min-w-[280px] ">

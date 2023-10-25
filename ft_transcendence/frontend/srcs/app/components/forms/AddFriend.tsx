@@ -157,6 +157,13 @@ function AddFriend(props: newType) {
   }, [props.login]);
   return (
     <div className="h-full w-full NeonShadowBord flex flex-col ">
+      {
+        props.state == -2 ? 
+        <div className=" flex flex-col space-y-2 w-full h-[80%] items-center justify-center">
+        <h1>Loading</h1>
+        <div className="spinner"></div>
+        </div>:
+      <>
       <div
         className={`w-full ${
           props.state == 1 ? 'h-1/5' : 'h-1/2'
@@ -209,6 +216,9 @@ function AddFriend(props: newType) {
           </div>
         )}
       </div>
+      
+      </>
+}
     </div>
   );
 }

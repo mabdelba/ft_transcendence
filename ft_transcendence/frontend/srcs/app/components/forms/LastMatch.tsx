@@ -96,6 +96,11 @@ function LastMatch(props: newType) {
           No matches played yet
         </div>
       ) : (
+        oppLogin == '' ?
+				<div className=" flex flex-col space-y-2 w-full h-[80%] items-center justify-start">
+					<h1>Loading</h1>
+					<div className="spinner"></div>
+			  	</div> :
         <div className="w-full h-[65%]  flex flex-row ">
           <div className="h-full w-[18%]"></div>
           <div className="w-[15%] h-[67%] flex flex-col justify-start items-end ">

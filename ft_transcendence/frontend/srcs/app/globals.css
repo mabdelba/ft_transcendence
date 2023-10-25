@@ -246,8 +246,8 @@ body {
 }
 
 .spinner {
-  width: 64px;
-  height: 64px;
+  width: 40px;
+  height: 40px;
   border: 8px solid;
   border-color: #ffffff transparent #FFFFFF transparent;
   border-radius: 50%;

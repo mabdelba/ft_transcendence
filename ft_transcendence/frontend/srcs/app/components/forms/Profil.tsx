@@ -22,7 +22,18 @@ function Profil(props: profileProp) {
 	const { user } = useContext(context);
 	const [userAvatar, setUserAvatar] = useState(alien);
 
-	let [profile, setProfile] = useState<any>(null);
+	const [profile, setProfile] = useState<any>({
+		firstName: '',
+		lastName: '',
+		login: '',
+		level: 0,
+		matchPlayed: 0,
+		winPercent: 50,
+		numberOfGamesPlayed: 0,
+		numberOfGamesWon: 0,
+		state: 0,
+	});
+
 	async function getProfile() {
 		if (props.login) {
 			const url = 'http://localhost:3000/api/atari-pong/v1/user/me';
@@ -77,19 +88,6 @@ function Profil(props: profileProp) {
 	let state;
 	let stateImage;
 
-	if (!profile) {
-		profile = {
-			firstName: 'Loading',
-			lastName: 'Loading',
-			login: '',
-			level: 0,
-			matchPlayed: 0,
-			winPercent: 50,
-			numberOfGamesPlayed: 0,
-			numberOfGamesWon: 0,
-			state: 0,
-		};
-	}
 	if (profile.numberOfGamesPlayed != 0)
 		winPercent = Math.floor((profile.numberOfGamesWon * 100) / profile.numberOfGamesPlayed);
 	const lev = Math.floor(profile.level);
@@ -117,7 +115,17 @@ function Profil(props: profileProp) {
 	}
 	return (
 		<div className="h-full w-full flex flex-col  justify-center items-center NeonShadowBord ">
-			<div className="h-1/2 w-full flex flex-row  items-center lg:space-x-2 2xl:space-x-0">
+			{
+				profile.login == '' && 
+				<div className=" flex flex-col space-y-2 w-full h-[80%] items-center justify-center">
+					<h1>Loading</h1>
+					<div className="spinner"></div>
+			  	</div>
+			}
+			{
+				profile.login != '' &&
+				<>
+				<div className="h-1/2 w-full flex flex-row  items-center lg:space-x-2 2xl:space-x-0">
 				<div className="w-[10%]  xl:w-[12.5%] h-[50%] "></div>
 				<div className="w-[15%] xl:w-[12.5%] h-[60%] flex justify-end items-center ">
 					<Pdp
@@ -170,6 +178,8 @@ function Profil(props: profileProp) {
 					</div>
 				</div>
 			</div>
+			</>
+			}
 		</div>
 	);
 }
