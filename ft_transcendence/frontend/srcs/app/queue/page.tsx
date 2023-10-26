@@ -3,23 +3,74 @@ import * as React from 'react'
 import Image from 'next/image';
 import LightMap from '../../public/lightMap.svg';
 import DarkMap from '../../public/darkMap.svg';
+import { Fragment, useState } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import Logout from '../../public/log-out.svg';
+import Loader from '../components/shapes/loader';
 
 function Queue() {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const toggleModal = () => {
+        setIsOpen(!isOpen);
+    }
 
     return (
-        <>
-            <div className='flex flex-col items-center h-screen justify-center'>
-                <h1 className='font-Orbitron NeonShadow text-[30px] mb-[30px]'>Chouse a map</h1>
-                <div className='flex content-center justify-center'>
-                    <button className=''>
-                        <Image src={LightMap} alt="LightMap" />
-                    </button>
-                    <button className=''>
-                        <Image src={DarkMap} alt="DarkMap" />
-                    </button>
+      <>
+        <div className='flex flex-col items-center h-screen justify-center'>
+          <h1 className='font-Orbitron NeonShadow text-[30px] mb-[30px]'>Chouse a map</h1>
+          <div className='flex content-center justify-center'>
+            <button className='' onClick={toggleModal}>
+              <Image src={LightMap} alt="LightMap" />
+            </button>
+            <button className='' onClick={toggleModal}>
+              <Image src={DarkMap} alt="DarkMap" />
+            </button>
+          </div>
+        </div>
+        {isOpen && (
+          <Transition appear show={isOpen} as={Fragment}>
+            <Dialog as="div" className="relative z-10" onClose={toggleModal}>
+              <div className="fixed inset-0 overflow-y-auto">
+                <div className="flex justify-center items-center bg-opacity-40 bg-[#282828] w-screen h-screen">
+                  <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0 scale-95"
+                    enterTo="opacity-100 scale-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100 scale-100"
+                    leaveTo="opacity-0 scale-95"
+                  >
+                    <Dialog.Panel className="font-Orbitron NeonShadow px-6 py-1 flex flex-col justify-center items-center min-w-[280px] min-h-[479px] w-full h-[50%] md:w-2/3  lg:w-1/3  bg-black NeonShadowBord">
+                      <div className='text-[35px]'>Waiting for opponents</div>
+
+
+
+
+
+                      <Loader />
+
+
+
+
+
+                      <button className='NeonShadow flex items-center justify-center NBord Boxshad h-[68px] w-[196px] text-[20px] hover:bg-white hover:text-black duration-300' onClick={toggleModal}>
+                        <Image
+                          src={Logout}
+                          alt='Logout'
+                          className='mr-3'
+                        />
+                        <div>Cancel</div>
+                      </button>
+                    </Dialog.Panel>
+                  </Transition.Child>
                 </div>
-            </div>
-        </>
+              </div>
+            </Dialog>
+          </Transition>
+        )}
+      </>
     )
 }
 
