@@ -8,12 +8,15 @@ import MyMenu from "../components/buttons/DropBox";
 import alien from "../../public/alien.svg";
 import Image from "next/image";
 import group from "../../public/friends.svg"
+import SendMessage from "../components/inputs/SendMessage";
 
 
 
 
-const friendList = ['forlan', 'maradona', 'costa', 'milito']
+const friendList = ['waelhamd', 'abdelbar', 'mohamed', 'wassim']
 const Groups = ['#Group one', 'Group two', '&Group three']
+
+
 
 function Messages(){
 
@@ -22,6 +25,15 @@ function Messages(){
     const {user} = useContext(context);
     const [showArray, setShowArray] = useState<any>([]);
     const [roomSelected, setRoomSelected] = useState(friendList[0]);
+    const [message, setMessage] = useState('');
+
+
+    const handleSend = (e:any) => {
+
+        e.preventDefault();
+        // alert(`message to ${roomSelected} : ${message}`);
+        setMessage('');
+    }
 
     // const [friendList, setFriendList] = useState(user.friendList);
   
@@ -42,16 +54,16 @@ function Messages(){
                     <div className="h-16  2xl:h-20  border-b-[3px] lineshad bg-[#36494e] bg-opacity-70">
                         <ListBox setSelected={setSelected} />
                     </div>
-                    <div className="h-auto w-full grid grid-cols-1">
+                    <div className="h-auto w-full grid grid-cols-1 pt-2 2xl:pt-4">
                     {
                         showArray.map((obj:string) => (
                         <button 
                         onClick={()=> {
                             setRoomSelected(obj);
                         }}
-                        key={obj} className={`h-14  2xl:h-[70px] border-b-[1px]  border-opacity-70 text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 md:pl-3 2xl:pl-5 items-center transition-all duration-200   ${roomSelected == obj ? ' text-[#FF184F] hover:bg-white redShadow font-bold' : 'hover:text-black hover:bg-white'}    `}>
-                            <Image src={selected == 0?  alien : group} alt="image" className={`rounded-full border-2 2xl:border-[3px] w-10 h-10  2xl:w-12 2xl:h-12 ${roomSelected != obj? 'border-[#00B2FF]' : 'border-[#FF184F] '} bg-black`} />
-                            <h1 className="hidden md:block ">{obj}</h1>
+                        key={obj} className={`h-14  2xl:h-[68px] truncate  border-opacity-70 text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 md:pl-5 2xl:pl-10 items-center transition-all duration-500 tracking-wide  ${roomSelected == obj ? ' text-[#FF184F] redShadow font-bold underline underline-offset-8 ' : 'hover:underline hover:underline-offset-8 hover:text-[#00B2FF] hover:blueShadow'}    `}>
+                            <Image src={ (selected == 0?  (user.avatar || alien) : group)} alt="image" width="50" height="50" className={`rounded-full border-2 2xl:border-[3px] w-10 h-10  2xl:w-12 2xl:h-12 ${roomSelected != obj? 'border-[#00B2FF]' : 'border-[#FF184F] '} bg-black`} />
+                            <span className="hidden md:block  ">{obj}</span>
                         </button>
                     ))
                     }
@@ -59,15 +71,16 @@ function Messages(){
 
                 </div>
                 <div className="h-full w-full flex flex-col justify-between">
-                    <div className="h-16  2xl:h-20  border-b-[3px] lineshad flex flex-row justify-between items-center bg-[#36494e] bg-opacity-70">
+                    <div className="h-16  2xl:h-20   border-b-[3px] lineshad flex flex-row justify-between items-center bg-[#36494e] bg-opacity-70">
                         <div><BurgButton setFlag={setShowSideBar} val={showSideBar} /></div>
-                        <span>{roomSelected}</span>
+                        <span className="text-base lg:text-lg">{roomSelected}</span>
                         <MyMenu  slected={selected}/>
-                        {/* <button>hello</button> */}
                     </div>
-                
-                    <div className="h-16  2xl:h-20  border-t-[3px] lineshad">
+                    <>
                         
+                    </>
+                    <div className="h-16  2xl:h-20  border-t-[3px] lineshad">
+                        <SendMessage  SetValue={setMessage} handleClick={handleSend} value={message} />
                     </div>
                 
                 </div>
