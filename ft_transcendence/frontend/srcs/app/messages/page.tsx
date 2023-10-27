@@ -49,7 +49,7 @@ function Messages(){
                         onClick={()=> {
                             setRoomSelected(obj);
                         }}
-                        key={obj} className={`h-14  2xl:h-[70px] border-b-[1px]  border-opacity-70 text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 md:pl-3 2xl:pl-5 items-center transition-all duration-200   ${roomSelected == obj ? 'bg-white bg-opacity-75 text-[#FF184F] redShadow font-bold' : ''}  hover:bg-white hover:text-black `}>
+                        key={obj} className={`h-14  2xl:h-[70px] border-b-[1px]  border-opacity-70 text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 md:pl-3 2xl:pl-5 items-center transition-all duration-200   ${roomSelected == obj ? ' text-[#FF184F] hover:bg-white redShadow font-bold' : 'hover:text-black hover:bg-white'}    `}>
                             <Image src={selected == 0?  alien : group} alt="image" className={`rounded-full border-2 2xl:border-[3px] w-10 h-10  2xl:w-12 2xl:h-12 ${roomSelected != obj? 'border-[#00B2FF]' : 'border-[#FF184F] '} bg-black`} />
                             <h1 className="hidden md:block ">{obj}</h1>
                         </button>
