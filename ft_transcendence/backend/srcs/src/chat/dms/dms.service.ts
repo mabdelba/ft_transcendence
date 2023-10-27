@@ -58,4 +58,51 @@ export class DmsService {
         if (!sender || !receiver) return false;
         return true;
     }
+
+    async usersWithConversation(login: string){
+        const usersWithConversation = await this.prisma.user.findMany({
+            where: {
+              OR: [
+                {
+                  sentMessages: {
+                    some: {
+                      reciever: login
+                    }
+                  }
+                },
+                {
+                  recievedMessages: {
+                    some: {
+                      sender: login
+                    }
+                  }
+                }
+              ]
+            },
+            include: {
+                sentMessages: true,
+                recievedMessages: true,
+            }
+          });
+        //   usersWithConversation.sort((a, b) => {
+        //     const getLastMessageDate = (user) => {
+        //       const sentDates = user.sentMessages.map((message) => message.dateOfSending);
+        //       const recievedDates = user.recievedMessages.map((message) => message.dateOfSending);
+        //       const allDates = [...sentDates, ...recievedDates];
+        //       return Math.max(...allDates);
+        //     };
+          
+        //     const aLastMessageDate = getLastMessageDate(a);
+        //     const bLastMessageDate = getLastMessageDate(b);
+          
+        //     if (aLastMessageDate > bLastMessageDate) {
+        //       return -1;
+        //     }
+        //     if (aLastMessageDate < bLastMessageDate) {
+        //       return 1;
+        //     }
+        //     return 0;
+        //     });
+        return usersWithConversation;
+    }
 }

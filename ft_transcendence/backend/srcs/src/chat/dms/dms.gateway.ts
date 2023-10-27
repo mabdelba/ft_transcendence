@@ -34,6 +34,13 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         await this.dmsService.saveMessage(client, data);
     }
 
+    @SubscribeMessage('users-with-conversation')
+    async getUsersWithConversation(@MessageBody() data: {login: string}){
+        const dms = await this.dmsService.usersWithConversation(data.login);
+        console.log(dms);
+        return dms;
+    }
+    
     @SubscribeMessage('get-messages')
     async handleGetMessages(@MessageBody() data: {senderLogin: string, receiverLogin: string}, @ConnectedSocket() client: Socket){
         if (!this.dmsService.checkUsers(data.senderLogin, data.receiverLogin)) return;
