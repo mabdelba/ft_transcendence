@@ -105,4 +105,37 @@ export class DmsService {
         //     });
         return usersWithConversation;
     }
+
+    async getMessages(senderLogin: string, receiverLogin: string){
+        const messages = await this.prisma.message.findMany({
+            where: {
+                AND: [
+                    {
+                        OR: [
+                            {
+                                sender: senderLogin
+                            },
+                            {
+                                sender: receiverLogin
+                            }
+                        ]
+                    },
+                    {
+                        OR: [
+                            {
+                                reciever: senderLogin
+                            },
+                            {
+                                reciever: receiverLogin
+                            }
+                        ]
+                    }
+                ]
+            },
+            orderBy: {
+                dateOfSending: 'asc'
+            }
+        });
+        return messages;
+    }
 }
