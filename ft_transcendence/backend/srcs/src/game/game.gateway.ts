@@ -17,7 +17,7 @@ export class GameGateway {
         const jwtToken = socket.handshake.auth.token;
         const decoded = jwtDecode(jwtToken);
         if (this.ConnectedUsers.has(decoded['login'])) {
-            // this.ConnectedUsers.get(decoded['login'])?.push(socket.id);
+            this.ConnectedUsers.get(decoded['login'])?.push(socket.id);
             socket.disconnect();
             // console.log('already connected', decoded['login']);
         }
