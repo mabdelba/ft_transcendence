@@ -61,9 +61,12 @@ function Messages(){
                         onClick={()=> {
                             setRoomSelected(obj);
                         }}
-                        key={obj} className={`h-14  2xl:h-[68px] truncate  border-opacity-70 text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 md:pl-5 2xl:pl-10 items-center transition-all duration-500 tracking-wide  ${roomSelected == obj ? ' text-[#FF184F] redShadow font-bold underline underline-offset-8 ' : 'hover:underline hover:underline-offset-8 hover:text-[#00B2FF] hover:blueShadow'}    `}>
-                            <Image src={ (selected == 0?  (user.avatar || alien) : group)} alt="image" width="50" height="50" className={`rounded-full border-2 2xl:border-[3px] w-10 h-10  2xl:w-12 2xl:h-12 ${roomSelected != obj? 'border-[#00B2FF]' : 'border-[#FF184F] '} bg-black`} />
-                            <span className="hidden md:block  ">{obj}</span>
+                        key={obj} className={`h-14  2xl:h-[68px] truncate ${roomSelected == obj ? 'border-none' : ''} border-none hover:border-none md:border-b-[2px]  md:border-double  border-opacity-70 text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 2xl:space-x-6 md:pl-5 2xl:pl-7 items-center transition-all duration-500 tracking-wide  ${roomSelected == obj ? ' text-[#FF184F] shadow-md shadow-[#FF184F] drop-shadow-md border-[#FF184F]   font-bold  underline-offset-8 ' : 'hover:bg-slate-400 hover:text-black hover:border-[#00B2FF] hover:blueShadow'}    `}>
+                            <Image src={ (selected == 0?  (user.avatar || alien) : group)} alt="image" width="50" height="50" className={`rounded-full border-2 2xl:border-[3px] w-10 h-10  2xl:w-12 2xl:h-12 border-inherit bg-slate-800`} />
+                            <span className="hidden  text-left pt-1 md:flex flex-col 2xl:-space-y-1">
+                                <h1>{obj}</h1>
+                                <h6 className="text-[7px] 2xl:text-[10px] antialiased  truncate w-1/3 2xl:w-1/2 font-normal tracking-normal text-[#484848]">hello, I am Steve from Oracle agency, we are looking for employees.</h6>
+                            </span>
                         </button>
                     ))
                     }
