@@ -1,8 +1,11 @@
 'use client'
+import { type } from "os";
 import { createContext, useState } from "react"
+import { StoreID } from "recoil";
 import { Socket } from "socket.io";
 
 import { io } from "socket.io-client";
+
 
 export interface User{
     id? : number,
@@ -28,6 +31,8 @@ export interface User{
     friendList?: any,
     blockedList?: any,
     history?: any,
+    messagesSocket?: any;
+    conversations?: any;
 
 }
 

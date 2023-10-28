@@ -16,7 +16,7 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     io: Namespace;
 
     async handleConnection(client: any, room: String, socket: Socket) {
-        console.log('connected');
+        console.log('connected hassan');
         // this.dmsService.joinRoom(client, socket, this.io.server);
     }
     handleDisconnect(client: any) {
@@ -35,11 +35,13 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     }
 
     @SubscribeMessage('users-with-conversation')
-    async getUsersWithConversation(@MessageBody() data: {login: string}){
+    async getUsersWithConversation(@MessageBody() data: {login: string}, @ConnectedSocket() client: Socket){
         const dms = await this.dmsService.usersWithConversation(data.login);
+        client.emit('get-users', dms);
         console.log(dms);
         return dms;
     }
+
 
     @SubscribeMessage('get-messages')
     async handleGetMessages(@MessageBody() data: {senderLogin: string, receiverLogin: string}, @ConnectedSocket() client: Socket){
