@@ -13,7 +13,7 @@ import React from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-import { context } from '../../../context/context';
+import { SocketContext } from '../../../context/context';
 type closeFunc = {
   handler: any;
   rout: any;
@@ -24,7 +24,7 @@ function Login(props: closeFunc) {
   const [password, setPassword] = useState('');
   const [Uerror, setUerror] = useState(false);
   const [Perror, setPerror] = useState(false);
-  const {socket} = useContext(context);
+  const {socket} = useContext(SocketContext);
   const Data = { username, password };
 
   const regex = /^.+$/;
@@ -101,7 +101,7 @@ function Login(props: closeFunc) {
           axios
             .get(apiUrl)
             .then((response) => {
-              toast.success('You have successfully registred!', {
+              toast.success('You have successfully logged in!', {
                 position: 'top-center',
                 autoClose: 2500,
                 hideProgressBar: false,
@@ -118,6 +118,7 @@ function Login(props: closeFunc) {
                 },
               });
               localStorage.setItem('jwtToken', jwtToken);
+              socket.emit('online', {token: jwtToken});
               props.rout.push('/dashboard');
             })
             .catch((error) => {

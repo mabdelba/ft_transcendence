@@ -14,7 +14,7 @@ import Pdp from '../../components/shapes/Pdp';
 import { Alatsi } from 'next/font/google';
 import { useRouter } from 'next/navigation';
 import OptionBar from '../../components/forms/OptionBar';
-import { context, User } from '../../../context/context';
+import { context, User, SocketContext } from '../../../context/context';
 import { useContext } from 'react';
 
 
@@ -23,7 +23,9 @@ type newType = {
 };
 
 function UserProfil(props: newType) {
-  const {user, setUser, socket } = useContext(context);
+  const {user, setUser } = useContext(context);
+  const { socket } = useContext(SocketContext);
+
   const router = useRouter();
   const [numberofMatchPlayed, setNumberOfMatchPlayed] = useState(0);
 
@@ -65,11 +67,13 @@ function UserProfil(props: newType) {
 				router.push('/');
 			}
       else getState();
-      if (!user.state)
-    {
-      socket.emit('online', {token: token} );
-      user.state = 1;
-    }
+
+      if (!user.state && socket) {
+        socket.emit('online', { token: localStorage.getItem('jwtToken') });
+        const _user: User = user;
+        _user.state = 1;
+        setUser(_user);
+      }
     }
   }, []);
   const [Case, setCase] = useState(-2);

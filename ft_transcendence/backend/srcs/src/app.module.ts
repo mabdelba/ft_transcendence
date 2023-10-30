@@ -9,6 +9,7 @@ import { ProfileModule } from './profile/profile.module';
 import { ChatModule } from './chat/chat.module';
 import { StateGateway } from './state/state.gateway';
 import { AchievementsModule } from './achievements/achievements.module';
+import { StateModule } from './state/state.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AchievementsModule } from './achievements/achievements.module';
     TwoFactorAuthModule,
     ProfileModule,
     AchievementsModule,
+    StateModule,
   ],
   controllers: [AppController],
   providers: [AppService, StateGateway],
