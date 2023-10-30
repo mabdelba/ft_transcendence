@@ -55,32 +55,30 @@ function Messages() {
 	// alert(`message to ${roomSelected} : ${message}`);
 	setMessage('');
   };
-  const connectSocket = () => {
-	const socket = io('http://localhost:3000/dm', {
-	  transports: ['websocket'],
-	});
-	const _user: User = { ...user, messagesSocket: socket };
-	setUser(_user);
-  };
 
   const usersWithConversation = async () => {
-	if (!user.messagesSocket) {
-	  connectSocket();
-	} else if(!user.conversations){
-	  	user.messagesSocket.emit('users-with-conversation', { login: user.login });
-	  	user.messagesSocket.on('get-users', (data: any) => {
+	
+	if(socket){
+		const _user: User = {...user}
+
+		if (!user.state) {
+			socket.emit('online', { token: localStorage.getItem('jwtToken') });
+			_user.state = 1;
+			setUser(_user);
+		}
+	  	socket.emit('users-with-conversation', { login: "mabdelba" });
+	  	socket.on('get-users', (data: any) => {
 		console.log('users ===== ', data);
 		data.map((obj:any) => (
-
 			getImageByLogin(obj.login).then((image) => {
 				obj.avatar = image;
 			})
 		));
-		const _user: User = {...user, conversations: data}
-		setUser(_user)
+		_user.conversations = data;
+		setUser(_user);
 		setConversations(data);
 	  });
-	}
+	} 
 	else 
 		setConversations(user.conversations);
   };
@@ -95,15 +93,8 @@ function Messages() {
 		? (setShowArray(Groups), setRoomSelected(Groups[0].login))
 		: setShowArray([]);
 	}
-	if (!user.state && socket) {
-		socket.emit('online', { token: localStorage.getItem('jwtToken') });
-		const _user: User = user;
-		_user.state = 1;
-		setUser(_user);
-	}
-
 	usersWithConversation();
-  }, [selected, user.messagesSocket, user.conversations, conversations]);
+  }, [selected, user.state, user.conversations, conversations]);
 
   return (
 	<OptionBar flag={3}>

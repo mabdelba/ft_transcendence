@@ -21,7 +21,7 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         // this.dmsService.joinRoom(client, socket, this.io.server);
     }
     handleDisconnect(client: any) {
-        console.log('disconnected');
+        console.log('disconnected'); 
     }
     @SubscribeMessage('join-room')
     handleJoinRoom(@MessageBody() data: {roomName: string, user: string}, @ConnectedSocket() client: Socket){
@@ -32,16 +32,16 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     async handleMessage(@MessageBody() data: {senderLogin: string, receiverLogin: string, text: string}, @ConnectedSocket() client: Socket){
         if (!this.dmsService.checkUsers(data.senderLogin, data.receiverLogin)) return;
         client.to(this.dmsService.createRoomName(data.receiverLogin, data.senderLogin)).emit('message', data);
-        await this.dmsService.saveMessage(client, data);
+        await this.dmsService.saveMessage(client, data); 
     }
 
     @SubscribeMessage('users-with-conversation')
     async getUsersWithConversation(@MessageBody() data: {login: string}, @ConnectedSocket() client: Socket){
         const dms = await this.dmsService.usersWithConversation(data.login);
         client.emit('get-users', dms);
-        console.log(dms);
+        // console.log(dms); 
         return dms;
-    }
+    } 
 
 
     @SubscribeMessage('get-messages')

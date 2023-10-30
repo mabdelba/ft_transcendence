@@ -6,15 +6,18 @@ import {
   OnGatewayDisconnect,
   SubscribeMessage,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Namespace, Server, Socket } from 'socket.io';
 import { JwtGuard } from 'src/auth/guards';
 import { PrismaService } from 'src/prisma/prisma.service';
 import jwtDecode from 'jwt-decode';
+import { DmsGateway } from 'src/chat/dms/dms.gateway';
+
 
 @WebSocketGateway()
 export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private prisma: PrismaService) {}
-  @WebSocketServer() server: Server;
+  constructor(private prisma: PrismaService, private dmsGateway: DmsGateway) {}
+  @WebSocketServer()
+  io: Server;
   users = new Map();
   @UseGuards(JwtGuard)
   handleConnection(client: Socket) {
@@ -35,7 +38,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
     this.users.delete(client.id);
     }
-  }
+  } 
 
   @SubscribeMessage('online')
   async setOnline(client: Socket, message: {token: string}) {
@@ -65,6 +68,14 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data: {
         state: 0,
       }
-    });
+    }); 
+  }
+  @SubscribeMessage('users-with-conversation')
+  getUsersWithConversation(client: Socket, data: {login: string}){
+    // this.io.of('/dm').emit('users-with-conversation');
+    // client.emit('users-with-conversation');
+    // console.log(client)
+    this.dmsGateway.getUsersWithConversation(data, client);
   }
 }
+ 
