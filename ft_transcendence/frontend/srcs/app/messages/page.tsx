@@ -2,7 +2,7 @@
 import { useContext, useEffect, useState } from 'react';
 import OptionBar from '../components/forms/OptionBar';
 import ListBox from '../components/buttons/ListBox';
-import { User, context } from '../../context/context';
+import { User, context, SocketContext } from '../../context/context';
 import BurgButton from '../components/shapes/burgButton';
 import MyMenu from '../components/buttons/DropBox';
 import alien from '../../public/alien.svg';
@@ -11,6 +11,7 @@ import group from '../../public/friends.svg';
 import SendMessage from '../components/inputs/SendMessage';
 import { io } from 'socket.io-client';
 import axios from 'axios';
+
 
 const friendList = ['waelhamd', 'abdelbar', 'mohamed', 'wassim'];
 const Groups = [{login: '#Group one', id: 777}, {login:'Group two', id:7788}, {login:'&Group three', id:98}];
@@ -43,6 +44,7 @@ function Messages() {
   const [showSideBar, setShowSideBar] = useState(false);
   const [selected, setSelected] = useState(0);
   const { user, setUser } = useContext(context);
+  const { socket } = useContext(SocketContext);
   const [showArray, setShowArray] = useState<any>([]);
   const [roomSelected, setRoomSelected] = useState(friendList[0]);
   const [message, setMessage] = useState('');
@@ -86,11 +88,19 @@ function Messages() {
 
   useEffect(() => {
 	if(conversations)
-	{	selected == 0
-	  ? (setShowArray(conversations), setRoomSelected(conversations[0].login))
-	  : selected == 1
-	  ? (setShowArray(Groups), setRoomSelected(Groups[0].login))
-	  : setShowArray([]);}
+	{	
+		selected == 0
+		? (setShowArray(conversations), setRoomSelected(conversations[0].login))
+		: selected == 1
+		? (setShowArray(Groups), setRoomSelected(Groups[0].login))
+		: setShowArray([]);
+	}
+	if (!user.state && socket) {
+		socket.emit('online', { token: localStorage.getItem('jwtToken') });
+		const _user: User = user;
+		_user.state = 1;
+		setUser(_user);
+	}
 
 	usersWithConversation();
   }, [selected, user.messagesSocket, user.conversations, conversations]);

@@ -13,7 +13,7 @@ import Image from "next/image";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from "next/navigation";
-import { context } from "../../context/context";
+import { context, SocketContext, User } from "../../context/context";
 
 
 
@@ -52,7 +52,9 @@ function Settings() {
         setSelectFileError(true);
         console.log(e.target.files[0]);
     }
-    const {user, socket} = useContext(context);
+    const {user, setUser} = useContext(context);
+    const { socket } = useContext(SocketContext);
+
     const getData = () => {
 
         const url = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
@@ -79,11 +81,13 @@ function Settings() {
     useEffect(()=> {
 
         getData();
-        if (!user.state)
-        {
-            socket.emit('online', {token: localStorage.getItem('jwtToken')} );
-            user.state = 1;
-        }
+        if (!user.state && socket) {
+			socket.emit('online', { token: localStorage.getItem('jwtToken') });
+			const _user: User = user;
+			_user.state = 1;
+			setUser(_user);
+		}
+        
     }, [counter])
 
 

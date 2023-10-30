@@ -8,15 +8,16 @@ import { subscribe } from "diagnostics_channel";
 
 
 
-@WebSocketGateway({namespace: 'dm'})
+@WebSocketGateway({namespace: 'dm'}) 
 // @UseGuards(JwtGuard)
 export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     constructor(private dmsService: DmsService){}
     @WebSocketServer()
-    io: Namespace;
+    io: Namespace;  
 
-    async handleConnection(client: any, room: String, socket: Socket) {
-        console.log('connected hassan');
+    async handleConnection(client: any, room: String) {
+        
+        console.log('connected dm ', client.id);
         // this.dmsService.joinRoom(client, socket, this.io.server);
     }
     handleDisconnect(client: any) {

@@ -3,6 +3,7 @@ import { type } from "os";
 import { createContext, useState } from "react"
 import { StoreID } from "recoil";
 import { Socket } from "socket.io";
+import { useEffect } from "react";
 
 import { io } from "socket.io-client";
 
@@ -36,17 +37,25 @@ export interface User{
 
 }
 
-export const context = createContext<{user: User; setUser: Function, socket: any}>({user: {}, setUser: ()=>{}, socket: {}});
+export const context = createContext<{user: User; setUser: Function}>({user: {}, setUser: ()=>{}});
+export const SocketContext = createContext<{socket: any}>({socket: {}});
+
 
 const Context = ({children}: {children: React.ReactNode}) => {
     const [user, setUser] = useState<User>({});
-    const socket = io('http://localhost:3000', {
-        transports: ['websocket'],
-    });
+    const [socket, setSocket] = useState<any>(null);
+    useEffect(() => {
+        const sock = io('http://localhost:3000', {
+          transports: ['websocket'],
+        });
+        setSocket(sock);
+    }, []);
 
     return (
-        <context.Provider value={{user, setUser, socket}}>
-            {children}
+        <context.Provider value={{user, setUser}}>
+            <SocketContext.Provider value={{socket}}>
+                {children}
+            </SocketContext.Provider>
         </context.Provider>
     );
 }
