@@ -25,7 +25,7 @@ export default function Home() {
   const openRegisterModal = () => {
     setRegisterOpen(true);
   };
-
+  
   const router = useRouter();
   function checkToken() {
     const token = localStorage.getItem('jwtToken');

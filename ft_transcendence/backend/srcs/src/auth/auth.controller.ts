@@ -91,4 +91,10 @@ export class AuthController {
   async uploadImage(@Req() req) {
     return this.authService.uploadFtAvatar(req.user as User);
   }
+
+  // @UseGuards(JwtGuard)
+  @Post('regenerate-token')
+  async regenerateToken(@Body() dto: {id, login}) {
+    return await this.authService.getToken(dto.id, dto.login);
+  }
 }

@@ -4,6 +4,7 @@ import {
   WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtGuard } from 'src/auth/guards';
@@ -14,33 +15,40 @@ import jwtDecode from 'jwt-decode';
 export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private prisma: PrismaService) {}
   @WebSocketServer() server: Server;
+  users = new Map();
   @UseGuards(JwtGuard)
-  async handleConnection(client: Socket) {
-    const jwtToken = client.handshake.auth.token;
+  handleConnection(client: Socket) {
+    this.users.set(client.id, null);
+  }
+  
+  async handleDisconnect(client: any) {
+    if (!this.users.has(client.id)) {
+    await this.prisma.user.update({
+      where: {
+        login: this.users.get(client.id),
+      },
+      data: {
+        state: 0,
+      },
+    });
+    this.users.delete(client.id);
+    }
+    console.log("offline handler");
+  }
+
+  @SubscribeMessage('online')
+  async setOnline(client: Socket, message: {token: string}) {
+    const jwtToken = message.token;
     const decoded = jwtDecode(jwtToken);
-    console.log('connected', decoded['login']);
+    console.log("online----", decoded['login']);
+    this.users.set(client.id, decoded['login']);
     await this.prisma.user.update({
       where: {
         login: decoded['login'],
       },
       data: {
         state: 1,
-      },
-    });
-  }
-
-  @UseGuards(JwtGuard)
-  async handleDisconnect(client: any) {
-    const jwtToken = client.handshake.auth.token;
-    const decoded = jwtDecode(jwtToken);
-    console.log('disconnected');
-    await this.prisma.user.update({
-      where: {
-        login: decoded['login'],
-      },
-      data: {
-        state: 0,
-      },
+      }
     });
   }
 }

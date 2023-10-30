@@ -5,7 +5,7 @@ import LastMatch from '../../components/forms/LastMatch';
 import LatestAchiev from '../../components/forms/LatestAchiev';
 import Profil from '../../components/forms/Profil';
 import AddFriend from '../../components/forms/AddFriend';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import io from 'socket.io-client';
 import axios from 'axios';
@@ -14,26 +14,27 @@ import Pdp from '../../components/shapes/Pdp';
 import { Alatsi } from 'next/font/google';
 import { useRouter } from 'next/navigation';
 import OptionBar from '../../components/forms/OptionBar';
+import { context, User } from '../../../context/context';
+import { useContext } from 'react';
+
 
 type newType = {
   params: { login: string };
 };
 
 function UserProfil(props: newType) {
+  const {user, setUser, socket } = useContext(context);
   const router = useRouter();
-  function setOnline() {
-    io('http://localhost:3000', {
-      transports: ['websocket'],
-      auth: {
-        token: localStorage.getItem('jwtToken'),
-      },
-    });
-  }
-  useEffect(() => {
-    if (!localStorage.getItem('jwtToken')) router.push('/');
-    setOnline();
-  }, []);
+  const [numberofMatchPlayed, setNumberOfMatchPlayed] = useState(0);
 
+  // useEffect(() => {
+  //   if (!user.state)
+  //   {
+  //     socket.emit('online', {token: localStorage.getItem('jwtToken')} );
+  //     user.state = 1;
+  //   }
+  // })
+  const [otherProfileAvatar, setOtherProfileAvatar] = useState(alien);
   const getState = () => {
     const url = 'http://localhost:3000/api/atari-pong/v1/user/check-relation';
     const token = localStorage.getItem('jwtToken');
@@ -64,18 +65,23 @@ function UserProfil(props: newType) {
 				router.push('/');
 			}
       else getState();
+      if (!user.state)
+    {
+      socket.emit('online', {token: token} );
+      user.state = 1;
+    }
     }
   }, []);
-  const [Case, setCase] = useState(1);
+  const [Case, setCase] = useState(-2);
 
   return (
-    <OptionBar flag={-1} userName="login">
+    <OptionBar flag={-1} >
       <main className="h-auto w-full md:h-full font-Orbitron NeonShadow min-h-[480px] min-w-[280px]">
       {Case == 5 || Case == 4 ? (
         <div className="w-full h-full flex justify-center items-center ">
           <div className="h-1/2 md:h-1/3 w-[95%] lg:w-1/3 NeonShadowBord flex flex-row justify-evenly items-center">
             <div className="-red-500">
-              <Pdp name={'unavailable'} color={false} image={alien} />
+              <Pdp name={'unavailable'} color={false} image={alien} myProfile={true} />
             </div>
             <div className="-green-500 text-xs md:text-base 2xl:text-2xl ">
               This user is not available
@@ -90,10 +96,10 @@ function UserProfil(props: newType) {
           <div className=" w-full md:h-[84%] h-auto flex flex-col md:flex-row justify-center items-center px-2 md:px-12 space-y-6 md:space-y-0 md:space-x-6 xl:space-x-12 ">
             <div className="md:h-full h-auto w-full md:w-[60%]  space-y-6 xl:space-y-12 flex flex-col -red-600">
               <div className="w-full md:h-[60%] h-52">
-                <Profil login={props.params.login} router={router} />
+                <Profil login={props.params.login} myProfil={true} router={router} setUserAvatar={setOtherProfileAvatar} setNumberOfMatch={setNumberOfMatchPlayed} />
               </div>
               <div className="w-full md:h-[40%] h-40">
-                <LastMatch matchPlayed={12} login={props.params.login} router={router} />
+                <LastMatch matchPlayed={numberofMatchPlayed} myProfile={true} pdp={otherProfileAvatar}  login={props.params.login} router={router} />
               </div>
             </div>
             <div className="md:h-full h-auto w-full md:w-[40%] space-y-6  xl:space-y-12 flex flex-col -yellow-300">
@@ -106,7 +112,7 @@ function UserProfil(props: newType) {
                 />
               </div>
               <div className="w-full md:h-[60%] h-auto">
-                <LatestAchiev login={props.params.login} router={router} />
+                <LatestAchiev login={props.params.login} router={router} myProfile={true}/>
               </div>
             </div>
           </div>
