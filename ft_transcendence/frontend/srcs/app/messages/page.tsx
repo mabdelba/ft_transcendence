@@ -16,7 +16,7 @@ import { StoreID } from 'recoil';
 
 
 const path = `/goinfre/mabdelba/ft_transcendence/ft_transcendence/backend/srcs/public/avatars/`;
-const friendList = [{login: 'waelhamd', id:1, avatar: `${path}waelhamd.jpg`}, {login: 'ozahid', id:3, avatar: `${path}ozahid.jpg`},
+const friendList = [{login: 'abas', id:1, avatar: `${path}waelhamd.jpg`}, {login: 'ozahid', id:3, avatar: `${path}ozahid.jpg`},
 	{login: 'mo9atil', id:2, avatar: `${path}mo9atil.jpg`}, {login: 'mlahlafi', id:5, avatar: `${path}mlahlafi.jpg`}];
 const Groups = [{login: '#Group one', id: 777, avatar : ''}, {login:'Group two', id:778,  avatar : ''}, {login:'&Group three', id:98,  avatar : ''}];
 
@@ -100,6 +100,7 @@ function Messages() {
 			})
 		));
 		_user.conversations = data;
+		console.log("this is data ", data);
 		setUser(_user);
 		setConversations(data);
 	  });
@@ -111,13 +112,6 @@ function Messages() {
 
   useEffect(() => {
 	if(conversations)
-	{	
-		selected == 0
-		? (setShowArray(conversations), setRoomSelected(conversations[0].login))
-		: selected == 1
-		? (setShowArray(Groups), setRoomSelected(Groups[0].login))
-		: setShowArray([]);
-	}
 	{	
 		selected == 0
 		? (setShowArray(conversations), setRoomSelected(conversations[0].login))
@@ -160,7 +154,7 @@ function Messages() {
 				  key={obj.id}
 				  className={`h-14 ease-in-out 2xl:h-[68px]  truncate rounded-br-full rounded-tr-full rounded-bl-full text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 2xl:space-x-6 md:pl-5 2xl:pl-7 items-center transition-all duration-500 tracking-wide  ${
 					roomSelected == obj.login
-					  ? ' text-[#FF184F]  hover:bg-[#EDEDED]  border-[#FF184F] md:border-b-2   2xl:border-b-4   font-bold  underline-offset-8 '
+					  ? ' text-white  hover:bg-[#EDEDED] hover:border-[#00B2FF] hover:text-black border-white md:border-b-2   2xl:border-b-4   font-bold  underline-offset-8 '
 					  : ' hover:bg-[#EDEDED] hover:text-black hover:border-[#00B2FF] hover:blueShadow '
 				  }`}
 				>
@@ -175,7 +169,7 @@ function Messages() {
 				  <span className="hidden  text-left pt-1 md:flex flex-col 2xl:-space-y-1">
 					<div className='flex flex-row  items-center justify-between'>
 						<h1>{obj.login}</h1>
-						{selected == 0 && <PiCircleFill className={`${obj.state == 1 ? 'text-green-500 border  border-neutral-500 rounded-full animate-pulse' : 'text-gray-500'} `}/>}
+						{selected == 0 && <PiCircleFill className={`${obj.state == 1 ? 'text-green-500 border  border-neutral-500 rounded-full ' : 'text-gray-500'} `}/>}
 					</div>
 					<h6 className="text-[7px] 2xl:text-[10px] antialiased  truncate w-24 2xl:w-44 overflow-hidden font-normal tracking-normal text-[#484848]">
 				  		hello from {obj.login}, how are you ?
@@ -190,7 +184,7 @@ function Messages() {
 			  <div>
 				<BurgButton setFlag={setShowSideBar} val={showSideBar} />
 			  </div>
-			  <span className="text-base lg:text-lg">{roomSelected}</span>
+			  <span className="text-xs md:text-base lg:text-lg truncate e">{roomSelected}</span>
 			  <MyMenu slected={selected} />
 			</div>
 			<div className='  border-yellow-400 h-[60vh] w-full overflow-y-auto flex flex-col-reverse justify-end pb-4'>
