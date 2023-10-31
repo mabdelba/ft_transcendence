@@ -25,7 +25,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.users.set(client.id, null);
   }
 
-  async handleDisconnect(client: any) {
+  async handleDisconnect(client: any) { 
     if (this.users.has(client.id) && this.users.get(client.id) != null) {
       console.log("offline----", this.users.get(client.id));
       await this.prisma.user.update({
@@ -70,12 +70,24 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }); 
   }
+
+
+  /** 
+       events for direct messages namespace
+  **/
   @SubscribeMessage('users-with-conversation')
-  getUsersWithConversation(client: Socket, data: {login: string}){
-    // this.io.of('/dm').emit('users-with-conversation');
-    // client.emit('users-with-conversation');
-    // console.log(client)
+  getUsersWithConversation(client: Socket, data: {me: string, login: string}){
     this.dmsGateway.getUsersWithConversation(data, client);
+  }
+
+  @SubscribeMessage('get-messages')
+  getMessages(client: Socket, data: {isChannel: boolean, senderLogin: string, receiverLogin: string}){
+    this.dmsGateway.handleGetMessages(data, client);
+  }
+
+  @SubscribeMessage('send-message')
+  sendMessage(client: Socket, data: {isChannel: boolean, senderLogin: string, receiverLogin: string, text: string}){
+    this.dmsGateway.handleMessage(data, client);
   }
 }
  

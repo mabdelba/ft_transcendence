@@ -118,6 +118,13 @@ function Messages() {
 		? (setShowArray(Groups), setRoomSelected(Groups[0].login))
 		: setShowArray([]);
 	}
+	{	
+		selected == 0
+		? (setShowArray(conversations), setRoomSelected(conversations[0].login))
+		: selected == 1
+		? (setShowArray(Groups), setRoomSelected(Groups[0].login))
+		: setShowArray([]);
+	}
 	usersWithConversation();
   }, [selected, user.state, user.conversations, conversations]);
 
