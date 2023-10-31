@@ -19,14 +19,11 @@ export class DmsService {
         return user2 + user1;
     }
 
-    joinRoom(data: any, isChannel: boolean, client: Socket){
-        client.join(data.roomName);
-        console.log(`User ${data.user} joined room ${data.roomName}`);
-        // return roomName;
-    }
-
-    async saveMessage(client: any,data: any){
+    async sendAndSaveMessage(client: any,data: any, io: any){
         console.log(`User ${data.senderLogin} sent message to ${data.receiverLogin}`);
+        const roomName = data.isChannel ? data.receiverLogin : this.createRoomName(data.senderLogin, data.receiverLogin);
+        // check if user is blocked
+        client.to(roomName).emit('receive-message', data);
         await this.prisma.message.create({
             data: {
                 text: data.text,
@@ -59,55 +56,10 @@ export class DmsService {
         return true;
     }
 
-    async usersWithConversation(login: string){
-        const usersWithConversation = await this.prisma.user.findMany({
-            where: {
-              OR: [
-                {
-                  sentMessages: {
-                    some: {
-                      reciever: login
-                    }
-                  }
-                },
-                {
-                  recievedMessages: {
-                    some: {
-                      sender: login
-                    }
-                  }
-                }
-              ]
-            },
-            include: {
-                sentMessages: true,
-                recievedMessages: true,
-            }
-          });
-        //   usersWithConversation.sort((a, b) => {
-        //     const getLastMessageDate = (user) => {
-        //       const sentDates = user.sentMessages.map((message) => message.dateOfSending);
-        //       const recievedDates = user.recievedMessages.map((message) => message.dateOfSending);
-        //       const allDates = [...sentDates, ...recievedDates];
-        //       return Math.max(...allDates);
-        //     };
-          
-        //     const aLastMessageDate = getLastMessageDate(a);
-        //     const bLastMessageDate = getLastMessageDate(b);
-          
-        //     if (aLastMessageDate > bLastMessageDate) {
-        //       return -1;
-        //     }
-        //     if (aLastMessageDate < bLastMessageDate) {
-        //       return 1;
-        //     }
-        //     return 0;
-        //     });
-        return usersWithConversation;
-    }
-
-    async getMessages(senderLogin: string, receiverLogin: string){
-        const messages = await this.prisma.message.findMany({
+    async getConversation(senderLogin: string, receiverLogin: string, isChannel: boolean){
+        var messages;
+        if (!isChannel){
+            messages = await this.prisma.message.findMany({
             where: {
                 AND: [
                     {
@@ -136,6 +88,124 @@ export class DmsService {
                 dateOfSending: 'asc'
             }
         });
+    }
+    else{
+        messages = await this.prisma.message.findMany({
+            where: {
+                recieverchannel: receiverLogin
+            },
+            orderBy: {
+                dateOfSending: 'asc'
+            }
+        });
+    }
         return messages;
+    }
+    async getUsersWithConversation(login: string){
+        const usersWithConversation = await this.prisma.user.findMany({
+            where: {
+                OR: [
+                    {
+                    sentMessages: {
+                        some: {
+                        reciever: login
+                        }
+                    }
+                    },
+                    {
+                    recievedMessages: {
+                        some: {
+                        sender: login
+                        }
+                    }
+                    }
+                ],
+            },
+            include: {
+                sentMessages: true,
+                recievedMessages: true,
+            }
+        });
+        return usersWithConversation;
+    }
+
+    async blockedList(login: string){
+        const blockedList = await this.prisma.user.findUnique({
+            where: {
+                login: login,
+            },
+            include: {
+                blockedList: true,
+            },
+        });
+        return blockedList;
+    }
+
+    async usersWithConversation(login: string){
+        const usersWithConversation = await this.getUsersWithConversation(login);
+        const blockedList = await this.blockedList(login);
+        const blockedListLogins = blockedList.blockedList.map((user) => user.login);
+        const users: {login: string, state: number, avatar?: string, isBlocked?: boolean}[] = [];
+        usersWithConversation.forEach(async (user) => {
+            users.push({
+                login: user.login,
+                state: user.state,
+                avatar: user.avatar,
+            });
+            if (blockedListLogins.includes(user.login)){
+                users['isBlocked'] = true;
+            }
+            else
+                users['isBlocked'] = false;
+        });
+        //   usersWithConversation.sort((a, b) => {
+        //     const getLastMessageDate = (user) => {
+        //       const sentDates = user.sentMessages.map((message) => message.dateOfSending);
+        //       const recievedDates = user.recievedMessages.map((message) => message.dateOfSending);
+        //       const allDates = [...sentDates, ...recievedDates];
+        //       return Math.max(...allDates);
+        //     };
+          
+        //     const aLastMessageDate = getLastMessageDate(a);
+        //     const bLastMessageDate = getLastMessageDate(b);
+          
+        //     if (aLastMessageDate > bLastMessageDate) {
+        //       return -1;
+        //     }
+        //     if (aLastMessageDate < bLastMessageDate) {
+        //       return 1;
+        //     }
+        //     return 0;
+        //     });
+        return users;
+    }
+
+    checkIfInRoomAndJoin(senderLogin: string, receiverLogin: string, io: any, client: Socket){
+        const roomName = this.createRoomName(senderLogin, receiverLogin);
+        const room = io.sockets.adapter.rooms.get(roomName);
+        if (room) {
+            for (const [socketId, socket] of room.sockets) {
+                if (socket === client)
+                    socket.emit('message', 'Hello from the server!');
+            }
+        }
+    }
+    async getMessages(data: any, io: any, client: Socket){
+        // this.checkIfInRoomAndJoin(senderLogin, receiverLogin, io, client);
+        const roomName = data.isChannel ? data.receiverLogin : this.createRoomName(data.senderLogin, data.receiverLogin);
+        client.join(roomName);
+        console.log(`User ${data.senderLogin} joined room ${roomName}`);
+        const messages = await this.getConversation(data.senderLogin, data.receiverLogin, data.isChannel);
+        const blockedList = await this.blockedList(data.senderLogin);
+        const messagesWithoutBlocked = [];
+        messages.forEach((message) => {
+            if (message.sender === data.senderLogin)
+                if (!blockedList.blockedList.map((user) => user.login).includes(message.reciever))
+                    messagesWithoutBlocked.push(message);
+            else if (message.reciever === data.senderLogin)
+                if (!blockedList.blockedList.map((user) => user.login).includes(message.sender))
+                    messagesWithoutBlocked.push(message);
+        });
+        return messagesWithoutBlocked;
     }
 }
