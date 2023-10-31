@@ -1,5 +1,5 @@
 'use client';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import OptionBar from '../components/forms/OptionBar';
 import ListBox from '../components/buttons/ListBox';
 import { User, context, SocketContext } from '../../context/context';
@@ -12,6 +12,7 @@ import SendMessage from '../components/inputs/SendMessage';
 import {PiCircleFill} from 'react-icons/pi'
 import axios from 'axios';
 import MessageText from '../components/shapes/MessageText'
+import { StoreID } from 'recoil';
 
 
 const path = `/goinfre/mabdelba/ft_transcendence/ft_transcendence/backend/srcs/public/avatars/`;
@@ -19,10 +20,20 @@ const friendList = [{login: 'waelhamd', id:1, avatar: `${path}waelhamd.jpg`}, {l
 	{login: 'mo9atil', id:2, avatar: `${path}mo9atil.jpg`}, {login: 'mlahlafi', id:5, avatar: `${path}mlahlafi.jpg`}];
 const Groups = [{login: '#Group one', id: 777, avatar : ''}, {login:'Group two', id:778,  avatar : ''}, {login:'&Group three', id:98,  avatar : ''}];
 
-const chatText = [{sender: 'mabdelba', receiver: 'waelhamd', id: 1, text: 'Salut Cava'},
+type ChatText = {
+	sender: string, receiver: string, id: number, text: string
+}
+var id = 10;
+const chatText : ChatText[] = [{sender: 'mabdelba', receiver: 'waelhamd', id: 1, text: 'Salut Cava'},
 {sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?'},
 {sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi'},
-{sender: 'mabdelba', receiver: 'waelhamd', id: 4, text: 'Lhamdoulah'}]
+{sender: 'mabdelba', receiver: 'waelhamd', id: 4, text: 'Lhamdoulah'},
+{sender: 'waelhamd', receiver: 'mabdelba', id: 5, text: ', hicham el guerroum etait arrivé à Athene farouchement deteminé à faire oublier ses mesaventures d"Atlanta et  de Sydnee où pour divers raisons il navait pas pû decrocher leur olympiques.h'},
+{sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?'},
+{sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi'},
+{sender: 'mabdelba', receiver: 'waelhamd', id: 4, text: 'Lhamdoulah'},
+{sender: 'waelhamd', receiver: 'mabdelba', id: 5, text: ', hicham el guerroum etait arrivé à Athene farouchement deteminé à faire oublier ses mesaventures d"Atlanta et  de Sydnee où pour divers raisons il navait pas pû decrocher leur olympiques.h'},
+]
 
 const getImageByLogin = async (login: string): Promise<string | null> => {
     return new Promise<string | null>(async (resolve) => {
@@ -57,11 +68,16 @@ function Messages() {
   const [roomSelected, setRoomSelected] = useState(friendList[0].login);
   const [message, setMessage] = useState('');
   const [conversations, setConversations] = useState<any>(null);
+  const [chatArea, setChatArea] = useState(chatText);
+  const messageEl = useRef<any>();
 
   const handleSend = (e: any) => {
 	e.preventDefault();
 	// alert(`message to ${roomSelected} : ${message}`);
-	setMessage('');
+	if(message != ''){	id++;
+	const _chatArea : ChatText[] = [...chatArea, {sender: 'mabdelba', receiver: 'waelhamd', text: message, id: id}]
+	setChatArea(_chatArea);
+	setMessage('');}
   };
 
   const usersWithConversation = async () => {
@@ -105,6 +121,14 @@ function Messages() {
 	usersWithConversation();
   }, [selected, user.state, user.conversations, conversations]);
 
+  useEffect(() => {
+    const conversationDiv: any = messageEl.current;
+    if (conversationDiv) {
+      conversationDiv.scrollTop = conversationDiv.scrollHeight;
+    }
+  }, [chatArea.length]);
+  
+
   return (
 	<OptionBar flag={3}>
 	  <main className="w-full h-full   flex flex-col items-center  font-Orbitron min-h-[550px]  min-w-[280px] pb-2 px-6  md:px-12  ">
@@ -144,7 +168,7 @@ function Messages() {
 				  <span className="hidden  text-left pt-1 md:flex flex-col 2xl:-space-y-1">
 					<div className='flex flex-row  items-center justify-between'>
 						<h1>{obj.login}</h1>
-						<PiCircleFill className={`${obj.state == 1 ? 'text-green-500 border  border-neutral-500 rounded-full animate-pulse' : 'text-gray-500'} `}/>
+						{selected == 0 && <PiCircleFill className={`${obj.state == 1 ? 'text-green-500 border  border-neutral-500 rounded-full animate-pulse' : 'text-gray-500'} `}/>}
 					</div>
 					<h6 className="text-[7px] 2xl:text-[10px] antialiased  truncate w-24 2xl:w-44 overflow-hidden font-normal tracking-normal text-[#484848]">
 				  		hello from {obj.login}, how are you ?
@@ -162,9 +186,15 @@ function Messages() {
 			  <span className="text-base lg:text-lg">{roomSelected}</span>
 			  <MyMenu slected={selected} />
 			</div>
-			<div className='  border-yellow-400 h-[60vh] w-full overflow-y-auto flex flex-col justify-end'>
-				<div className='border-2  h-auto'>
-					<MessageText sender='mabdelba' message='salam alikom mohamed abdelbar too large a si mohamed'/>
+			<div className='  border-yellow-400 h-[60vh] w-full overflow-y-auto flex flex-col-reverse justify-end pb-4'>
+				<div className='h-auto overflow-y-auto scroll-smooth' ref={messageEl}>
+				{
+					chatArea.map((obj: ChatText) => (
+						<div key={obj.id}  className=' w-full h-auto'>
+						<MessageText sender={obj.sender}  message={obj.text}/>
+						</div>
+					))
+				}
 				</div>
 			</div>
 			<div className="h-16  2xl:h-20  border-t-[3px] lineshad">
