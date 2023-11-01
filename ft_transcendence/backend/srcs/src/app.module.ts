@@ -10,6 +10,8 @@ import { ChatModule } from './chat/chat.module';
 import { StateGateway } from './state/state.gateway';
 import { AchievementsModule } from './achievements/achievements.module';
 import { StateModule } from './state/state.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksService } from './tasks/tasks.service';
 
 @Module({
   imports: [
@@ -23,8 +25,9 @@ import { StateModule } from './state/state.module';
     ProfileModule,
     AchievementsModule,
     StateModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
-  providers: [AppService, StateGateway],
+  providers: [AppService, StateGateway, TasksService],
 })
 export class AppModule {}
