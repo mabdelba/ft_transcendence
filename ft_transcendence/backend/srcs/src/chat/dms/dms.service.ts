@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import jwtDecode from 'jwt-decode';
 import { Socket } from "socket.io";
-import { async } from "rxjs";
 
 
 @Injectable()
@@ -19,26 +18,65 @@ export class DmsService {
         return user2 + user1;
     }
 
+    async mutedUserInChannel(login: string, channel: string){
+        const muted = await this.prisma.userMutedInChannel.findFirst({
+            where: {
+                AND: [
+                    {
+                        channelName: channel
+                    },
+                    {
+                        userLogin: login
+                    }
+                ]
+            }
+        });
+        if (muted) return true;
+        return false;
+    }
+
     async sendAndSaveMessage(client: any,data: any, io: any){
         console.log(`User ${data.senderLogin} sent message to ${data.receiverLogin}`);
         const roomName = data.isChannel ? data.receiverLogin : this.createRoomName(data.senderLogin, data.receiverLogin);
         // check if user is blocked
+        if (data.isChannel){
+            const mutedInChannel = await this.mutedUserInChannel(data.senderLogin, data.receiverLogin);
+            if (mutedInChannel) return;
+            await this.prisma.message.create({
+                data: {
+                    text: data.text,
+                    senderUser: {
+                        connect: {
+                            login: data.senderLogin
+                        }
+                    },
+                    channel: {
+                        connect: {
+                            name: data.receiverLogin
+                        }
+                    }
+                }
+            });
+        }
+        else
+        {
+            await this.prisma.message.create({
+                data: {
+                    text: data.text,
+                    senderUser: {
+                        connect: {
+                            login: data.senderLogin
+                        }
+                    },
+                    recieverUser: {
+                        connect: {
+                            login: data.receiverLogin
+                        }
+                    }
+                }
+            });
+        }
         client.to(roomName).emit('receive-message', data);
-        await this.prisma.message.create({
-            data: {
-                text: data.text,
-                senderUser: {
-                    connect: {
-                        login: data.senderLogin
-                    }
-                },
-                recieverUser: {
-                    connect: {
-                        login: data.receiverLogin
-                    }
-            }
-            }
-        });
     }
 
     async checkUsers(senderLogin: string, receiverLogin: string){
@@ -141,8 +179,31 @@ export class DmsService {
         return blockedList;
     }
 
+    sortUsersWithConversation(usersWithConversation: any[]){
+        usersWithConversation.sort((a, b) => {
+            const getLastMessageDate = (user) => {
+              const sentDates = user.sentMessages.map((message) => message.dateOfSending);
+              const recievedDates = user.recievedMessages.map((message) => message.dateOfSending);
+              const allDates = [...sentDates, ...recievedDates];
+              return Math.max(...allDates);
+            };
+          
+            const aLastMessageDate = getLastMessageDate(a);
+            const bLastMessageDate = getLastMessageDate(b);
+          
+            if (aLastMessageDate > bLastMessageDate) {
+              return -1;
+            }
+            if (aLastMessageDate < bLastMessageDate) {
+              return 1;
+            }
+            return 0;
+          });
+    }
+
     async usersWithConversation(login: string){
         const usersWithConversation = await this.getUsersWithConversation(login);
+        this.sortUsersWithConversation(usersWithConversation);
         const blockedList = await this.blockedList(login);
         const blockedListLogins = blockedList.blockedList.map((user) => user.login);
         const users: {login: string, state: number, avatar?: string, isBlocked?: boolean}[] = [];
@@ -158,25 +219,6 @@ export class DmsService {
             else
                 users['isBlocked'] = false;
         });
-        //   usersWithConversation.sort((a, b) => {
-        //     const getLastMessageDate = (user) => {
-        //       const sentDates = user.sentMessages.map((message) => message.dateOfSending);
-        //       const recievedDates = user.recievedMessages.map((message) => message.dateOfSending);
-        //       const allDates = [...sentDates, ...recievedDates];
-        //       return Math.max(...allDates);
-        //     };
-          
-        //     const aLastMessageDate = getLastMessageDate(a);
-        //     const bLastMessageDate = getLastMessageDate(b);
-          
-        //     if (aLastMessageDate > bLastMessageDate) {
-        //       return -1;
-        //     }
-        //     if (aLastMessageDate < bLastMessageDate) {
-        //       return 1;
-        //     }
-        //     return 0;
-        //     });
         return users;
     }
 
@@ -200,12 +242,43 @@ export class DmsService {
         const messagesWithoutBlocked = [];
         messages.forEach((message) => {
             if (message.sender === data.senderLogin)
+            {
                 if (!blockedList.blockedList.map((user) => user.login).includes(message.reciever))
                     messagesWithoutBlocked.push(message);
+            }
             else if (message.reciever === data.senderLogin)
+            {
                 if (!blockedList.blockedList.map((user) => user.login).includes(message.sender))
                     messagesWithoutBlocked.push(message);
+            }
         });
         return messagesWithoutBlocked;
+    }
+
+    async channelsWithConversation(login: string){
+        const channelsWithConversation = await this.prisma.channel.findMany({
+            where: {
+                OR: [
+                    {
+                        messages: {
+                            some: {
+                                recieverchannel: login
+                            }
+                        }
+                    },
+                    {
+                        messages: {
+                            some: {
+                                sender: login
+                            }
+                        }
+                    }
+                ]
+            },
+            include: {
+                messages: true,
+            }
+        });
+        return channelsWithConversation;
     }
 }
