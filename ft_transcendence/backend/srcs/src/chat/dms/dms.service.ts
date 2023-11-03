@@ -57,7 +57,7 @@ export class DmsService {
                     }
                 }
             });
-        }
+        } 
         else
         {
             await this.prisma.message.create({
@@ -76,6 +76,7 @@ export class DmsService {
                 }
             });
         }
+        console.log('room name == ', roomName);
         client.to(roomName).emit('receive-message', data);
     }
 
@@ -201,7 +202,7 @@ export class DmsService {
           });
     }
 
-    async usersWithConversation(login: string){
+    async usersWithConversation(login: string, client: any){
         const usersWithConversation = await this.getUsersWithConversation(login);
         this.sortUsersWithConversation(usersWithConversation);
         const blockedList = await this.blockedList(login);
@@ -212,12 +213,10 @@ export class DmsService {
                 login: user.login,
                 state: user.state,
                 avatar: user.avatar,
+                isBlocked: blockedListLogins.includes(user.login)
             });
-            if (blockedListLogins.includes(user.login)){
-                users['isBlocked'] = true;
-            }
-            else
-                users['isBlocked'] = false;
+            console.log(login, "join ", this.createRoomName(login, user.login));
+            client.join(this.createRoomName(login, user.login));
         });
         return users;
     }

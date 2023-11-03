@@ -34,20 +34,20 @@ type ChatText = {
   text: string;
 };
 var id = 10;
-const chatText: ChatText[] = [
-  { sender: 'mabdelba', receiver: 'waelhamd', id: 1, text: 'Salut Cava' },
+// const chatText: ChatText[] = [
+//   { sender: 'mabdelba', receiver: 'waelhamd', id: 1, text: 'Salut Cava' },
 
-  { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
-  { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
-  { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
-  { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
-  { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
-  { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
-  { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
-  { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
-  { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
-  { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
-];
+//   { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
+//   { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
+//   { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
+//   { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
+//   { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
+//   { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
+//   { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
+//   { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
+//   { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
+//   { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
+// ];
 
 const getImageByLogin = async (login: string): Promise<string | null> => {
   return new Promise<string | null>(async (resolve) => {
@@ -84,7 +84,6 @@ function Messages() {
   const [conversations, setConversations] = useState<any>(null);
   const [chatArea, setChatArea] = useState<any>([]);
   const messageEl = useRef<any>();
-  const [changeList, setChangeList] = useState(false);
 
   const handleSend = (e: any) => {
     e.preventDefault();
@@ -101,7 +100,23 @@ function Messages() {
         { sender: user.login, reciever: roomSelected, text: message },
       ];
       setChatArea(_chatArea);
+      //   setChangeList(false);
       setMessage('');
+      if(conversations[0].login != roomSelected ){
+
+        const tempConversation = conversations;
+        const indexOfElementToMove = tempConversation.findIndex((obj: any) => obj.login == roomSelected);
+        const elementToMove = tempConversation[indexOfElementToMove];
+        if(indexOfElementToMove != -1)
+        {
+          tempConversation.splice(indexOfElementToMove, 1);
+          tempConversation.unshift(elementToMove);
+          const _user : User = {...user, }
+          _user.conversations = tempConversation;
+          setUser(_user);
+          setConversations(tempConversation);
+        }
+      }
     }
   };
 
@@ -117,7 +132,7 @@ function Messages() {
         }
         socket.emit('users-with-conversation', { login: user.login || 'mabdelba' });
         socket.on('get-users', (data: any) => {
-          console.log('users ===== ', data);
+          console.log('this is all users === ', data);
           data.map((obj: any) =>
             getImageByLogin(obj.login).then((image) => {
               obj.avatar = image;
@@ -126,7 +141,6 @@ function Messages() {
           _user.conversations = data;
 
           setUser(_user);
-
           setConversations(data);
         });
       } else setConversations(user.conversations);
@@ -140,9 +154,24 @@ function Messages() {
         ...chatArea,
         { sender: data.senderLogin, reciever: data.receiverLogin, text: data.text },
       ]);
-	else
-	  setChangeList(!changeList);
+    else {
+      // console.log('heeeereeeeeee');
+
+      const tempConversation = conversations;
+      const indexOfElementToMove = tempConversation.findIndex((obj: any) => (obj.login == data.senderLogin || obj.login == data.receiverLogin));
+      const elementToMove = tempConversation[indexOfElementToMove];
+      if(indexOfElementToMove != -1)
+      {
+        tempConversation.splice(indexOfElementToMove, 1);
+        tempConversation.unshift(elementToMove);
+        const _user : User = {...user, }
+        _user.conversations = tempConversation;
+        setUser(_user);
+        setConversations(tempConversation);
+      }
+    }
   }
+
   useEffect(() => {
     if (socket) {
       socket.emit('get-messages', {
@@ -153,7 +182,7 @@ function Messages() {
         setChatArea(data);
       });
     }
-  }, [roomSelected, socket, changeList]);
+  }, [roomSelected, socket]);
 
   useEffect(() => {
     if (socket) {
