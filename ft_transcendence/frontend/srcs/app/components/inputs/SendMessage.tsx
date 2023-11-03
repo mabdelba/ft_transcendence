@@ -16,7 +16,7 @@ function SendMessage(props: InputProps) {
   return (
     <form className="space-y-44 h-full w-full">
       <div
-        className={`w-full h-full  flex justify-center  items-center  bg-transparent px-7`}
+        className={`w-full h-full  flex justify-center  items-center  bg-transparent px-2 sm:px-7`}
       >
         <div className='mr-4'><BsKeyboardFill size="25"/></div>
         <div className="flex justify-center items-center bg-transparent font-Orbitron text-sm md:text-lg lg:text-xl h-full w-full">

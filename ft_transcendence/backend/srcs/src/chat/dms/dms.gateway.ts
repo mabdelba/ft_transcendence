@@ -13,7 +13,7 @@ import { subscribe } from "diagnostics_channel";
 export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     constructor(private dmsService: DmsService){}
     @WebSocketServer()
-    io: Namespace;
+    io: Namespace;  
 
     async handleConnection(client: any, room: String) {
         console.log('connected dm ', client.id);
@@ -31,9 +31,9 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
 
     @SubscribeMessage('users-with-conversation')
     async getUsersWithConversation(@MessageBody() data: {login: string}, @ConnectedSocket() client: Socket){
-        const dms = await this.dmsService.usersWithConversation(data.login);
+        const dms = await this.dmsService.usersWithConversation(data.login, client);
         client.emit('get-users', dms);
-        return dms;
+        return dms;  
     }
 
     @SubscribeMessage('get-messages')
@@ -41,7 +41,7 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         if (!this.dmsService.checkUsers(data.senderLogin, data.receiverLogin)) return;
         const messages = await this.dmsService.getMessages(data, this.io, client);
         client.emit('get-messages', messages);
-        return messages;
+        return messages; 
     }
 
     // channels part

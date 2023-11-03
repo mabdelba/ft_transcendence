@@ -49,12 +49,12 @@ function MyListbox(props: newType) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute ml-4 mt-1 max-h-60  w-40 xl:w-60 2xl:w-80 overflow-auto SmallNeonShadowBord  bg-[#36494e] text-base  ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <Listbox.Options className="absolute ml-4 mt-1 max-h-60  w-40 xl:w-60 2xl:w-80 overflow-auto SmallNeonShadowBord z-10 bg-[#36494e] text-base  focus:outline-none sm:text-sm">
               {people.map((person, personIdx) => (
                 <Listbox.Option
                   key={personIdx}
                   className={({ active }) =>
-                    `relative border-b-2 border-r-2 cursor-pointer select-none py-2 xl:py-4 pl-10 pr-4 ${
+                    `relative border-b-2 border-r-2 cursor-pointer select-none py-2 xl:py-4 pl-10 pr-4  ${
                       active ? 'bg-white text-black' : 'text-white'
                     }`
                   }

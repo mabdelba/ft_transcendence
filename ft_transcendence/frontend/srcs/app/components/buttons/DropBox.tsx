@@ -55,7 +55,7 @@ function MyMenu(props: {slected: number}) {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute right-0 mr-3 mt-2 w-60 origin-top-right divide-yoverflow-auto SmallNeonShadowBord  bg-[#36494e] text-base shadow-lg ring-1 ring-black ring-opacity-5  sm:text-sm focus:outline-none">
+          <Menu.Items className="absolute right-0 mr-3 mt-2 w-60 z-10 origin-top-right divide-yoverflow-auto SmallNeonShadowBord  bg-[#36494e] text-base shadow-lg ring-1 ring-black ring-opacity-5  sm:text-sm focus:outline-none">
             <div className="px-1  ">
               {
                 links.map((link: any) => (
