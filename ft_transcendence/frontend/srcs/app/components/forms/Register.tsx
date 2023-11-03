@@ -15,6 +15,9 @@ import React from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+import { SocketContext } from '../../../context/context';
+import { useContext } from 'react';
+
 
 type closeFunc = {
   handler: any;
@@ -26,6 +29,7 @@ function Register(props: closeFunc) {
   const EmRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
   const PassRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
   const UserRegex = /^[^\s]+$/;
+  const {socket} = useContext(SocketContext);
 
   const [firstname, setFirstName] = useState('');
   const [lastname, setLastName] = useState('');
@@ -92,6 +96,7 @@ function Register(props: closeFunc) {
         });
         const jwtToken = response.data.token;
         localStorage.setItem('jwtToken', jwtToken);
+        socket.emit('online', {token: jwtToken});
         props.rout.push('/dashboard');
         console.log('Response from loclahost:3000', response.data);
       })
@@ -140,6 +145,7 @@ function Register(props: closeFunc) {
               });
               const jwtToken = response.data.token;
               localStorage.setItem('jwtToken', jwtToken);
+              socket.emit('online', {token: jwtToken});
               props.rout.push('/dashboard');
             })
             .catch((error) => {

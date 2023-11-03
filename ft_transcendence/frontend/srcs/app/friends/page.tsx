@@ -15,7 +15,7 @@ import { error } from 'console';
 import io from 'socket.io-client';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { User, context } from '../../context/context';
+import { User, context,SocketContext} from '../../context/context';
 import OptionBar from '../components/forms/OptionBar';
 import { useQueries, useQuery } from 'react-query';
 import { data } from 'autoprefixer';
@@ -50,7 +50,8 @@ const fetchBlockedList = async () => {
 
 function Friends() {
   const router = useRouter();
-  const { user, setUser, socket } = useContext(context);
+  const { user, setUser } = useContext(context);
+  const { socket } = useContext(SocketContext);
 
   const { data: requestListData, status } = useQuery('requestList', fetchRequestList);
   const { data: friendListData, status: status_ } = useQuery('friendList', fetchFriendList);
@@ -89,6 +90,10 @@ function Friends() {
       setRequest(requestListData.recievedFriendRequestsBy);
       const _user: User = user;
       _user.friendRequestList = requestListData.recievedFriendRequestsBy;
+      if (!_user.state) {
+        socket.emit('online', { token: localStorage.getItem('jwtToken') });
+        _user.state = 1;
+      }
       setUser(_user);
     }
   };
@@ -144,10 +149,6 @@ function Friends() {
         setRequest(user.friendRequestList);
         setFriendsList(user.friendList);
         setBlockedList(user.blockedList);
-      }
-      if (!user.state) {
-        socket.emit('online', { token: token });
-        user.state = 1;
       }
     }
   }, [status, status_, status__]);
@@ -427,7 +428,7 @@ function Friends() {
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex justify-center items-center bg-opacity-40 bg-[#282828] w-screen h-screen">
+            <div className="flex justify-center items-center bg-opacity-40 backdrop-blur bg-[#282828] w-screen h-screen">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -471,7 +472,7 @@ function Friends() {
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto ">
-            <div className="flex justify-center items-center bg-opacity-40 bg-[#282828] w-full h-full">
+            <div className="flex justify-center items-center bg-opacity-40 backdrop-blur bg-[#282828] w-full h-full">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -516,7 +517,7 @@ function Friends() {
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex justify-center items-center bg-opacity-40 bg-[#282828] w-full h-full">
+            <div className="flex justify-center items-center bg-opacity-40 backdrop-blur bg-[#282828] w-full h-full">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"

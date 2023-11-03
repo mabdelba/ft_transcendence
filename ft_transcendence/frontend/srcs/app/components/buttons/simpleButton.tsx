@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
+
 type ButtonProps = {
   icon?: string;
   icon2?: string;
@@ -32,6 +33,7 @@ function SimpleButton(props: ButtonProps) {
         <Image src={!hoverBool ? props.icon : props.icon2} alt="upload icon" className=" w-8 h-7 pr-2" />
       )}
       <div className={`${props.flag ? 'hidden xl:block': '' }`}>{props.content}</div>
+    
       
     </button>
   );

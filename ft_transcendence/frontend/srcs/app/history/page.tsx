@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import OptionBar from '../components/forms/OptionBar';
-import { User, context } from '../../context/context';
+import { User, context, SocketContext } from '../../context/context';
 import { useQuery } from 'react-query';
 
 const fetchHistory = async () => {
@@ -20,7 +20,9 @@ const fetchHistory = async () => {
 };
 
 function History() {
-  const { user, setUser, socket } = useContext(context);
+  const { user, setUser } = useContext(context);
+  const { socket } = useContext(SocketContext);
+
   const [matches, setMatches] = useState([]);
 
   const { data, status } = useQuery('history', fetchHistory);
@@ -56,9 +58,11 @@ function History() {
         router.push('/');
       } else if (!user.history) getMatches();
       else setMatches(user.history);
-      if (!user.state) {
-        socket.emit('online', { token: token });
-        user.state = 1;
+      if (!user.state && socket) {
+        socket.emit('online', { token: localStorage.getItem('jwtToken') });
+        const _user: User = user;
+        _user.state = 1;
+        setUser(_user);
       }
     }
   }, [status,]);
