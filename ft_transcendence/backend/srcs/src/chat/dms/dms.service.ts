@@ -190,7 +190,7 @@ export class DmsService {
           
             const aLastMessageDate = getLastMessageDate(a);
             const bLastMessageDate = getLastMessageDate(b);
-          
+
             if (aLastMessageDate > bLastMessageDate) {
               return -1;
             }
@@ -212,12 +212,8 @@ export class DmsService {
                 login: user.login,
                 state: user.state,
                 avatar: user.avatar,
+                isBlocked: blockedListLogins.includes(user.login)
             });
-            if (blockedListLogins.includes(user.login)){
-                users['isBlocked'] = true;
-            }
-            else
-                users['isBlocked'] = false;
         });
         return users;
     }
@@ -274,6 +270,23 @@ export class DmsService {
                 ],
             }
         });
+        channelsWithConversation.sort((a, b) => {
+            const getLastMessageDate = (channel) => {
+              const dates = channel.messages.map((message) => message.dateOfSending);
+              return Math.max(...dates);
+            };
+
+            const aLastMessageDate = getLastMessageDate(a);
+            const bLastMessageDate = getLastMessageDate(b);
+
+            if (aLastMessageDate > bLastMessageDate) {
+              return -1;
+            }
+            if (aLastMessageDate < bLastMessageDate) {
+              return 1;
+            }
+            return 0;
+          });
         return channelsWithConversation;
     }
 }
