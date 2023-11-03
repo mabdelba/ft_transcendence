@@ -45,8 +45,8 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     }
 
     @SubscribeMessage('channels-with-conversation')
-    async getChannelsWithConversation(@MessageBody() data: {login: string}, @ConnectedSocket() client: Socket){
-        const channels = await this.dmsService.channelsWithConversation(data.login);
+    async getChannelsWithConversation(@MessageBody() data: {channelName: string}, @ConnectedSocket() client: Socket){
+        const channels = await this.dmsService.channelsWithConversation(data.channelName);
         client.emit('get-channels', channels);
         return channels;
     }

@@ -258,25 +258,20 @@ export class DmsService {
     async channelsWithConversation(login: string){
         const channelsWithConversation = await this.prisma.channel.findMany({
             where: {
-                OR: [
+                AND: [
                     {
-                        messages: {
-                            some: {
-                                recieverchannel: login
-                            }
+                        members: {
+                        some: {
+                            login: login
                         }
+                     },
                     },
                     {
                         messages: {
-                            some: {
-                                sender: login
-                            }
+                            some: {}
                         }
                     }
-                ]
-            },
-            include: {
-                messages: true,
+                ],
             }
         });
         return channelsWithConversation;
