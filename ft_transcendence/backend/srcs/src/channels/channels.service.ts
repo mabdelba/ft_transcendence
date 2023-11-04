@@ -325,4 +325,20 @@ export class ChannelsService {
         const banned = (isAdmin || isOwner) ? channel.banned : []
         return {owner: channel.owner, admins: channel.admins, members: channel.members, banned: banned};
     }
+
+    async listPublicProtectedChannels() {
+        const channels = await this.prismaservice.channel.findMany({
+            where: {
+                OR: [
+                    {
+                        type: 0
+                    },
+                    {
+                        type: 2
+                    }
+                ]
+            }
+        })
+        return channels;
+    }
 }
