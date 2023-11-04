@@ -51,10 +51,27 @@ export class ChannelsService {
         })
     }
 
-    async addNewUserToChannel(dto: { channelName: string, user: string }) {
-        const isAdmin = await this.checkIfAdmin(dto);
-        const isOwner = await this.checkIfOwner(dto);
-        if (isAdmin || isOwner)
+    async checkTypeOfChannel(dto: { channelName: string }) {
+        const channel = await this.prismaservice.channel.findUnique({
+            where: {
+                name: dto.channelName
+            }
+        })
+        return channel.type;
+    }
+
+    async getChannelPassword(dto: { channelName: string }) {
+        const channel = await this.prismaservice.channel.findUnique({
+            where: {
+                name: dto.channelName
+            }
+        })
+        return channel.password;
+    }
+
+    async addNewUserToChannel(dto: { channelName: string, user: string, password?: string }) {
+        const channelType = await this.checkTypeOfChannel(dto);
+        if (channelType == 0 || channelType == 1)
         {
             await this.prismaservice.channel.update({
                 where: {
@@ -69,8 +86,26 @@ export class ChannelsService {
                 }
             })
         }
-        else
-            throw new ForbiddenException("You are not admin or owner of this channel");
+        else if (channelType == 1)
+        {
+            if( await this.getChannelPassword(dto) == dto.password)
+            {
+                await this.prismaservice.channel.update({
+                    where: {
+                        name: dto.channelName
+                    },
+                    data: {
+                        members: {
+                            connect: {
+                                login: dto.user
+                            }
+                        }
+                    }
+                })
+            }
+            else
+                throw new ForbiddenException("Wrong password");
+        }
     }
 
     /// use in channel gateway
@@ -87,6 +122,16 @@ export class ChannelsService {
                         disconnect: {
                             login: dto.user
                         }
+                    },
+                }
+            })
+            await this.prismaservice.userMutedInChannel.deleteMany({
+                where: {
+                    user: {
+                        login: dto.user
+                    },
+                    channel: {
+                        name: dto.channelName
                     }
                 }
             })
@@ -220,5 +265,64 @@ export class ChannelsService {
         }
         else
             throw new ForbiddenException("You are not owner of this channel");
+    }
+
+    async checkIfUserMuted(dto: { channelName: string, user: string }) {
+        const channel = await this.prismaservice.userMutedInChannel.findFirst({
+            where: {
+                user: {
+                    login: dto.user
+                },
+                channel: {
+                    name: dto.channelName
+                }
+            }
+        });
+        if (channel)
+            return true;
+        return false;
+    }
+
+    async whoIam(dto: { channelName: string, user: string }) {
+        const channel = await this.prismaservice.channel.findUnique({
+            where: {
+                name: dto.channelName
+            },
+            include: {
+                owner: true,
+                admins: true,
+                members: true,
+                banned: true
+            }
+        })
+        if (channel.owner.login == dto.user)
+            return 0;
+        if (channel.admins.find((admin) => admin.login == dto.user))
+            return 1;
+        if (channel.members.find((member) => member.login == dto.user))
+            return 2;
+        if (channel.banned.find((ban) => ban.login == dto.user))
+            return 3;
+        if ( await this.checkIfUserMuted(dto))
+            return 4;
+        return 5;
+    }
+
+    async listChannelMembers(dto: { channelName: string, user: string }) {
+        const channel = await this.prismaservice.channel.findUnique({
+            where: {
+                name: dto.channelName
+            },
+            include: {
+                owner: true,
+                admins: true,
+                members: true,
+                banned: true
+            }
+        })
+        const isAdmin = await this.checkIfAdmin(dto);
+        const isOwner = await this.checkIfOwner(dto);
+        const banned = (isAdmin || isOwner) ? channel.banned : []
+        return {owner: channel.owner, admins: channel.admins, members: channel.members, banned: banned};
     }
 }

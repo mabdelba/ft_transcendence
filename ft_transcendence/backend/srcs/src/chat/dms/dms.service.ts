@@ -231,6 +231,7 @@ export class DmsService {
             }
         }
     }
+    // Check if user is in room before join it
     async getMessages(data: any, io: any, client: Socket){
         // this.checkIfInRoomAndJoin(senderLogin, receiverLogin, io, client);
         const roomName = data.isChannel ? data.receiverLogin : this.createRoomName(data.senderLogin, data.receiverLogin);
