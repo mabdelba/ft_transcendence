@@ -12,6 +12,7 @@ import { AchievementsModule } from './achievements/achievements.module';
 import { StateModule } from './state/state.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksService } from './tasks/tasks.service';
+import { ChannelsModule } from './channels/channels.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TasksService } from './tasks/tasks.service';
     AchievementsModule,
     StateModule,
     ScheduleModule.forRoot(),
+    ChannelsModule,
   ],
   controllers: [AppController],
   providers: [AppService, StateGateway, TasksService],
