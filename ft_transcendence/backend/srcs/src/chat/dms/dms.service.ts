@@ -68,9 +68,6 @@ export class DmsService {
         } 
         else
         {
-            if (this.getClientFromLogin(data.receiverLogin, users) === null) return;
-            else
-                io.sockets.socket.get(this.getClientFromLogin(data.receiverLogin, users)).join(roomName);
             await this.prisma.message.create({
                 data: {
                     text: data.text,
@@ -86,6 +83,9 @@ export class DmsService {
                     }
                 }
             });
+            if (this.getClientFromLogin(data.receiverLogin, users) === null) console.log('null');
+            else
+                io.sockets.socket.get(this.getClientFromLogin(data.receiverLogin, users)).join(roomName);
         }
         console.log('room name == ', roomName);
         client.to(roomName).emit('receive-message', data);
