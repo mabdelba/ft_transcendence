@@ -1,8 +1,8 @@
 'use client'
 import * as React from 'react'
 import Image from 'next/image';
-import LightMap from '../../public/lightMap.svg';
-import DarkMap from '../../public/darkMap.svg';
+import LightMap from '../../public/lightmap.svg';
+import DarkMap from '../../public/darkmap.svg';
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import Logout from '../../public/log-out.svg';
