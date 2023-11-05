@@ -35,7 +35,15 @@ export class DmsService {
         return false;
     }
 
-    async sendAndSaveMessage(client: any,data: any, io: any){
+    async getClientFromLogin(login: string, users: Map<string, string>){
+        for (const [socketId, userLogin] of users) {
+            if (userLogin === login)
+                return socketId;
+        }
+        return null;
+    }
+
+    async sendAndSaveMessage(client: any,data: any, io: any, users: Map<string, string>){
         console.log(`User ${data.senderLogin} sent message to ${data.receiverLogin}`);
         const roomName = data.isChannel ? data.receiverLogin : this.createRoomName(data.senderLogin, data.receiverLogin);
         // check if user is blocked
@@ -75,6 +83,9 @@ export class DmsService {
                     }
                 }
             });
+            if (this.getClientFromLogin(data.receiverLogin, users) === null) console.log('null');
+            else
+                io.sockets.socket.get(this.getClientFromLogin(data.receiverLogin, users)).join(roomName);
         }
         console.log('room name == ', roomName);
         client.to(roomName).emit('receive-message', data);
@@ -231,6 +242,7 @@ export class DmsService {
             }
         }
     }
+    // Check if user is in room before join it
     async getMessages(data: any, io: any, client: Socket){
         // this.checkIfInRoomAndJoin(senderLogin, receiverLogin, io, client);
         const roomName = data.isChannel ? data.receiverLogin : this.createRoomName(data.senderLogin, data.receiverLogin);
