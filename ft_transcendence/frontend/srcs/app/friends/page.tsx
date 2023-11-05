@@ -1,9 +1,7 @@
 'use client';
 
-import Pdp from '../components/shapes/Pdp';
-import Photo from '../../public/42.svg';
+
 import alien from '../../public/alien.svg';
-import blueAchiev from '../../public/blueAchiev.svg';
 import DiscloComp from '../components/shapes/DiscloComp';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment, useContext, useEffect, useState } from 'react';
@@ -11,14 +9,11 @@ import Invit from '../components/shapes/Invit';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-import { error } from 'console';
-import io from 'socket.io-client';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { User, context,SocketContext} from '../../context/context';
 import OptionBar from '../components/forms/OptionBar';
 import { useQueries, useQuery } from 'react-query';
-import { data } from 'autoprefixer';
+
 
 const fetchRequestList = async () => {
   const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-requests-list';
@@ -38,6 +33,7 @@ const fetchFriendList = async () => {
   });
   return res.json();
 };
+
 const fetchBlockedList = async () => {
   const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/blocked-user-list';
   const res = await fetch(urlreq, {
@@ -438,7 +434,7 @@ function Friends() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
+                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[40%] xl:h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
                   <Invit
                     login={userName}
                     closeModal={closeModal}
@@ -482,7 +478,7 @@ function Friends() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
+                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[40%] xl:h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
                   <Invit
                     login={userName}
                     closeModal={closeFriendModal}
@@ -527,7 +523,7 @@ function Friends() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
+                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[40%] xl:h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
                   <Invit
                     login={userName}
                     closeModal={closeBlockModal}

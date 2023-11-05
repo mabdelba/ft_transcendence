@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState, Fragment} from 'react';
 import OptionBar from '../components/forms/OptionBar';
 import ListBox from '../components/buttons/ListBox';
 import { User, context, SocketContext } from '../../context/context';
@@ -12,7 +12,8 @@ import SendMessage from '../components/inputs/SendMessage';
 import { PiCircleFill } from 'react-icons/pi';
 import axios from 'axios';
 import MessageText from '../components/shapes/MessageText';
-import { StoreID } from 'recoil';
+import { Dialog, Transition } from '@headlessui/react';
+import {AiOutlineClose} from 'react-icons/ai'
 
 const path = `/goinfre/mabdelba/ft_transcendence/ft_transcendence/backend/srcs/public/avatars/`;
 const friendList = [
@@ -78,12 +79,13 @@ function Messages() {
   const [selected, setSelected] = useState(0);
   const { user, setUser } = useContext(context);
   const { socket } = useContext(SocketContext);
-  const [showArray, setShowArray] = useState<any>([]);
+  const [showArray, setShowArray] = useState<any>();
   const [roomSelected, setRoomSelected] = useState<string>('');
   const [message, setMessage] = useState('');
-  const [conversations, setConversations] = useState<any>(null);
+  const [conversations, setConversations] = useState<any>([]);
   const [chatArea, setChatArea] = useState<any>([]);
   const messageEl = useRef<any>();
+  const [openModal, setOpenModal] = useState(false);
 
   const handleSend = (e: any) => {
     e.preventDefault();
@@ -122,9 +124,9 @@ function Messages() {
 
   const usersWithConversation = async () => {
     if (socket) {
-      if (!user.conversations) {
+      if(!user.conversations || (user.conversations.length == 1 && user.conversations.isFrd)) {
         const _user: User = { ...user };
-
+        console.log("mo9atil:::::: ", user.conversations)
         if (!user.state) {
           socket.emit('online', { token: localStorage.getItem('jwtToken') });
           _user.state = 1;
@@ -138,12 +140,20 @@ function Messages() {
               obj.avatar = image;
             }),
           );
-          _user.conversations = data;
-
-          setUser(_user);
-          setConversations(data);
+        if(user.conversations)
+        {
+          data.map((obj: any) => {
+            if(obj.login != _user.conversations[0].login)
+              _user.conversations = [..._user.conversations, obj]
+          })
+        }
+        else
+         _user.conversations = data;
+        setUser(_user);
+        setConversations(_user.conversations);
         });
-      } else setConversations(user.conversations);
+      }
+      else setConversations(user.conversations);
     }
   };
   // const [friendList, setFriendList] = useState(user.friendList);
@@ -192,9 +202,10 @@ function Messages() {
   }, [chatArea, socket]);
 
   useEffect(() => {
-    if (conversations) {
+    if (conversations.length != 0) {
+  
       selected == 0
-        ? (setShowArray(conversations), setRoomSelected(conversations[0].login))
+        ? (setShowArray(conversations), setRoomSelected(conversations[0].login || ''))
         : selected == 1
         ? (setShowArray(Groups), setRoomSelected(Groups[0].login))
         : setShowArray([]);
@@ -222,17 +233,19 @@ function Messages() {
             }  sm:block  w-20 md:w-60 2xl:w-96  border-r-[3px] lineshad flex flex-col`}
           >
             <div className="h-16  2xl:h-20  border-b-[3px] lineshad bg-[#36494e] bg-opacity-70">
-              <ListBox setSelected={setSelected} />
+              <ListBox setSelected={setSelected} setOpenModal={setOpenModal} />
             </div>
             <div className="h-auto w-full grid grid-cols-1 pt-2 2xl:pt-4">
-              {showArray.map(
+              {
+                showArray &&
+                showArray.map(
                 (obj: any) =>
                   !obj.isBlocked && (
                     <button
                       onClick={() => {
                         setRoomSelected(obj.login);
                       }}
-                      key={obj.id}
+                      key={obj.loin}
                       className={`h-14 ease-in-out 2xl:h-[68px]  truncate rounded-br-full rounded-tr-full rounded-bl-full text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 2xl:space-x-6 md:pl-5 2xl:pl-7 items-center transition-all duration-500 tracking-wide  ${
                         roomSelected == obj.login
                           ? ' text-white  hover:bg-[#EDEDED] hover:border-[#00B2FF] hover:text-black border-white md:border-b-2   2xl:border-b-4   font-bold  underline-offset-8 '
@@ -299,6 +312,42 @@ function Messages() {
           </div>
         </div>
       </main>
+      <Transition appear show={openModal} as={Fragment}>
+        <Dialog as="div" className="relative z-10 " onClose={()=> {setOpenModal(false)}}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto ">
+            <div className="flex justify-center items-center bg-opacity-40 backdrop-blur bg-[#282828] w-full h-full">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="relative min-w-[260px] min-h-[100px] h-[40%] xl:h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
+                  <button className='absolute' onClick={()=> {setOpenModal(false)}}>
+                    <AiOutlineClose />
+                  </button>
+                    hello world
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
     </OptionBar>
   );
 }

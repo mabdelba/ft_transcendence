@@ -37,12 +37,12 @@ export interface User{
 
 }
 
-export const context = createContext<{user: User; setUser: Function}>({user: {}, setUser: ()=>{}});
+export const context = createContext<{user: User; setUser: Function}>({user: {conversations: []}, setUser: ()=>{}});
 export const SocketContext = createContext<{socket: any}>({socket: {}});
 
 
 const Context = ({children}: {children: React.ReactNode}) => {
-    const [user, setUser] = useState<User>({});
+    const [user, setUser] = useState<User>({conversations: []});
     const [socket, setSocket] = useState<any>(null);
     useEffect(() => {
         const sock = io('http://localhost:3000', {

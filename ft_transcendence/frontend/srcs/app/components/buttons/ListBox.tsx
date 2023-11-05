@@ -4,6 +4,7 @@ import { Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronUpDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid';
 import { AiOutlinePlus } from "react-icons/ai"
 import { TbMessage2Plus } from "react-icons/tb"
+import { useRouter } from 'next/navigation';
 
 const people = [
   { name: 'Friends Messages' },
@@ -15,10 +16,13 @@ const people = [
 type newType = {
 
   setSelected: any;
+  setOpenModal : any;
 }
 
 function MyListbox(props: newType) {
+
   const [selected, setSelected] = useState(people[0]);
+  const router = useRouter();
   // const [open, setOpen] = useState(false);
 
   useEffect(()=> {
@@ -27,8 +31,16 @@ function MyListbox(props: newType) {
       props.setSelected(0);
     else if(selected.name == 'Groups Messages')
       props.setSelected(1);
-    else
+    else if (selected.name == 'DM a friend')
+    {
+      router.push('/friends');
       props.setSelected(2);
+    }
+    else {
+
+        props.setOpenModal(true);
+        props.setSelected(2);
+    }
 
     // console.log('kitab hayati: ', selected.name);
   }, [selected])

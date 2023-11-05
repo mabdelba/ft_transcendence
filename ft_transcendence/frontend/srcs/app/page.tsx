@@ -2,9 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import Register from './components/forms/Register';
 import Login from './components/forms/Login';
+import { context } from '../context/context';
 
 export default function Home() {
   const [loginOpen, setLoginOpen] = useState(false);
@@ -25,6 +26,7 @@ export default function Home() {
   const openRegisterModal = () => {
     setRegisterOpen(true);
   };
+
   
   const router = useRouter();
   function checkToken() {
