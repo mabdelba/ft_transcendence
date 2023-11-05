@@ -24,11 +24,11 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     }
 
     @SubscribeMessage('send-message')
-    async handleMessage(@MessageBody() data: {isChannel: boolean, senderLogin: string, receiverLogin: string, text: string}, @ConnectedSocket() client: Socket){
+    async handleMessage(@MessageBody() data: {isChannel: boolean, senderLogin: string, receiverLogin: string, text: string}, @ConnectedSocket() client: Socket, users: Map<string, string>){
         if (!this.dmsService.checkUsers(data.senderLogin, data.receiverLogin)) return;
-        await this.dmsService.sendAndSaveMessage(client, data, this.io);
+        await this.dmsService.sendAndSaveMessage(client, data, this.io, users);
     }
-
+ 
     @SubscribeMessage('users-with-conversation')
     async getUsersWithConversation(@MessageBody() data: {login: string}, @ConnectedSocket() client: Socket){
         const dms = await this.dmsService.usersWithConversation(data.login, client);

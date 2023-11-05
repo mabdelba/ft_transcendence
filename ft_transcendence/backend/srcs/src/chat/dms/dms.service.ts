@@ -35,7 +35,15 @@ export class DmsService {
         return false;
     }
 
-    async sendAndSaveMessage(client: any,data: any, io: any){
+    async getClientFromLogin(login: string, users: Map<string, string>){
+        for (const [socketId, userLogin] of users) {
+            if (userLogin === login)
+                return socketId;
+        }
+        return null;
+    }
+
+    async sendAndSaveMessage(client: any,data: any, io: any, users: Map<string, string>){
         console.log(`User ${data.senderLogin} sent message to ${data.receiverLogin}`);
         const roomName = data.isChannel ? data.receiverLogin : this.createRoomName(data.senderLogin, data.receiverLogin);
         // check if user is blocked
@@ -60,6 +68,9 @@ export class DmsService {
         } 
         else
         {
+            if (this.getClientFromLogin(data.receiverLogin, users) === null) return;
+            else
+                io.sockets.socket.get(this.getClientFromLogin(data.receiverLogin, users)).join(roomName);
             await this.prisma.message.create({
                 data: {
                     text: data.text,
