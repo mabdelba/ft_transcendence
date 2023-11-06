@@ -85,7 +85,11 @@ export class DmsService {
             });
             if (this.getClientFromLogin(data.receiverLogin, users) === null) console.log('null');
             else
+            {
                 io.sockets.sockets.get(this.getClientFromLogin(data.receiverLogin, users)).join(roomName);
+                
+                console.log(data.receiverLogin, " join this room === ", roomName);
+            }
         }
         console.log('room name == ', roomName);
         client.to(roomName).emit('receive-message', data);
