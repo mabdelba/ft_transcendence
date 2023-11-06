@@ -100,12 +100,14 @@ function Messages() {
       senderLogin: user.login,
       receiverLogin: roomSelected,
       text: message,
+      senderAvatar: user.avatar,
+      state: user.state
     });
     if (message != '') {
       const _chatArea = [
         ...chatArea,
         { sender: user.login, reciever: roomSelected, text: message },
-      ];
+      ]; 
       setChatArea(_chatArea);
       //   setChangeList(false);
       setMessage('');
@@ -163,6 +165,7 @@ function Messages() {
   // const [friendList, setFriendList] = useState(user.friendList);
 
   function recieveMessage(data: any) {
+    console.log('recieve message', data);
     if (data.senderLogin == roomSelected || data.receiverLogin == roomSelected)
       setChatArea([
         ...chatArea,
@@ -183,6 +186,15 @@ function Messages() {
         setUser(_user);
         setConversations(tempConversation);
       }
+      else
+      {
+        tempConversation.unshift({login: data.senderLogin, avatar: data.senderAvatar, state: data.state});
+        const _user : User = {...user}
+        _user.conversations = tempConversation;
+        setUser(_user);
+        setConversations(tempConversation);
+      }
+      
     }
   }
 
