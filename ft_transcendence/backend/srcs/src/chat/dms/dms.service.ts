@@ -35,7 +35,7 @@ export class DmsService {
         return false;
     }
 
-    async getClientFromLogin(login: string, users: Map<string, string>){
+    getClientFromLogin(login: string, users: Map<string, string>){
         for (const [socketId, userLogin] of users) {
             if (userLogin === login)
                 return socketId;
@@ -62,30 +62,30 @@ export class DmsService {
                         connect: {
                             name: data.receiverLogin
                         }
-                    }
+                    } 
                 }
             });
         } 
         else
         {
             await this.prisma.message.create({
-                data: {
+                data: { 
                     text: data.text,
                     senderUser: {
                         connect: {
                             login: data.senderLogin
-                        }
+                        }  
                     },
                     recieverUser: {
                         connect: {
                             login: data.receiverLogin
                         }
-                    }
+                    } 
                 }
             });
             if (this.getClientFromLogin(data.receiverLogin, users) === null) console.log('null');
             else
-                io.sockets.socket.get(this.getClientFromLogin(data.receiverLogin, users)).join(roomName);
+                io.sockets.sockets.get(this.getClientFromLogin(data.receiverLogin, users)).join(roomName);
         }
         console.log('room name == ', roomName);
         client.to(roomName).emit('receive-message', data);
@@ -95,7 +95,7 @@ export class DmsService {
         const sender = await this.prisma.user.findUnique({
             where: {
                 login: senderLogin
-            }
+            } 
         });
         const receiver = await this.prisma.user.findUnique({
             where: {
