@@ -34,12 +34,12 @@ function MyListbox(props: newType) {
     else if (selected.name == 'DM a friend')
     {
       router.push('/friends');
-      props.setSelected(2);
+      props.setSelected(0);
     }
     else {
 
         props.setOpenModal(true);
-        props.setSelected(2);
+        props.setSelected(1);
     }
 
     // console.log('kitab hayati: ', selected.name);

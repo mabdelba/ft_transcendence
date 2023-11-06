@@ -14,6 +14,8 @@ import axios from 'axios';
 import MessageText from '../components/shapes/MessageText';
 import { Dialog, Transition } from '@headlessui/react';
 import {AiOutlineClose} from 'react-icons/ai'
+import SimpleButton from '../components/buttons/simpleButton';
+import SimpleInput from '../components/inputs/simpleInput';
 
 const path = `/goinfre/mabdelba/ft_transcendence/ft_transcendence/backend/srcs/public/avatars/`;
 const friendList = [
@@ -86,6 +88,9 @@ function Messages() {
   const [chatArea, setChatArea] = useState<any>([]);
   const messageEl = useRef<any>();
   const [openModal, setOpenModal] = useState(false);
+  const [groupName , setGroupName ] = useState('');
+  const [groupPassword, setGroupPassword] = useState('');
+  const [error, setError] = useState(false);
 
   const handleSend = (e: any) => {
     e.preventDefault();
@@ -126,7 +131,6 @@ function Messages() {
     if (socket) {
       if(!user.conversations || (user.conversations.length == 1 && user.conversations.isFrd)) {
         const _user: User = { ...user };
-        console.log("mo9atil:::::: ", user.conversations)
         if (!user.state) {
           socket.emit('online', { token: localStorage.getItem('jwtToken') });
           _user.state = 1;
@@ -281,7 +285,7 @@ function Messages() {
                           )}
                         </div>
                         <h6 className="text-[7px] 2xl:text-[10px] antialiased  truncate w-24 2xl:w-44 overflow-hidden font-normal tracking-normal text-[#484848]">
-                          hello from {obj.login}, how are you ?
+                          {obj.state == 1 ? `${obj.login} is available` : 'Disconnected'}
                         </h6>
                       </span>
                     </button>
@@ -337,11 +341,23 @@ function Messages() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="relative min-w-[260px] min-h-[100px] h-[40%] xl:h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
-                  <button className='absolute' onClick={()=> {setOpenModal(false)}}>
-                    <AiOutlineClose />
-                  </button>
-                    hello world
+                <Dialog.Panel className="relative min-w-[260px] min-h-[100px]  h-[60%] xl:h-[60%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
+                  <div className='h-[10%] w-full flex justify-end items-center pr-3 NeonShadow'>
+                    <AiOutlineClose  onClick={()=> {setOpenModal(false)}}  className="cursor-pointer h-7 w-7  lg:h-10 lg:w-10"/>
+                  </div>
+                  <h1 className='h-[10%] w-full font-Orbitron NeonShadow text-base md:text-xl 2xl:text-3xl flex justify-center items-center'>Add new group</h1>
+                  <form className='h-[75%] flex flex-col justify-between w-full p-2 sm:p-10 '>
+                    <div className='h-1/5'>
+                      <SimpleInput holder={'Group name'} type1={'text'} SetValue={setGroupName} val={''} setError={setError} isVerif={false}  />
+                    </div>
+                    <div className='h-1/5 flex justify-between'></div>
+                    <div className='h-1/5'>
+                      <SimpleInput holder={'Password (optional)'} type1={'text'} type2='password' SetValue={setGroupPassword} val={''} setError={setError} isVerif={false}  />
+                    </div>
+                    <div className='h-1/5'>
+                      <SimpleButton content='Add group' buttonType={"submit"} handleClick={(e: any)=> {e.preventDefault()}}/>
+                    </div>
+                  </form>
                 </Dialog.Panel>
               </Transition.Child>
             </div>
