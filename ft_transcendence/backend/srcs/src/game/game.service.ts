@@ -7,6 +7,8 @@ class GameModel{
     private _runner: Runner;
     width: number = 600;
     height: number = 800;
+    xForce: number = 0;
+    yForce: number = 0;
     walls: Body[] = [];
     ball: Body | null = null;
     player1: Body | null = null;
@@ -29,7 +31,10 @@ class GameModel{
         this._createBall();
         this._createPlayers();
         this._setEvents();
-        Runner.run(this._runner, this._engine);
+    }
+    setForce(x: number, y: number): void{
+        this.xForce = x;
+        this.yForce = y;
     }
 
     private _createWalls(): void{
@@ -43,7 +48,7 @@ class GameModel{
     }
 
     private _createBall(): void{
-        this.ball = Bodies.circle(this.width / 2, this.height / 2, 10, {mass: 60, restitution: 1, force: {x: 1, y: 1}, friction: 0, frictionAir: 0, frictionStatic: 0, inertia: Infinity});
+        this.ball = Bodies.circle(this.width / 2, this.height / 2, 10, {mass: 60, restitution: 1, force: {x: this.xForce, y: this.yForce}, friction: 0, frictionAir: 0, frictionStatic: 0, inertia: Infinity});
         World.add(this._world, this.ball);
     }
 
@@ -71,9 +76,11 @@ class GameModel{
     public setID2(id: string): void{
         this.id2 = id;
     }
-
+//run this function when the game starts
     public run(): void{
-        this._createBall();
+        console.log("run");
+        this.setForce(1,1)
+        Runner.run(this._runner, this._engine);
     }
 
     public movePlayer(id: string, x: number): void{

@@ -18,7 +18,7 @@ export class GameGateway {
         const decoded = jwtDecode(jwtToken);
         if (this.ConnectedUsers.has(decoded['login'])) {
             this.ConnectedUsers.get(decoded['login'])?.push(socket.id);
-            //  socket.disconnect();
+             socket.disconnect();
             console.log('already connected', decoded['login']);
         }
         else{
@@ -34,25 +34,24 @@ export class GameGateway {
         const login = decoded['login'];
         const index = this.RandomGames.findIndex((game) => game.map == data.map);
         if (index >= 0){
+            console.log("index "+ index +" "+decoded['login']+" joined game");
             const game = this.RandomGames[index];
             game.game.setSocket2(socket);
             game.id2 = socket.id;
             game.game.setID2(game.id2);
         }else{
             let game: GameModel = new GameModel(socket);
+            console.log(decoded['login']+" created new game");
             this.RandomGames.push({game: game, id1: socket.id, id2: '', map: data.map});
         }
     }
 
     @SubscribeMessage('StartGame')
     handleStartGame(@ConnectedSocket() socket: Socket, @MessageBody() data: { map: string }) {
-        const index = this.RandomGames.findIndex((game) => {(game.id1 == socket.id && game.id2 != '') || (game.id2 == socket.id && game.id1 != '')});
+        const index = this.RandomGames.findIndex((game) => (game.id1 == socket.id && game.id2 != '') || game.id2 == socket.id);
         if (index >= 0){
             const game: GameModel = this.RandomGames[index].game;
-            // console.log("id 1 "+ game.id1, "id 2"+ game.id2);
             game.run();
-            game.socket1?.emit('StartGame', {data: 'started'});
-            game.socket2?.emit('StartGame', {data: 'started'});
         }
     }
 
@@ -61,7 +60,6 @@ export class GameGateway {
         const index = this.RandomGames.findIndex((game) => (game.id1 == socket.id || game.id2 == socket.id));
         if (index >= 0){
             const game: GameModel = this.RandomGames[index].game;
-            // console.log(socket.id, data.x);
             game.movePlayer(socket.id, data.x);
         }
     }
