@@ -12,7 +12,7 @@ import OptionBar from '../components/forms/OptionBar';
 import Login from '../components/forms/Login';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { context } from '../../context/context';
+import { context, SocketContext } from '../../context/context';
 import { User } from '../../context/context';
 import { useQuery } from 'react-query';
 import { log } from 'console';
@@ -30,7 +30,7 @@ const fetchDashboard = async () => {
 function Dashboard() {
   const { setUser: setUser__, user } = useContext(context);
   const router = useRouter();
-  const { socket } = useContext(context);
+  const { socket } = useContext(SocketContext);
 
   const [myLogin, setMyLogin] = useState('');
 

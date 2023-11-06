@@ -42,7 +42,7 @@ function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}
     
     const [hoverBool, setHoverBool] = useState(false);
     return(
-        <main className='w-screen h-screen flex NeonShadow min-h-[600px] min-w-[280px] overflow-y-hidden'>
+        <main className='w-screen h-screen flex  min-h-[600px] min-w-[280px] overflow-y-hidden'>
           <div className={`h-full ${showSideBar ? '' : 'hidden'}  sm:block  w-20 xl:w-60  border-r-[3px] lineshad bg-opacity-10 bg-blue-500`}>
             <div className="h-14 xl:h-16 ">
               <MenuButton />
@@ -62,7 +62,7 @@ function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}
               onMouseEnter={() => {setHoverBool(true)}}
               onMouseLeave={() => {setHoverBool(false)}}
               href={`/profil/${user.login}`} className="flex flex-row space-x-2 items-center min-w-[40px] w-auto justify-center  font-Orbitron font-light hover:text-lime-300 hover:font-extrabold text-xs md:text-base 2xl:text-lg pr-6">
-                <span>{user.login}</span>
+                <span className="NeonShadow">{user.login}</span>
                 {
                   showPdp &&
                     <Image width="50" height="50"  alt="image" src={user.avatar || alien}  className={`w-10 h-10 lineshad  ${!hoverBool ? 'border-[2px]' : 'border-lime-300 border-[4px]' }  rounded-full` }/>

@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client';
 // import OptionBar from '../components/forms/OptionBar'
 import dynamic from 'next/dynamic';
-import { User, context } from '../../context/context';
+import { User, context, SocketContext } from '../../context/context';
 import { useQuery } from 'react-query';
 
 
@@ -35,15 +35,16 @@ const fetchUnacquiredAchiev = async ()=>{
 function Achievements() {
 
 	const {user, setUser} = useContext(context);
+	const { socket } = useContext(SocketContext);
 	const [acquired, setAcquired] = useState<any>(null); //
 	const [unacquired, setUnacquired] = useState<any>(null); //
 
 	
 	const {data : achievements, status } = useQuery("achievements", fetchAchivements);
 	const {data : unacquiredAchiev, status : status1} = useQuery("unacquiredAchiev", fetchUnacquiredAchiev);
-
-
-	useEffect(()=> {
+	
+	
+	useEffect(()=> {	
 		if(!user.achievements || !user.unacquiredAchiev)
 		{
 			const _user : User = user;
@@ -63,9 +64,13 @@ function Achievements() {
 			setAcquired(user.achievements);
 			setUnacquired(user.unacquiredAchiev);
 		}
-	
-	}, [status, status1])
-	
+		if (!user.state && socket) {
+			socket.emit('online', { token: localStorage.getItem('jwtToken') });
+			const _user: User = user;
+			_user.state = 1;
+			setUser(_user);
+		}
+	}, [status, status1]);
 	
 	return (
 		<OptionBar flag={1} >

@@ -75,8 +75,8 @@ function Profil(props: profileProp) {
 			if (exp < current_time) {
 				localStorage.removeItem('jwtToken');
 				props.router.push('/');
-			} else if (props.myProfil) getProfile();
-			else setProfile(user);
+			} else if (!props.myProfil) setProfile(user);
+			else getProfile();
 		}
 	}, [props.login, user]);
 
