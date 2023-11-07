@@ -92,7 +92,7 @@ const gamePage = () => {
                     <div className="blueShadow text-[20px] text-[#00B2FF] m-2 hidden md:block">{username}</div>
                 </div>
                 <button type="button" className="NeonShadowBord flex flex-row items-center h-fit px-4 py-3 hover:bg-white hover:text-[black] transition-[300]">
-                    <Image src={Logout} className='h-[20px]' />
+                    <Image src={Logout} className='h-[20px]' alt="logout" />
                     <div className="hidden md:block pl-2 text-[15px]">Leave</div>
                 </button>
                 <div className="flex flex-row items-center m-2">
