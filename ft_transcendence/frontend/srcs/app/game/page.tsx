@@ -82,9 +82,6 @@ const gamePage = () => {
             console.error('Error:', error);
         });
 
-        console.log(avatar);
-
-
     return (
         <div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
             <div className='flex flex-row items-center w-[100%] justify-evenly'>
