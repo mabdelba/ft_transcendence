@@ -48,7 +48,7 @@ const gamePage = () => {
         });
 
         setGameSocket(socket);
-        
+
         return () => {
             window.removeEventListener('resize', handleResize)
         }
@@ -60,7 +60,7 @@ const gamePage = () => {
             <button
                 type='button'
                 onClick={()=> {
-                    // console.log(gameSocket?.id);
+                    console.log(gameSocket?.id);
                     gameSocket?.emit('StartGame', {map: 'map1'})}}
                  className='z-10 h-10 w-52 border'>Start Game</button>
             <div className='w-[80%] h-[90%] bg-red-500 flex justify-center items-center' ref={gameDiv}>               

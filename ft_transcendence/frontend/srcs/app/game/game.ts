@@ -46,7 +46,12 @@ class Game{
     private _setEvents(): void{
         Events.on(this._engine, 'beforeUpdate', () => {
             if (this.mouse && this.mouse?.position.x != this.player1?.position.x){
-                this.socket?.emit('MovePlayer', {x: this._map(this.mouse?.position.x, 0, this.width, 0, 600)});
+                //min of window width
+                let min: number = this._map(50, 0, 600, 0, this.width);
+                //max of window width
+                let max: number = this.width - min;
+                if(this.mouse?.position.x < min || this.mouse?.position.x > max)
+                    this.socket?.emit('MovePlayer', {x: this._map(this.mouse?.position.x, 0, this.width, 0, 600)});
             }
         });
     }

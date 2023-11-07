@@ -21,7 +21,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   users = new Map();
   @UseGuards(JwtGuard)
   handleConnection(client: Socket) {
-    console.log('connected state  ', client.id);
+    // console.log('connected state  ', client.id);
     this.users.set(client.id, null);
   }
 
