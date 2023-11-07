@@ -9,6 +9,9 @@ import { ProfileModule } from './profile/profile.module';
 import { ChatModule } from './chat/chat.module';
 import { StateGateway } from './state/state.gateway';
 import { AchievementsModule } from './achievements/achievements.module';
+import { StateModule } from './state/state.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksService } from './tasks/tasks.service';
 import { GameGateway } from './game/game.gateway';
 
 @Module({
@@ -22,8 +25,10 @@ import { GameGateway } from './game/game.gateway';
     TwoFactorAuthModule,
     ProfileModule,
     AchievementsModule,
+    StateModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
-  providers: [AppService, StateGateway, GameGateway],
+  providers: [AppService, StateGateway, GameGateway, TasksService],
 })
 export class AppModule {}

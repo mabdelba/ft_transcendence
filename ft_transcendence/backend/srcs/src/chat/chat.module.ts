@@ -5,4 +5,4 @@ import { DmsModule } from './dms/dms.module';
     // providers: [ChatService, ChatGateway],
     imports: [DmsModule],
 })
-export class ChatModule {}
+export class ChatModule {} 

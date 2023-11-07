@@ -8,37 +8,47 @@ import { subscribe } from "diagnostics_channel";
 
 
 
-@WebSocketGateway({namespace: 'dm'})
+@WebSocketGateway({namespace: 'dm'}) 
 // @UseGuards(JwtGuard)
 export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     constructor(private dmsService: DmsService){}
     @WebSocketServer()
-    io: Namespace;
+    io: Namespace;  
 
-    async handleConnection(client: any, room: String, socket: Socket) {
-        console.log('connected');
+    async handleConnection(client: any, room: String) {
+        console.log('connected dm ', client.id);
         // this.dmsService.joinRoom(client, socket, this.io.server);
     }
     handleDisconnect(client: any) {
-        console.log('disconnected');
-    }
-    @SubscribeMessage('join-room')
-    handleJoinRoom(@MessageBody() data: {roomName: string, user: string}, @ConnectedSocket() client: Socket){
-        this.dmsService.joinRoom(data, false, client);
+        console.log('disconnected'); 
     }
 
-    @SubscribeMessage('message')
-    async handleMessage(@MessageBody() data: {senderLogin: string, receiverLogin: string, text: string}, @ConnectedSocket() client: Socket){
+    @SubscribeMessage('send-message')
+    async handleMessage(@MessageBody() data: {isChannel: boolean, senderLogin: string, receiverLogin: string, text: string}, @ConnectedSocket() client: Socket){
         if (!this.dmsService.checkUsers(data.senderLogin, data.receiverLogin)) return;
-        client.to(this.dmsService.createRoomName(data.receiverLogin, data.senderLogin)).emit('message', data);
-        await this.dmsService.saveMessage(client, data);
+        await this.dmsService.sendAndSaveMessage(client, data, this.io);
+    }
+
+    @SubscribeMessage('users-with-conversation')
+    async getUsersWithConversation(@MessageBody() data: {login: string}, @ConnectedSocket() client: Socket){
+        const dms = await this.dmsService.usersWithConversation(data.login, client);
+        client.emit('get-users', dms);
+        return dms;  
     }
 
     @SubscribeMessage('get-messages')
-    async handleGetMessages(@MessageBody() data: {senderLogin: string, receiverLogin: string}, @ConnectedSocket() client: Socket){
+    async handleGetMessages(@MessageBody() data: {isChannel: boolean, senderLogin: string, receiverLogin: string}, @ConnectedSocket() client: Socket){
         if (!this.dmsService.checkUsers(data.senderLogin, data.receiverLogin)) return;
-        // const messages = await this.dmsService.getMessages(data.senderLogin, data.receiverLogin);
-        // client.emit('get-messages', messages);
+        const messages = await this.dmsService.getMessages(data, this.io, client);
+        client.emit('get-messages', messages);
+        return messages; 
     }
 
+    // channels part
+    @SubscribeMessage('channels-with-conversation')
+    async getChannelsWithConversation(@MessageBody() data: {channelName: string}, @ConnectedSocket() client: Socket){
+        const channels = await this.dmsService.channelsWithConversation(data.channelName);
+        client.emit('get-channels', channels);
+        return channels;
+    }
 }

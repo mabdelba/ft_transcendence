@@ -6,7 +6,8 @@ import { Providers } from '../redux-store/provider';
 import OptionBar from './components/forms/OptionBar';
 import Context from '../context/context';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
-import { ChakraProvider } from '@chakra-ui/react'
+import Logo from "../public/logo.svg"
+
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,7 +23,10 @@ export default function rootLayout({ children }: { children: React.ReactNode }) 
   return (
     
     <html lang="en">
-   
+      <head >
+        <title>Atari Pong</title>
+        {/* <link rel="icon" type="image/svg" href={Logo}/> */}
+      </head>
       <body className={inter.className}>
         <Context>
           <QueryClientProvider client={new QueryClient} >
