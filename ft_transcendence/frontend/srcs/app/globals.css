@@ -287,3 +287,24 @@ body {
       transform: rotate(360deg);
   }
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+  border: 2px solid #FFF;
+  margin: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #FFF;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: lightgray;
+}
