@@ -51,6 +51,7 @@ export class GameGateway {
         const index = this.RandomGames.findIndex((game) => (game.id1 == socket.id && game.id2 != '') || game.id2 == socket.id);
         if (index >= 0){
             const game: GameModel = this.RandomGames[index].game;
+            console.log("start game", game.id1, game.id2, this.RandomGames.length);
             game.run();
         }
     }
@@ -91,6 +92,6 @@ export class GameGateway {
                 this.RandomGames.splice(index, 1);
             }
         }
-        // console.log("GameGateway handleDisconnect", socket.id);
+        console.log("GameGateway handleDisconnect", socket.id);
     }
 }
