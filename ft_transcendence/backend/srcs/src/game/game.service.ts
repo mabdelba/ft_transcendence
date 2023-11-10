@@ -72,6 +72,11 @@ class GameModel{
     public setSocket2(socket: Socket): void{
         this.socket2 = socket;
     }
+// need to remove this funtions
+    public setSocket1(socket: Socket): void{
+        this.socket1 = socket;
+    }
+///////////////////////////////
 
     public setID2(id: string): void{
         this.id2 = id;
@@ -80,6 +85,13 @@ class GameModel{
     public run(): void{
         console.log("run");
         Runner.run(this._runner, this._engine);
+    }
+//destroy this function when the game ends
+    public destroy(): void{
+        console.log("destroy");
+        Runner.stop(this._runner);
+        World.clear(this._world, false);
+        Engine.clear(this._engine);
     }
 
     public movePlayer(id: string, x: number): void{

@@ -18,7 +18,7 @@ function Queue() {
     return (
       <>
         <div className='flex flex-col items-center h-screen justify-center'>
-          <h1 className='font-Orbitron NeonShadow text-[30px] mb-[30px]'>Chouse a map</h1>
+          <h1 className='font-Orbitron NeonShadow text-[30px] mb-[30px]'>Choose a map</h1>
           <div className='flex content-center justify-center'>
             <button className='' onClick={toggleModal}>
               <Image src={LightMap} alt="LightMap" />

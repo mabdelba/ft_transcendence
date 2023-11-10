@@ -8,7 +8,7 @@ import GameModel from "./game.service";
 
 @WebSocketGateway(3001, { cors: '*' })
 export class GameGateway {
-    ConnectedUsers: Map<string, string[]> = new Map<string, string[]>();
+    ConnectedUsers: Map<string, Socket[]> = new Map<string, Socket[]>();
     RandomGames: { game: GameModel, id1: string, id2: string, map: string }[] = [];
     constructor() {}
  
@@ -16,16 +16,18 @@ export class GameGateway {
     handleConnection(socket: Socket) {
         const jwtToken = socket.handshake.auth.token;
         const decoded = jwtDecode(jwtToken);
-        if (this.ConnectedUsers.has(decoded['login'])) {
-            this.ConnectedUsers.get(decoded['login'])?.push(socket.id);
-             socket.disconnect();
-            console.log('already connected', decoded['login']);
+        const login = decoded['login'];
+        if (this.ConnectedUsers.has(login)) {
+            this.ConnectedUsers.get(login)?.push(socket);
+            console.log('already connected', login, socket.id);
         }
         else{
-            this.ConnectedUsers.set(decoded['login'], [socket.id]);
-            console.log('connected', decoded['login']);
+            this.ConnectedUsers.set(login, [socket]);
+            console.log('connected', login, socket.id);
         }
     }
+
+
 
     @SubscribeMessage('NewGame')
     handleNewGame(@ConnectedSocket() socket: Socket, @MessageBody() data: { map: string }) {
@@ -34,14 +36,14 @@ export class GameGateway {
         const login = decoded['login'];
         const index = this.RandomGames.findIndex((game) => game.map == data.map);
         if (index >= 0){
-            console.log("index "+ index +" "+decoded['login']+" joined game");
+            console.log("index "+ index +" "+ login +" joined game");
             const game = this.RandomGames[index];
             game.game.setSocket2(socket);
             game.id2 = socket.id;
             game.game.setID2(game.id2);
         }else{
             let game: GameModel = new GameModel(socket);
-            console.log(decoded['login']+" created new game");
+            console.log( login +" created new game");
             this.RandomGames.push({game: game, id1: socket.id, id2: '', map: data.map});
         }
     }
@@ -66,30 +68,32 @@ export class GameGateway {
     }
 
     @UseGuards(JwtGuard)
-    handleDisconnect(socket: Socket) {
+     handleDisconnect(socket: Socket) {
         const jwtToken = socket.handshake.auth.token;
         const decoded = jwtDecode(jwtToken);
         let ids = this.ConnectedUsers.get(decoded['login']);
-        const index = ids?.indexOf(socket.id);
-        if (index >= 0)
-            ids.splice(index!, 1);
-        console.log("ids", ids.length, ids);
-        if (ids?.length == 0){
+        const index = ids?.indexOf(socket);
+        ids?.forEach((id) => {
+            id.emit('left game', {winner: true});
+            console.log("here333", id.id, id.connected);
+        });
+        if (index >= 0){
             this.ConnectedUsers.delete(decoded['login']);
-            const index = this.RandomGames.findIndex((game) => game.id1 == socket.id || game.id2 == socket.id);
-            if (index >= 0){
-                const game: GameModel = this.RandomGames[index].game;
-                game.socket1?.emit('left', {data: 'your opponent left'});
-                game.socket2?.emit('left', {data: 'your opponent left'});
-                if (game.socket1?.id == socket.id){
-                    console.log("here222");
-                    game.socket2?.disconnect();
+            const gameIndex = this.RandomGames.findIndex((game) => game.id1 == socket.id || game.id2 == socket.id);
+            if (gameIndex >= 0){
+                const game: GameModel = this.RandomGames[gameIndex].game;
+                if (socket.id === game.socket1.id){
+                    console.log("here111", socket.id, game.socket1.connected);
+                    game.socket2.emit('left game', {winner: true});
                 }
                 else{
-                    console.log("here1111");
-                    game.socket1?.disconnect();
+                    console.log("here222", socket.id, game.socket2.connected);
+                    game.socket1.emit('left game', {winner: true});
                 }
-                this.RandomGames.splice(index, 1);
+
+                game.destroy();
+                this.RandomGames.splice(gameIndex, 1);
+
             }
         }
         console.log("GameGateway handleDisconnect", socket.id);

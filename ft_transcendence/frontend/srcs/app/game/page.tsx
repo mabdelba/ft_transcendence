@@ -10,6 +10,7 @@ import Logout from '../../public/log-out.svg';
 import Image from 'next/image';
 import { set } from 'husky';
 import { Console } from 'console';
+import { useRouter } from 'next/navigation';
 
 let game: Game | null = null;
 
@@ -27,6 +28,42 @@ const gamePage = () => {
     const gameDiv = useRef<HTMLDivElement>(null)
     const [{width, height}, setWindowSize] = useState({width: 0, height: 0})
     const [gameSocket, setGameSocket] = useState<Socket | null>(null)
+    const router = useRouter();
+
+useEffect(() => {
+        const handleResize = () => {
+            setWindowSize({width: window.innerWidth, height: window.innerHeight});
+        };
+
+        if (typeof window !== 'undefined') {
+            window.addEventListener('resize', handleResize);
+
+            let socket: Socket = io('http://localhost:3001', {
+                auth: {
+                    token: localStorage.getItem('jwtToken'),
+                },
+            });
+
+            socket?.on('connect', () => {
+                socket.emit('NewGame', {map: 'map1'});
+                console.log('connectedff');
+                game?.setSocket(socket);
+            });
+
+            socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
+                game?.setState(data.player1, data.player2, data.ball);
+            });
+
+            setGameSocket(socket);
+        }
+
+        return () => {
+            if (typeof window !== 'undefined') {
+                window.removeEventListener('resize', handleResize);
+            }
+        };
+    }, []);
+
     useEffect(() => {
         if (gameDiv.current){
             console.log('gameDiv.current');
@@ -40,36 +77,6 @@ const gamePage = () => {
         }
     }, [width, height])
 
-    useEffect(() => {
-        const handleResize = () => {
-            setWindowSize({width: window.innerWidth, height: window.innerHeight})
-        }
-        window.addEventListener('resize', handleResize)
-
-
-        let socket: Socket = io('http://localhost:3001', {
-            auth: {
-                token: localStorage.getItem('jwtToken')
-            }
-        });
-
-        socket?.on('connect', () => {
-            socket.emit('NewGame', {map: 'map1'})
-            console.log('connected');
-            game?.setSocket(socket);
-        })
-
-        socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
-            game?.setState(data.player1, data.player2, data.ball);
-        });
-
-        setGameSocket(socket);
-
-        return () => {
-            window.removeEventListener('resize', handleResize)
-        }
-    }, [])
-
     const [username, setUsername] = useState("Username");
     const [avatar, setAvatar] = useState(Alien);
 
@@ -81,6 +88,66 @@ const gamePage = () => {
         .catch((error) => {
             console.error('Error:', error);
         });
+    
+    const handleLeave = () => {
+
+        router.push('/queue');
+    }
+
+
+   const [isLeft, setIsLeft] = useState(false);
+   useEffect(() => {
+        gameSocket?.on('left game', (data : {winner: boolean}) => {
+                setIsLeft(true);
+                console.log('isLeft', isLeft, data.winner);
+           })
+         if (isLeft) {
+                router.push('/queue');
+                gameSocket?.disconnect();
+                game?.destroy();
+         }
+    }, [isLeft, gameSocket])
+
+//    //if player emit left game, redirect to queue page
+//    //need to add winner component to show who win the game
+//    //need to add loser component to show who lose the game
+//    //need to add draw component to show draw game
+// function handleWinner() {
+//     return (
+//         <div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
+//             <div className='text-[40px]'>
+//                 You Win!
+//             </div>
+//             <button
+//                 type='button'
+//                 onClick={()=> {
+//                     router.push('/queue');
+//                     gameSocket?.disconnect();
+//                     game?.destroy();
+//                     }
+//                 }
+//                 className='z-10 h-10 w-52 border'>Leave Game</button>
+//         </div>
+//     )
+// }
+// function handleLoser() {
+//     return (
+//         <div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
+//             <div className='text-[40px]'>
+//                 You Lose!
+//             </div>
+//             <button
+//                 type='button'
+//                 onClick={()=> {
+//                     router.push('/queue');
+//                     gameSocket?.disconnect();
+//                     game?.destroy();
+//                     }
+//                 }
+//                 className='z-10 h-10 w-52 border'>Leave Game</button>
+//         </div>
+//     )
+// }
 
     return (
         <div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
@@ -91,7 +158,7 @@ const gamePage = () => {
                     </div>
                     <div className="blueShadow text-[20px] text-[#00B2FF] m-2 hidden md:block">{username}</div>
                 </div>
-                <button type="button" className="NeonShadowBord flex flex-row items-center h-fit px-4 py-3 hover:bg-white hover:text-[black] transition-[300]">
+                <button onClick={handleLeave} type="button" className="NeonShadowBord flex flex-row items-center h-fit px-4 py-3 hover:bg-white hover:text-[black] transition-[300]">
                     <Image src={Logout} className='h-[20px]' alt="logout" />
                     <div className="hidden md:block pl-2 text-[15px]">Leave</div>
                 </button>
@@ -105,12 +172,14 @@ const gamePage = () => {
             <div className='text-[40px]'>
                 0 - 0
             </div>
-            {/* <button
+             <button
                 type='button'
                 onClick={()=> {
-                    console.log(gameSocket?.id);
-                    gameSocket?.emit('StartGame', {map: 'map1'})}}
-                 className='z-10 h-10 w-52 border'>Start Game</button> */}
+                    console.log(gameSocket);
+                        gameSocket?.emit('StartGame', {map: 'map1'})
+                    }
+                }
+                 className='z-10 h-10 w-52 border'>Start Game</button>
             <div className='w-[100%] h-[80%] flex justify-center items-center' ref={gameDiv}>
             </div>
 
