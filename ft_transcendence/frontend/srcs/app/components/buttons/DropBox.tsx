@@ -9,31 +9,32 @@ import {GiGamepad} from 'react-icons/gi'
 import {FiSettings} from 'react-icons/fi'
 import {TbLogout2} from 'react-icons/tb'
 import {MdGroups2} from 'react-icons/md'
+import { useRouter } from 'next/navigation'
 
 
-const friendMenu = [
-  { href: '/account-settings', label: 'View profile' , render: (renderFuntion: any) => {return(<BsFillEyeFill size="20"/>)}},
-  { href: '/support', label: 'Block' ,render: (renderFuntion: any) => {return(<ImBlocked size="20"/>)}},
-  { href: '/license', label: 'Invite for a match' ,render: (renderFuntion: any) => {return(<GiGamepad size="20"/>)} },
-]
-
-const GroupMenu = [
-  { href: '/account-settings', label: 'Group settings' ,render: (renderFuntion: any) => {return(<FiSettings size="20"/>)}},
-  { href: '/support', label: 'Leave' ,render: (renderFuntion: any) => {return(<TbLogout2 size="20"/>)}},
-  { href: '/license', label: 'Group Members' ,render: (renderFuntion: any) => {return(<MdGroups2 size="20"/>)}},  
-  { href: '/license', label: 'Invite members' ,render: (renderFuntion: any) => {return(<AiOutlinePlus size="20"/>)}},  
-]
 
 
-function MyMenu(props: {slected: number}) {
 
-
+function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: any,roomSelected : string}) {
+  
+  const router = useRouter();
+  const friendMenu = [
+    { handleClick: ()=>{  props.roomSelected != '' && router.push(`/profil/${props.roomSelected}`)}, label: 'View profile' , render: () => {return(<BsFillEyeFill size="20"/>)}},
+    { handleClick: ()=>{}, label: 'Block' ,render: () => {return(<ImBlocked size="20"/>)}},
+    { handleClick: ()=>{}, label: 'Invite for a match' ,render: () => {return(<GiGamepad size="20"/>)} },
+  ]
+  
+  const GroupMenu = [
+    { handleClick: ()=>{ props.setOpenSettings(true) }, label: 'Group settings' ,render: () => {return(<FiSettings size="20"/>)}},
+    { handleClick: ()=>{}, label: 'Leave' ,render: () => {return(<TbLogout2 size="20"/>)}},
+    { handleClick: ()=>{  props.setOpenMembers(true) }, label: 'Group Members' ,render: () => {return(<MdGroups2 size="20"/>)}},  
+    { handleClick: ()=>{}, label: 'Invite members' ,render: () => {return(<AiOutlinePlus size="20"/>)}},  
+  ]
   const [links, setLinks] = useState(friendMenu);
-
+  
   useEffect(()=> {
-    
     props.slected == 0 ? setLinks(friendMenu) : props.slected == 1 ? setLinks(GroupMenu) : setLinks([]);
-  }, [props.slected])
+  }, [props.slected, props.roomSelected])
 
   return (
     <div className="">
@@ -62,6 +63,7 @@ function MyMenu(props: {slected: number}) {
                   <Menu.Item>
                   {({ active }) => (
                     <button
+                      onClick={link.handleClick}
                       className={ ` w-full h-14 relative border-b-2  cursor-pointer select-none flex flex-row items-center justify-center space-x-2  ${
                         active ? 'bg-white text-black' : 'text-white'
                       }`}
