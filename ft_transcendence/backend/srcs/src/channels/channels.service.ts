@@ -33,18 +33,17 @@ export class ChannelsService {
     }
 
 
-    async addNewChannel(dto: { channelName: string,  description: string , owner: string, type: number, password?: string}) {
+    async addNewChannel(login: string, dto: { channelName: string, type: number, password?: string}) {
         if (dto.type == 0)
             dto.password = null;
         await this.prismaservice.channel.create({
             data: {
                 name: dto.channelName,
-                description: dto.description,
                 password: dto.password,
                 type: dto.type,
                 owner: {
                     connect: {
-                        login: dto.owner
+                        login: login
                     }
                 }
             }

@@ -1,7 +1,7 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { ChannelsService } from './channels.service';
 import { JwtGuard } from 'src/auth/guards';
-import { type } from 'os';
+import { User } from '@prisma/client';
 
 @Controller('channels')
 export class ChannelsController {
@@ -9,7 +9,22 @@ export class ChannelsController {
 
     @UseGuards(JwtGuard)
     @Post('add-new-channel')
-    addNewChannel(@Body() dto: { channelName: string,  description: string , owner: string, type: number, password?: string}) {
-        return this.channelsService.addNewChannel(dto);
+    addNewChannel(@Req() req,@Body() dto: { channelName: string , type: number, password?: string}) {
+        return this.channelsService.addNewChannel((req.user as User).login, dto);
+    }
+    @UseGuards(JwtGuard)
+    @Post('add-user-to-channel')
+    addUserToChannel(@Req() req,@Body() dto: { channelName: string, user: string }) {
+        return this.channelsService.addNewUserToChannel(dto);
+    }
+    @UseGuards(JwtGuard)
+    @Post('add-admin-to-channel')
+    addAdminToChannel(@Req() req,@Body() dto: { channelName: string, user: string }) {
+        return this.channelsService.addAdminToChannel(dto);
+    }
+    @UseGuards(JwtGuard)
+    @Post('channel-members')
+    getChannelMembers(@Req() req,@Body() dto: { channelName: string, user: string }) {
+        return this.channelsService.listChannelMembers(dto);
     }
 }
