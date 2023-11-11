@@ -34,28 +34,38 @@ useEffect(() => {
         const handleResize = () => {
             setWindowSize({width: window.innerWidth, height: window.innerHeight});
         };
+        window.addEventListener('resize', handleResize);
+        const isPageReloaded = window.performance.navigation.type === 1;
 
-        if (typeof window !== 'undefined') {
-            window.addEventListener('resize', handleResize);
-
-            let socket: Socket = io('http://localhost:3001', {
-                auth: {
-                    token: localStorage.getItem('jwtToken'),
-                },
-            });
-
-            socket?.on('connect', () => {
-                socket.emit('NewGame', {map: 'map1'});
-                console.log('connectedff');
-                game?.setSocket(socket);
-            });
-
-            socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
-                game?.setState(data.player1, data.player2, data.ball);
-            });
-
-            setGameSocket(socket);
+        if (isPageReloaded) {
+            gameSocket?.disconnect();
+            router.push('/queue');
         }
+        else {
+               if (typeof window !== 'undefined' && gameSocket === null) {
+    
+               let socket: Socket = io('http://localhost:3001', {
+                   auth: {
+                       token: localStorage.getItem('jwtToken'),
+                   },
+               });
+               socket?.on('connect', () => {
+                   socket.emit('NewGame', {map: 'map1'});
+                   console.log('connectedff', socket.id );
+                   //dont set the game socket here because it will be set again in the next useEffect and player can start game from another tab
+                   game?.setSocket(socket);
+               });
+    
+                   socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
+                       game?.setState(data.player1, data.player2, data.ball);
+               });
+    
+               setGameSocket(socket);
+            
+            }
+        }
+
+        
 
         return () => {
             if (typeof window !== 'undefined') {
@@ -90,8 +100,8 @@ useEffect(() => {
         });
     
     const handleLeave = () => {
-
         router.push('/queue');
+        gameSocket?.disconnect();
     }
 
 
@@ -103,16 +113,19 @@ useEffect(() => {
            })
          if (isLeft) {
                 router.push('/queue');
+                console.log('isLeft', gameSocket?.id);
                 gameSocket?.disconnect();
-                game?.destroy();
+                 game?.destroy();
          }
+        
+
     }, [isLeft, gameSocket])
 
-//    //if player emit left game, redirect to queue page
-//    //need to add winner component to show who win the game
-//    //need to add loser component to show who lose the game
-//    //need to add draw component to show draw game
-// function handleWinner() {
+   //if player emit left game, redirect to queue page
+   //need to add winner component to show who win the game popup
+   //need to add loser component to show who lose the game popup
+   //need to add draw component to show draw game
+// function handleWinnerPopup() {
 //     return (
 //         <div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
 //             <div className='text-[40px]'>

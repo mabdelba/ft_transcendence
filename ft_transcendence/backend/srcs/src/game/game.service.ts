@@ -22,8 +22,8 @@ class GameModel{
 
     constructor(socket: Socket){
         this.socket1 = socket;
-        console.log("Game constructor");
         this.id1 = socket.id;
+        console.log("Game constructor");
         this._runner = Runner.create();
         this._engine = Engine.create({gravity: {x: 0, y: 0}});
         this._world = this._engine.world;
@@ -80,7 +80,8 @@ class GameModel{
 
     public setID2(id: string): void{
         this.id2 = id;
-    }
+    } 
+
 //run this function when the game starts
     public run(): void{
         console.log("run");
