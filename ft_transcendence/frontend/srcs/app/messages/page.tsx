@@ -13,7 +13,7 @@ import { PiCircleFill } from 'react-icons/pi';
 import axios from 'axios';
 import MessageText from '../components/shapes/MessageText';
 import { Dialog, Transition } from '@headlessui/react';
-import {AiOutlineClose} from 'react-icons/ai'
+import {AiOutlineClose, AiOutlineUserAdd} from 'react-icons/ai'
 import SimpleButton from '../components/buttons/simpleButton';
 import SimpleInput from '../components/inputs/simpleInput';
 import SwitchButton from '../components/buttons/switchButton';
@@ -25,13 +25,7 @@ import UploadAvatar from '../components/buttons/uploadAvatar';
 import Upload from "../../public/uploadIcon.svg"
 import BlackUpload from "../../public/blackupload.svg"
 
-const path = `/goinfre/mabdelba/ft_transcendence/ft_transcendence/backend/srcs/public/avatars/`;
-const friendList = [
-  { login: 'abas', id: 1, avatar: `${path}waelhamd.jpg` },
-  { login: 'ozahid', id: 3, avatar: `${path}ozahid.jpg` },
-  { login: 'mo9atil', id: 2, avatar: `${path}mo9atil.jpg` },
-  { login: 'mlahlafi', id: 5, avatar: `${path}mlahlafi.jpg` },
-];
+
 const Groups = [
   { owner: 'waelhamd', avatar: group   ,channelName : 'channel 01', type : 1, password : ''},
   { owner: 'ozahid',  avatar: group   ,channelName : 'channel 02' , type : 1, password : ''},
@@ -74,21 +68,6 @@ type ChatText = {
   id: number;
   text: string;
 };
-var id = 10;
-// const chatText: ChatText[] = [
-//   { sender: 'mabdelba', receiver: 'waelhamd', id: 1, text: 'Salut Cava' },
-
-//   { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
-//   { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
-//   { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
-//   { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
-//   { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
-//   { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
-//   { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
-//   { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
-//   { sender: 'mabdelba', receiver: 'waelhamd', id: 2, text: '?' },
-//   { sender: 'waelhamd', receiver: 'mabdelba', id: 3, text: 'Lhamdoulah toi' },
-// ];
 
 const getImageByLogin = async (login: string): Promise<string | null> => {
   return new Promise<string | null>(async (resolve) => {
@@ -131,6 +110,7 @@ function Messages() {
   const [openModal, setOpenModal] = useState(false);
   const [openMembersModal, setOpenMembersModal] = useState(false);
   const [openSettingModal , setOpenSettingModal] = useState(false);
+  const [openInviteModal, setOpenInviteModal] = useState(false);
   const [groupName , setGroupName ] = useState('');
   const [groupPassword, setGroupPassword] = useState('');
   const [error, setError] = useState(false);
@@ -138,6 +118,7 @@ function Messages() {
   const [fileName, setFilename] = useState("");
   const [description, setDescripion] = useState("");
   const [avatarToUpload, setAvatarToUpload] = useState("");
+  const [friendList, setFriendList] = useState<any>();
 
   const handleImage = (e: any) => {
 
@@ -159,6 +140,26 @@ function Messages() {
     else
       setError(true);
   }
+
+  useEffect(()=> {
+    if(!user.friendList)
+    {
+      const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-list';
+      axios.get(urlreq, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+        },
+      }).then((response: any)=> {
+
+        console.log('ayeh n3amass ha data:: ', response.data.friends)
+        setFriendList(response.friends);
+        const _user : User = {...user, friendList : response.data.friends};
+        setUser(_user);
+      })
+    }
+    else
+      setFriendList(user.friendList);
+  }, [user.friendList])
 
   useEffect(()=> {
 
@@ -381,7 +382,7 @@ function Messages() {
                 <BurgButton setFlag={setShowSideBar} val={showSideBar} />
               </div>
               <span className="text-xs md:text-base lg:text-lg truncate e">{roomSelected}</span>
-              <MyMenu slected={selected} setOpenMembers={setOpenMembersModal} roomSelected={roomSelected} setOpenSettings={setOpenSettingModal} />
+              {roomSelected != "" && <MyMenu slected={selected} setOpenMembers={setOpenMembersModal} roomSelected={roomSelected} setOpenSettings={setOpenSettingModal} setOpenInvite={setOpenInviteModal}/>}
             </div>
             <div className="  border-yellow-400 h-[60vh] w-full overflow-y-auto flex flex-col-reverse justify-end pb-4">
               <div className="h-auto  overflow-y-auto scroll-smooth" ref={messageEl}>
@@ -471,6 +472,34 @@ function Messages() {
               <SimpleButton content='Save' buttonType={"submit"} handleClick={()=>{}}/>
             </div>
           </form>
+      </Popup>
+      <Popup openModal={openInviteModal} setOpenModal={setOpenInviteModal}>
+      <div className='h-[10%] w-full flex justify-end items-center pr-3 NeonShadow'>
+            <AiOutlineClose  onClick={()=> {setOpenInviteModal(false)}}  className="cursor-pointer h-7 w-7  lg:h-10 lg:w-10"/>
+          </div>
+          <h1 className='h-[10%] w-full font-Orbitron NeonShadow text-base md:text-xl 2xl:text-3xl flex justify-center items-center'>Invite Members</h1>
+          <div className='h-[75%] flex flex-col font-Orbitron  justify-between w-full p-2 sm:p-10'>
+						<div className=' w-full flex items-center flex-col  mb-8 overflow-x-hidden  overflow-y-auto'>
+							<ul className='w-full'>
+								{friendList && friendList.map((member : any, index : number) => (
+								<li key={index}>
+									<div className='flex flex-row items-center my-[10px] justify-between'>
+										<div className='flex flex-row'>
+											<div className='NeonShadowBord h-[60px] w-[60px] flex items-center mr-[10px]'>
+												<Image src={member.avatar != `public/avatars/${member.login}.jpg` ? member.avatar : alien} alt="avatar" width="50" height="50" className='h-auto w-auto' />
+											</div>
+											<div className='flex flex-col justify-center'>
+												<span>{member.login}</span>
+											</div>
+										</div>
+										<button className='mr-5 p-1 text-[20px]'>
+											<AiOutlineUserAdd className="md:h-8 md:w-8 md:hover:h-9 md:hover:w-9 focus:outline-none hover:font-extrabold hover:text-cyan-500 duration-500" />
+										</button>
+									</div>
+								</li>))}
+							</ul>
+						</div>
+					  </div>
       </Popup>
     </OptionBar>
   );

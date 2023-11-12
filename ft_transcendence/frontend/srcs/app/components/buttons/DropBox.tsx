@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation'
 
 
 
-function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: any,roomSelected : string}) {
+function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: any, setOpenInvite: any ,roomSelected : string}) {
   
   const router = useRouter();
   const friendMenu = [
@@ -28,7 +28,7 @@ function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: 
     { handleClick: ()=>{ props.setOpenSettings(true) }, label: 'Group settings' ,render: () => {return(<FiSettings size="20"/>)}},
     { handleClick: ()=>{}, label: 'Leave' ,render: () => {return(<TbLogout2 size="20"/>)}},
     { handleClick: ()=>{  props.setOpenMembers(true) }, label: 'Group Members' ,render: () => {return(<MdGroups2 size="20"/>)}},  
-    { handleClick: ()=>{}, label: 'Invite members' ,render: () => {return(<AiOutlinePlus size="20"/>)}},  
+    { handleClick: ()=>{props.setOpenInvite(true)}, label: 'Invite members' ,render: () => {return(<AiOutlinePlus size="20"/>)}},  
   ]
   const [links, setLinks] = useState(friendMenu);
   
