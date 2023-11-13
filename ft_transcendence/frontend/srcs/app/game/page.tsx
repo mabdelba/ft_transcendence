@@ -11,6 +11,8 @@ import Image from 'next/image';
 import { set } from 'husky';
 import { Console } from 'console';
 import { useRouter } from 'next/navigation';
+import { data } from 'autoprefixer';
+import { emit } from 'process';
 
 let game: Game | null = null;
 
@@ -28,6 +30,8 @@ const gamePage = () => {
     const gameDiv = useRef<HTMLDivElement>(null)
     const [{width, height}, setWindowSize] = useState({width: 0, height: 0})
     const [gameSocket, setGameSocket] = useState<Socket | null>(null)
+    const [isLeft, setIsLeft] = useState(false);
+    const [gameEnded, setGameEnded] = useState(false);
     const router = useRouter();
 
 useEffect(() => {
@@ -38,8 +42,7 @@ useEffect(() => {
         const isPageReloaded = window.performance.navigation.type === 1;
 
         if (isPageReloaded) {
-            gameSocket?.disconnect();
-            router.push('/queue');
+            setIsLeft(true);
         }
         else {
                if (typeof window !== 'undefined' && gameSocket === null) {
@@ -52,7 +55,6 @@ useEffect(() => {
                socket?.on('connect', () => {
                    socket.emit('NewGame', {map: 'map1'});
                    console.log('connectedff', socket.id );
-                   //dont set the game socket here because it will be set again in the next useEffect and player can start game from another tab
                    game?.setSocket(socket);
                });
     
@@ -65,8 +67,6 @@ useEffect(() => {
             }
         }
 
-        
-
         return () => {
             if (typeof window !== 'undefined') {
                 window.removeEventListener('resize', handleResize);
@@ -74,7 +74,7 @@ useEffect(() => {
         };
     }, []);
 
-    useEffect(() => {
+useEffect(() => {
         if (gameDiv.current){
             console.log('gameDiv.current');
             game = new Game(gameDiv.current);
@@ -98,69 +98,48 @@ useEffect(() => {
         .catch((error) => {
             console.error('Error:', error);
         });
-    
+
     const handleLeave = () => {
-        router.push('/queue');
         gameSocket?.disconnect();
+        game?.destroy();
+        router.push('/queue');
     }
 
-
-   const [isLeft, setIsLeft] = useState(false);
    useEffect(() => {
-        gameSocket?.on('left game', (data : {winner: boolean}) => {
+        gameSocket?.on('left game', () => {
                 setIsLeft(true);
-                console.log('isLeft', isLeft, data.winner);
+                console.log('isLeft', isLeft);
            })
          if (isLeft) {
-                router.push('/queue');
-                console.log('isLeft', gameSocket?.id);
-                gameSocket?.disconnect();
-                 game?.destroy();
+                handleLeave();
          }
         
-
     }, [isLeft, gameSocket])
+    
+    const youWinPopup = () => {
+        console.log('youWinPopup');
+    }
 
-   //if player emit left game, redirect to queue page
-   //need to add winner component to show who win the game popup
-   //need to add loser component to show who lose the game popup
-   //need to add draw component to show draw game
-// function handleWinnerPopup() {
-//     return (
-//         <div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
-//             <div className='text-[40px]'>
-//                 You Win!
-//             </div>
-//             <button
-//                 type='button'
-//                 onClick={()=> {
-//                     router.push('/queue');
-//                     gameSocket?.disconnect();
-//                     game?.destroy();
-//                     }
-//                 }
-//                 className='z-10 h-10 w-52 border'>Leave Game</button>
-//         </div>
-//     )
-// }
-// function handleLoser() {
-//     return (
-//         <div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
-//             <div className='text-[40px]'>
-//                 You Lose!
-//             </div>
-//             <button
-//                 type='button'
-//                 onClick={()=> {
-//                     router.push('/queue');
-//                     gameSocket?.disconnect();
-//                     game?.destroy();
-//                     }
-//                 }
-//                 className='z-10 h-10 w-52 border'>Leave Game</button>
-//         </div>
-//     )
-// }
+    const youLosePopup = () => {
+        console.log('youLosePopup');
+    }
+
+    useEffect(() => {
+        let State : string = '';
+        gameSocket?.on('gameEnded', (data: {state: string}) => {
+            console.log('gameEnded');
+            setGameEnded(true);
+            State = data.state;
+        })
+        if(gameEnded){
+            if(State === 'win')
+                youWinPopup();
+            else if(State === 'lose' && !isLeft)
+                youLosePopup();
+            gameSocket?.disconnect();
+            game?.destroy();
+        }
+    }, [gameEnded])
 
     return (
         <div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>

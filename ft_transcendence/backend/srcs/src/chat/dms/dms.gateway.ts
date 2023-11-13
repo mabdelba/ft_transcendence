@@ -16,19 +16,19 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
     io: Namespace;  
 
     async handleConnection(client: any, room: String) {
-        console.log('connected dm ', client.id);
+        console.log('connected dm ', client.id); 
         // this.dmsService.joinRoom(client, socket, this.io.server);
-    }
+    } 
     handleDisconnect(client: any) {
         console.log('disconnected'); 
     }
 
     @SubscribeMessage('send-message')
-    async handleMessage(@MessageBody() data: {isChannel: boolean, senderLogin: string, receiverLogin: string, text: string}, @ConnectedSocket() client: Socket){
+    async handleMessage(@MessageBody() data: {isChannel: boolean, senderLogin: string, receiverLogin: string, text: string}, @ConnectedSocket() client: Socket, users: Map<string, string>,  ios: Server){
         if (!this.dmsService.checkUsers(data.senderLogin, data.receiverLogin)) return;
-        await this.dmsService.sendAndSaveMessage(client, data, this.io);
+        await this.dmsService.sendAndSaveMessage(client, data,ios, users);
     }
-
+ 
     @SubscribeMessage('users-with-conversation')
     async getUsersWithConversation(@MessageBody() data: {login: string}, @ConnectedSocket() client: Socket){
         const dms = await this.dmsService.usersWithConversation(data.login, client);
@@ -42,10 +42,10 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect{
         const messages = await this.dmsService.getMessages(data, this.io, client);
         client.emit('get-messages', messages);
         return messages; 
-    }
+    } 
 
     // channels part
-    @SubscribeMessage('channels-with-conversation')
+    @SubscribeMessage('channels-with-conversation') 
     async getChannelsWithConversation(@MessageBody() data: {channelName: string}, @ConnectedSocket() client: Socket){
         const channels = await this.dmsService.channelsWithConversation(data.channelName);
         client.emit('get-channels', channels);

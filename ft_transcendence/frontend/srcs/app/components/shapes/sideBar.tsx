@@ -20,12 +20,15 @@ import limeHistory from "../../../public/limeHistory.svg"
 import limeSettings from "../../../public/limeSetting.svg"
 import { useRouter } from 'next/navigation';
 import { useContext } from 'react';
-import { SocketContext, context } from '../../../context/context';
+import { SocketContext, User, context } from '../../../context/context';
 
 function SideBar({flag}: {flag: number}) {
 	const {socket} = useContext(SocketContext);
+	const {user, setUser} = useContext(context);
 	const router = useRouter();
 	function handleLogOutClick() {
+		const _user : User = {};
+		setUser(_user);
 		socket.emit('offline', { token: localStorage.getItem('jwtToken') });
 		localStorage.removeItem('jwtToken');
 		router.push('/');

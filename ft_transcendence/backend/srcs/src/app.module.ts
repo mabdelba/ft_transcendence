@@ -13,6 +13,7 @@ import { StateModule } from './state/state.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksService } from './tasks/tasks.service';
 import { GameGateway } from './game/game.gateway';
+import { ChannelsModule } from './channels/channels.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { GameGateway } from './game/game.gateway';
     AchievementsModule,
     StateModule,
     ScheduleModule.forRoot(),
+    ChannelsModule,
   ],
   controllers: [AppController],
   providers: [AppService, StateGateway, GameGateway, TasksService],

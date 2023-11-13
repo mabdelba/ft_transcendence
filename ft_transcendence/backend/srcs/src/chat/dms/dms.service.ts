@@ -35,7 +35,15 @@ export class DmsService {
         return false;
     }
 
-    async sendAndSaveMessage(client: any,data: any, io: any){
+    getClientFromLogin(login: string, users: Map<string, string>){
+        for (const [socketId, userLogin] of users) {
+            if (userLogin === login)
+                return socketId;
+        }
+        return null;
+    }
+
+    async sendAndSaveMessage(client: any,data: any, io: any, users: Map<string, string>){
         console.log(`User ${data.senderLogin} sent message to ${data.receiverLogin}`);
         const roomName = data.isChannel ? data.receiverLogin : this.createRoomName(data.senderLogin, data.receiverLogin);
         // check if user is blocked
@@ -54,27 +62,34 @@ export class DmsService {
                         connect: {
                             name: data.receiverLogin
                         }
-                    }
+                    } 
                 }
             });
         } 
         else
         {
             await this.prisma.message.create({
-                data: {
+                data: { 
                     text: data.text,
                     senderUser: {
                         connect: {
                             login: data.senderLogin
-                        }
+                        }  
                     },
                     recieverUser: {
                         connect: {
                             login: data.receiverLogin
                         }
-                    }
+                    } 
                 }
             });
+            if (this.getClientFromLogin(data.receiverLogin, users) === null) console.log('null');
+            else
+            {
+                io.sockets.sockets.get(this.getClientFromLogin(data.receiverLogin, users)).join(roomName);
+                
+                console.log(data.receiverLogin, " join this room === ", roomName);
+            }
         }
         console.log('room name == ', roomName);
         client.to(roomName).emit('receive-message', data);
@@ -84,7 +99,7 @@ export class DmsService {
         const sender = await this.prisma.user.findUnique({
             where: {
                 login: senderLogin
-            }
+            } 
         });
         const receiver = await this.prisma.user.findUnique({
             where: {
@@ -231,6 +246,7 @@ export class DmsService {
             }
         }
     }
+    // Check if user is in room before join it
     async getMessages(data: any, io: any, client: Socket){
         // this.checkIfInRoomAndJoin(senderLogin, receiverLogin, io, client);
         const roomName = data.isChannel ? data.receiverLogin : this.createRoomName(data.senderLogin, data.receiverLogin);
@@ -257,20 +273,20 @@ export class DmsService {
     async channelsWithConversation(login: string){
         const channelsWithConversation = await this.prisma.channel.findMany({
             where: {
-                AND: [
-                    {
+                // AND: [
+                    // {
                         members: {
                         some: {
                             login: login
                         }
                      },
-                    },
-                    {
-                        messages: {
-                            some: {}
-                        }
-                    }
-                ],
+                    // },
+                    // {
+                    //     messages: {
+                    //         some: {}
+                    //     }
+                    // }
+                // ],
             }
         });
         channelsWithConversation.sort((a, b) => {

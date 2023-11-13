@@ -40,9 +40,7 @@ class Game{
         this._setMouse();
         this._setEvents();
     }
-    // public setSocket(socket: Socket): void{
-    //     this.socket = socket;
-    // }
+
     private _setEvents(): void{
         Events.on(this._engine, 'beforeUpdate', () => {
             if (this.mouse && this.mouse?.position.x != this.player1?.position.x){

@@ -289,11 +289,18 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
-  border: 2px solid #FFF;
-  margin: 10px;
+  width: 5px;
+  border: 0.5px solid #FFF;
+  
+  margin: 50px;
 }
 
+/* @media (max-width = 60px) {
+  
+  ::-webkit-scrollbar{
+    wi
+  }
+} */
 /* Track */
 ::-webkit-scrollbar-track {
   background: transparent;

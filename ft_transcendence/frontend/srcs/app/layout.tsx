@@ -7,6 +7,8 @@ import OptionBar from './components/forms/OptionBar';
 import Context from '../context/context';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
 import Logo from "../public/logo.svg"
+import { Provider } from 'react-redux';
+import { store } from '../redux_tool';
 
 
 const inter = Inter({ subsets: ['latin'] });
@@ -28,16 +30,13 @@ export default function rootLayout({ children }: { children: React.ReactNode }) 
         {/* <link rel="icon" type="image/svg" href={Logo}/> */}
       </head>
       <body className={inter.className}>
+        <Provider store={store} >
         <Context>
           <QueryClientProvider client={new QueryClient} >
-          {/* <ChakraProvider> */}
-          {children}
-          {/* </ChakraProvider> */}
+            {children}
           </QueryClientProvider>
         </Context>
-          {/* <OptionBar userName='mabdelba' flag={0}> */}
-            {/* {children} */}
-          {/* </OptionBar> */}
+        </Provider>
       </body>
     </html>
   );

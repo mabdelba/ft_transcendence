@@ -21,7 +21,7 @@ export class GameGateway {
         if (this.ConnectedUsers.has(login)) {
             this.ConnectedUsers.get(login)?.push(socket);
             console.log('already connected', login, socket.id);
-            // socket.disconnect();
+            socket.disconnect();
         }
         else{
             this.ConnectedUsers.set(login, [socket]);
@@ -71,37 +71,50 @@ export class GameGateway {
         }
     }
 
+    @SubscribeMessage('endGame')
+    handleEndGame(@ConnectedSocket() socket: Socket, @MessageBody() data: { winner: number}) {
+        const index = this.RandomGames.findIndex((game) => (game.game.id1 == socket.id || game.game.id2 == socket.id));
+        console.log("end game", index);
+        if (index >= 0){
+            const game: GameModel = this.RandomGames[index].game;
+            if (data.winner == 1){
+                game.socket1.emit('gameEnded', {state: 'win'});
+                game.socket2.emit('gameEnded', {state: 'lose'});
+            }
+            else if(data.winner == 2){
+                game.socket1.emit('gameEnded', {state: 'lose'});
+                game.socket2.emit('gameEnded', {state: 'win'});
+            }
+            this.RandomGames.splice(index, 1);
+            game.destroy();
+        }
+    }
+
     @UseGuards(JwtGuard)
      handleDisconnect(socket: Socket) {
         const jwtToken = socket.handshake.auth.token;
         const decoded = jwtDecode(jwtToken);
         const ids = this.ConnectedUsers.get(decoded['login']);
-        console.log("ids", ids.length);
-        //map for ids and emit game leave to all ids
-        // if (ids.length > 1){
-        //     const index = ids.findIndex((id) => id.id == socket.id);
-        //     ids.splice(index, 1);
-        //     console.log("ids", ids.length);
-        // }
-        // else
-        //     this.ConnectedUsers.delete(decoded['login']);
-
+        if (ids?.length > 1){
+            ids.map((id) => {
+                id.emit('left game');
+            });
+        }
 
         const gameIndex = this.RandomGames.findIndex((game) => game.game.id1 == socket.id || game.game.id2 == socket.id);
-        this.ConnectedUsers.delete(decoded['login']);
+        
         if (gameIndex >= 0){
             const game: GameModel = this.RandomGames[gameIndex].game;
-            if (socket.id === game.socket1.id){
-                console.log("here111", socket.id, game.socket2?.connected);
-                // game.socket2?.disconnect();
+            if (socket.id == game.socket1.id){
+                console.log("here111");
+                game.socket2?.emit('endGame', {winner: 2});
             }
-            else{
-                console.log("here222", socket.id, game.socket1?.connected);
-                // game.socket1?.disconnect();
+            else if (socket.id == game.socket2.id){
+                console.log("here222");
+                game.socket1?.emit('endGame', {winner: 1});
             }
-            game.destroy();
-            this.RandomGames.splice(gameIndex, 1);
         }
+        this.ConnectedUsers.delete(decoded['login']);
         console.log("GameGateway handleDisconnect", socket.id, decoded['login']);
     }
 }

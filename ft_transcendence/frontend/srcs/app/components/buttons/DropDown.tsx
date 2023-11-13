@@ -8,7 +8,7 @@ import {BsFillVolumeMuteFill} from 'react-icons/bs'
 import {GiBootKick} from 'react-icons/gi'
 
 
-function MyMenu() {
+function MyDropDown() {
   
   const links = [
     { href: '/', label: 'Block' , render: (renderFuntion: any) => {return(<ImBlocked size="20"/>)}},
@@ -37,14 +37,14 @@ function MyMenu() {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="bg-black absolute right-0 w-60 z-10 origin-top-right divide-yoverflow-auto SmallNeonShadowBord text-base ring-1 ring-black ring-opacity-5 sm:text-sm focus:outline-none sm:mr-2">
+          <Menu.Items className="bg-black absolute right-0 w-36 z-10 origin-top-right divide-yoverflow-auto SmallNeonShadowBord text-base ring-1 ring-black ring-opacity-5 sm:text-sm focus:outline-none sm:mr-2">
             <div className="">
               {
                 links.map((link: any) => (
                   <Menu.Item>
                   {({ active }) => (
                     <button
-                      className={ ` w-full h-14 relative border-b-2  cursor-pointer select-none flex flex-row items-center justify-center space-x-2 transition-all duration-500  ${
+                      className={ ` w-full h-10 relative border-b-2  cursor-pointer select-none flex flex-row items-center justify-center space-x-2 transition-all duration-500  ${
                         active ? 'bg-white text-black' : 'text-white'
                       }`}
                     >
@@ -65,4 +65,4 @@ function MyMenu() {
   )
 }
 
-export default MyMenu;
+export default MyDropDown;
