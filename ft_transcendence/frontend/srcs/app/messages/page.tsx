@@ -26,41 +26,24 @@ import Upload from "../../public/uploadIcon.svg"
 import BlackUpload from "../../public/blackupload.svg"
 
 
-// const groups = [
-//   { owner: 'waelhamd', avatar: group   ,channelName : 'channel 01', type : 1, password : ''},
-//   { owner: 'ozahid',  avatar: group   ,channelName : 'channel 02' , type : 1, password : ''},
-//   { owner: 'aelabid', avatar: group ,channelName : 'channel 03',    type : 1, password : ''},
-//   { owner: 'waelhamd', avatar: group   ,channelName : 'channel 04', type : 1, password : ''},
-//   { owner: 'ozahid',  avatar: group   ,channelName : 'channel 05' , type : 1, password : ''},
-//   { owner: 'aelabid', avatar: group ,channelName : 'channel 06',    type : 1, password : ''},
-//   { owner: 'waelhamd', avatar: group   ,channelName : 'channel 07', type : 1, password : ''},
-//   { owner: 'ozahid',  avatar: group   ,channelName : 'channel 08' , type : 2, password : ''},
-//   { owner: 'aelabid', avatar: group ,channelName : 'channel 09',    type : 2, password : ''},
-//   { owner: 'waelhamd', avatar: group   ,channelName : 'channel 10', type : 2, password : ''},
-//   { owner: 'ozahid',  avatar: group   ,channelName : 'channel 11' , type : 0, password : ''},
-//   { owner: 'aelabid', avatar: group ,channelName : 'channel 12',    type : 0, password : ''},
-//   { owner: 'waelhamd', avatar: group   ,channelName : 'channel 13', type : 0, password : ''},
-//   { owner: 'ozahid',  avatar: group   ,channelName : 'channel 14' , type : 0, password : ''},
-//   { owner: 'aelabid', avatar: group ,channelName : 'channel 15',    type : 0, password : ''},
-// ];
 
-const groupMembers = [
-  {login: 'mabdelba', avatar : alien, state: 'admin' },
-  {login: 'ahel-bah', avatar : alien, state: 'moderator' },
-  {login: 'flan 1', avatar : alien, state: 'member' },
-  {login: 'flan 2', avatar : alien, state: 'member' },
-  {login: 'flan 3', avatar : alien, state: 'member' },
-  {login: 'flan 4', avatar : alien, state: 'member' },
-  {login: 'flan 5', avatar : alien, state: 'member' },
-  {login: 'flan 6', avatar : alien, state: 'moderator' },
-  {login: 'flan 7', avatar : alien, state: 'moderator' },
-  {login: 'flan 8', avatar : alien, state: 'moderator' },
-  {login: 'flan 9', avatar : alien, state: 'moderator' },
-  {login: 'flan 10', avatar : alien, state: 'admin' },
-  {login: 'flan 11', avatar : alien, state: 'admin' },
-  {login: 'flan 12', avatar : alien, state: 'admin' },
-  {login: 'flan 13', avatar : alien, state: 'admin' }
-]
+// const groupMembers = [
+//   {login: 'mabdelba', avatar : alien, state: 'admin' },
+//   {login: 'ahel-bah', avatar : alien, state: 'moderator' },
+//   {login: 'flan 1', avatar : alien, state: 'member' },
+//   {login: 'flan 2', avatar : alien, state: 'member' },
+//   {login: 'flan 3', avatar : alien, state: 'member' },
+//   {login: 'flan 4', avatar : alien, state: 'member' },
+//   {login: 'flan 5', avatar : alien, state: 'member' },
+//   {login: 'flan 6', avatar : alien, state: 'moderator' },
+//   {login: 'flan 7', avatar : alien, state: 'moderator' },
+//   {login: 'flan 8', avatar : alien, state: 'moderator' },
+//   {login: 'flan 9', avatar : alien, state: 'moderator' },
+//   {login: 'flan 10', avatar : alien, state: 'admin' },
+//   {login: 'flan 11', avatar : alien, state: 'admin' },
+//   {login: 'flan 12', avatar : alien, state: 'admin' },
+//   {login: 'flan 13', avatar : alien, state: 'admin' }
+// ]
 
 type ChatText = {
   sender: string;
@@ -120,13 +103,41 @@ function Messages() {
   const [description, setDescripion] = useState("");
   const [avatarToUpload, setAvatarToUpload] = useState("");
   const [friendList, setFriendList] = useState<any>();
+  const [groupMembers, setGroupMembers] = useState<any>([]);
 
   const handleImage = (e: any) => {
 
     setFilename(e.target.files[0].name);
     setAvatarToUpload(e.target.files[0]);
    
-}
+  }
+
+  useEffect(()=> {
+
+    if(selected == 1 && roomSelected != ''){
+      const apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/channel-members";
+      axios.post(apiUrl, {channelName : roomSelected, user: user.login} , {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+        },
+    }).then((response:any)=> {
+      response.data.owner.state = 'owner';
+      response.data.admins.forEach((obj : any) => {
+        obj.state = 'admin';
+      })
+      response.data.members.forEach((obj: any) => {
+        obj.state = 'member';
+      })
+      let tempMembers : any[] = [];
+      tempMembers[0] = response.data.owner;
+      tempMembers = [...tempMembers, ...response.data.admins , ...response.data.members]
+     
+
+      setGroupMembers(tempMembers);
+
+    }).catch()
+  }
+  }, [roomSelected, user.login])
 
   const addNewGroup = (e: any) =>{
     e.preventDefault();
@@ -134,9 +145,21 @@ function Messages() {
     {
       let groupType = 0;
       enabled ? groupType = 1 : groupPassword != '' ? groupType = 2 : groupType = 0;
-      const newChannel = [{owner: user.login, channelName : groupName, password: groupPassword, type : groupType}];
-      console.log(newChannel);
+      // const newChannel = [{ownerLogin: user.login, name : groupName, password: groupPassword, type : groupType}];
+      const  apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/add-new-channel";
+      axios.post(apiUrl, {channelName: groupName, type: groupType, password: groupPassword},{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+        },
+      }).then((response : any)=> {
+        
+        const tempGroup = [...groups, {name : groupName, ownerLogin: user.login, type: groupType}];
+        setGroups(tempGroup);
+        const _user: User = {...user, groups : tempGroup};
+        setUser(_user);
+      }).catch();
       setError(false);
+      setOpenModal(false);
     }
     else
       setError(true);
@@ -169,15 +192,15 @@ function Messages() {
   const handleSend = (e: any) => {
     e.preventDefault();
     // alert(`message to ${roomSelected} : ${message}`);
-    socket.emit('send-message', {
-      isChannel: false,
-      senderLogin: user.login,
-      receiverLogin: roomSelected,
-      text: message,
-      senderAvatar: user.avatar,
-      state: user.state
-    });
     if (message != '') {
+      socket.emit('send-message', {
+        isChannel: selected == 1 ? true : false,
+        senderLogin: user.login,
+        receiverLogin: roomSelected,
+        text: message,
+        senderAvatar: user.avatar,
+        state: user.state
+      });
       const _chatArea = [
         ...chatArea,
         { sender: user.login, reciever: roomSelected, text: message },
@@ -185,7 +208,7 @@ function Messages() {
       setChatArea(_chatArea);
       //   setChangeList(false);
       setMessage('');
-      if(conversations[0].login != roomSelected ){
+      if(selected == 0 && conversations[0].login != roomSelected ){
 
         const tempConversation = conversations;
         const indexOfElementToMove = tempConversation.findIndex((obj: any) => obj.login == roomSelected);
@@ -199,6 +222,22 @@ function Messages() {
           setUser(_user);
           setConversations(tempConversation);
         }
+      }
+      else if(selected == 1 && groups[0].name != roomSelected){
+
+        const tempGroup = groups;
+        const indexOfElementToMove = tempGroup.findIndex((obj: any) => obj.name == roomSelected);
+        const elementToMove = tempGroup[indexOfElementToMove];
+        if(indexOfElementToMove != -1)
+        {
+          tempGroup.splice(indexOfElementToMove, 1);
+          tempGroup.unshift(elementToMove);
+          const _user : User = {...user, }
+          _user.groups = tempGroup;
+          setUser(_user);
+          setGroups(tempGroup);
+        }
+
       }
     }
   };
@@ -214,7 +253,7 @@ function Messages() {
         }
         socket.emit('channels-with-conversation', {channelName: user.login || 'mabdelba'});
         socket.on('get-channels', (data : any) => {
-          console.log('this is all channels ', data);
+
           setGroups(data);
           _user.groups = data;
           setUser(_user);
@@ -265,7 +304,7 @@ function Messages() {
         ...chatArea,
         { sender: data.senderLogin, reciever: data.receiverLogin, text: data.text },
       ]);
-    else {
+    if(selected == 0) {
       // console.log('heeeereeeeeee');
 
       const tempConversation = conversations;
@@ -288,22 +327,24 @@ function Messages() {
         setUser(_user);
         setConversations(tempConversation);
       }
-      
+    }
+    else if(selected == 1){
+
+      const tempGroup = groups;
+      const indexOfElementToMove = tempGroup.findIndex((obj: any) => (obj.name == data.senderLogin || obj.name == data.receiverLogin));
+      const elementToMove = tempGroup[indexOfElementToMove];
+      if(indexOfElementToMove != -1)
+      {
+        tempGroup.splice(indexOfElementToMove, 1);
+        tempGroup.unshift(elementToMove);
+        const _user : User = {...user, }
+        _user.groups = tempGroup;
+        setUser(_user);
+        setGroups(tempGroup);
+      }  
     }
   }
-
-  useEffect(() => {
-    if (socket) {
-      socket.emit('get-messages', {
-        senderLogin: user.login || 'mabdelba',
-        receiverLogin: roomSelected,
-      });
-      socket.on('get-messages', (data: any) => {
-        setChatArea(data);
-      });
-    }
-  }, [roomSelected, socket]);
-
+  
   useEffect(() => {
     if (socket) {
       socket.on('receive-message', recieveMessage);
@@ -312,17 +353,33 @@ function Messages() {
   }, [chatArea, socket]);
 
   useEffect(() => {
+    if (socket && roomSelected != '') {
+    
+        socket.emit('get-messages', {
+          senderLogin: user.login || 'mabdelba',
+          receiverLogin: roomSelected,
+          isChannel : selected == 1 ? true : false ,
+        });
+        socket.on('get-messages', (data: any) => {
+          setChatArea(data);
+        });
+      }
+    else setChatArea([]);
+  }, [roomSelected, socket]);
+
+
+  useEffect(() => {
 
     selected == 0
       ? (setShowArray(conversations), setRoomSelected(conversations.length == 0 ? ''  :  conversations[0].login ))
       : selected == 1
-      ? (setShowArray(groups), setRoomSelected(groups.length == 0 ? '' : conversations[0].channelName))
+      ? (setShowArray(groups), setRoomSelected(groups.length == 0 ? '' : groups[0].name))
       : setShowArray([]);
     if(selected == 0)
       usersWithConversation();
     else if(selected == 1)
       channelsWithConversation();
-  }, [selected, user.state, user.conversations, conversations]);
+  }, [selected, user.state, user.conversations, conversations, user.groups, groups]);
 
   useEffect(() => {
     const conversationDiv: any = messageEl.current;
@@ -355,18 +412,18 @@ function Messages() {
                   !obj.isBlocked && (
                     <button
                     onClick={() => {
-                      setRoomSelected(selected == 0 ? obj.login : obj.channelName);
+                      setRoomSelected(selected == 0 ? obj.login : obj.name);
                     }}
                     key={selected == 0 ?obj.login : obj.channelName}
                     className={`w-full h-14 ease-in-out 2xl:h-[68px]  truncate   text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 2xl:space-x-6 md:pl-5 2xl:pl-7 items-center transition-all duration-500 tracking-wide  ${
-                      roomSelected == obj.login || roomSelected == obj.channelName
-                      ? ' text-white  hover:bg-[#EDEDED] hover:border-[#00B2FF] hover:text-black border-white md:border-b-2   2xl:border-b-4   font-bold  underline-offset-8 '
-                      : ' hover:bg-[#EDEDED] hover:text-black hover:border-[#00B2FF] hover:blueShadow '
+                      roomSelected == obj.login || roomSelected == obj.name
+                      ? ' text-white  hover:bg-[#EDEDED] border-[#00B2FF] hover:text-black  md:border-b-2   2xl:border-b-4   font-bold  underline-offset-8 '
+                      : ' hover:bg-[#EDEDED] hover:text-black  hover:blueShadow '
                     }`}
                     >
                       {
                         <Image
-                        src={obj.avatar == `public/avatars/${obj.login}.jpg` ? alien : obj.avatar}
+                        src={obj.avatar == `public/avatars/${obj.login}.jpg` ? alien : selected == 0 ? obj.avatar : group}
                         alt="image"
                         width="50"
                         height="50"
@@ -375,7 +432,7 @@ function Messages() {
                       }
                       <span className="hidden  text-left pt-1 md:flex flex-col 2xl:-space-y-1">
                         <div className="flex flex-row  items-center justify-between">
-                          <h1>{selected ==0 ? obj.login : obj.channelName}</h1>
+                          <h1 className='truncate w-[70%]'>{selected == 0 ? obj.login : obj.name}</h1>
                           {selected == 0 && (
                             <PiCircleFill
                             className={`${
@@ -406,9 +463,9 @@ function Messages() {
             </div>
             <div className="  border-yellow-400 h-[60vh] w-full overflow-y-auto flex flex-col-reverse justify-end pb-4">
               <div className="h-auto  overflow-y-auto scroll-smooth" ref={messageEl}>
-                {chatArea.map((obj: ChatText) => (
+                {chatArea && chatArea.map((obj: ChatText) => (
                   <div key={obj.id} className=" w-full h-auto">
-                    <MessageText sender={obj.sender} message={obj.text} />
+                    <MessageText sender={obj.sender} message={obj.text} selected={selected} />
                   </div>
                 ))}
               </div>
@@ -446,22 +503,22 @@ function Messages() {
           </div>
           <h1 className='h-[10%] w-full font-Orbitron NeonShadow text-base md:text-xl 2xl:text-3xl flex justify-center items-center'>Group members</h1>
           <div className='h-[75%] flex flex-col font-Orbitron  justify-between w-full p-2 sm:p-10'>
-						<div className=' w-full flex items-center flex-col  mb-8 overflow-x-hidden  overflow-y-auto'>
+						<div className=' w-full h-full flex items-center flex-col  mb-8 overflow-x-hidden  overflow-y-auto'>
 							<ul className='w-full'>
-								{groupMembers.map((member, index) => (
+								{groupMembers && groupMembers.map((member : any, index : number) => (
 								<li key={index}>
 									<div className='flex flex-row items-center my-[10px] justify-between'>
 										<div className='flex flex-row'>
 											<div className='NeonShadowBord h-[60px] w-[60px] flex items-center mr-[10px]'>
-												<Image src={member.avatar} alt="avatar" />
+												<Image src={!member.avatar|| member.avatar == `public/avatars/${member.login}.jpg`  ? alien : member.avatar} alt="avatar" width="50" height="50" className='h-auto w-auto' />
 											</div>
 											<div className='flex flex-col'>
 												<span className='truncate'>{member.login}</span>
-												<p className='text-[12px]'>{member.state}</p>
+												<p className='text-[12px] text-yellow-400'>{member.state}</p>
 											</div>
 										</div>
 										<div className='ml-[30px]'>
-											<DropDown />
+											{member.state != 'owner' && <DropDown />}
 										</div>
 									</div>
 								</li>))}
