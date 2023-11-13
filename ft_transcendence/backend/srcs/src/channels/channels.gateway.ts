@@ -5,27 +5,27 @@ import { ChannelsService } from './channels.service';
 export class ChannelsGateway {
   constructor(private channelService: ChannelsService) {}
   @SubscribeMessage('remove-user-from-channel')
-  async removeUserFromChannel(data: {channelName: string, user: string}) {
+  async removeUserFromChannel(data: {channelName: string, myLogin: string, otherLogin: string}) {
     return this.channelService.removeUserFromChannel(data);
   }
 
   @SubscribeMessage('mute-user-in-channel')
-  async muteUserInChannel(data: {channelName: string, user: string}) {
+  async muteUserInChannel(data:{channelName: string, myLogin: string, otherLogin: string}) {
     return this.channelService.muteUserInChannel(data);
   }
 
   @SubscribeMessage('ban-user-in-channel')
-  async banUserInChannel(data: {channelName: string, user: string}) {
+  async banUserInChannel(data:{channelName: string, myLogin: string, otherLogin: string}) {
     return this.channelService.banUserFromChannel(data);
   }
 
   @SubscribeMessage('unban-user-in-channel')
-  async unbanUserInChannel(data: {channelName: string, user: string}) {
+  async unbanUserInChannel(data:{channelName: string, myLogin: string, otherLogin: string}) {
     return this.channelService.unbanUserFromChannel(data);
   }
 
   @SubscribeMessage('remove-admin-from-channel')
-  async removeAdminFromChannel(data: {channelName: string, user: string}) {
+  async removeAdminFromChannel(data:{channelName: string, myLogin: string, otherLogin: string}) {
     return this.channelService.removeAdminFromChannel(data);
   }
 

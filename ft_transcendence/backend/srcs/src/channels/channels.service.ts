@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { channel } from 'diagnostics_channel';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -94,66 +95,107 @@ export class ChannelsService {
         return channel.password;
     }
 
-    async addNewUserToChannel(dto: { channelName: string, user: string, password?: string }) {
+    async getBannedUsers(channelName: string) {
+        const channel = await this.prismaservice.channel.findUnique({
+            where: {
+                name: channelName
+            },
+            include: {
+                banned: true
+            }
+        })
+        return channel.banned;
+    }
+
+    async addNewUserToChannel(login: string, dto: { channelName: string, user: string, password?: string }) {
         const channelType = await this.checkTypeOfChannel(dto);
-        if (channelType == 0 || channelType == 1)
-        {
-            await this.prismaservice.channel.update({
-                where: {
-                    name: dto.channelName
-                },
-                data: {
-                    members: {
-                        connect: {
-                            login: dto.user
-                        }
-                    }
-                }
-            })
+        if (channelType == 2){
+            const checkIfAdmin = await this.checkIfAdmin({channelName: dto.channelName, user: login});
+            const checkIfOwner = await this.checkIfOwner({channelName: dto.channelName, user: login});
+            if (!checkIfAdmin && !checkIfOwner){
+                throw new ForbiddenException("You are not admin or owner of this channel");
+            }
         }
         else if (channelType == 1)
         {
-            if( await this.getChannelPassword(dto) == dto.password)
+            if( await this.getChannelPassword(dto) != dto.password)
+            {
+                throw new ForbiddenException("Wrong password");
+            }
+        }
+        const isBanned = await this.getBannedUsers(dto.channelName);
+        if (isBanned.find((ban) => ban.login == dto.user))
+            throw new ForbiddenException("You are banned in this channel");
+        await this.prismaservice.channel.update({
+            where: {
+                name: dto.channelName
+            },
+            data: {
+                members: {
+                    connect: {
+                        login: dto.user
+                    }
+                }
+            }
+        })
+    }
+
+    async checkIfMember(channelName: string, login: string){
+        const channel = await this.prismaservice.channel.findUnique({
+            where: {
+                name: channelName
+            },
+            include: {
+                members: true
+            }
+        })
+        if (channel.members.find((member) => member.login == login))
+            return true;
+        return false;
+    }
+    /// use in channel gateway
+    async removeUserFromChannel(dto: {channelName: string, myLogin: string, otherLogin: string}) {
+        const isAdmin = await this.checkIfAdmin({channelName: dto.channelName, user: dto.myLogin});
+        const isOwner = await this.checkIfOwner({channelName: dto.channelName, user: dto.myLogin});
+        const isOtherAdmin = await this.checkIfAdmin({channelName: dto.channelName, user: dto.otherLogin});
+        const isOtherMember = await this.checkIfMember(dto.channelName, dto.otherLogin);
+        if (isOtherAdmin){
+            if (isOwner)
             {
                 await this.prismaservice.channel.update({
                     where: {
                         name: dto.channelName
                     },
                     data: {
-                        members: {
-                            connect: {
-                                login: dto.user
+                        admins: {
+                            disconnect: {
+                                login: dto.otherLogin
                             }
                         }
                     }
                 })
             }
             else
-                throw new ForbiddenException("Wrong password");
+                throw new ForbiddenException("You are not owner of this channel and you want to remove admin");
         }
-    }
-
-    /// use in channel gateway
-    async removeUserFromChannel(dto: { channelName: string, user: string }) {
-        const isAdmin = await this.checkIfAdmin(dto);
-        const isOwner = await this.checkIfOwner(dto);
-        if (isAdmin || isOwner){
-            await this.prismaservice.channel.update({
-                where: {
-                    name: dto.channelName
-                },
-                data: {
-                    members: {
-                        disconnect: {
-                            login: dto.user
-                        }
+        else if (isOtherMember){
+            if (isAdmin || isOwner){
+                await this.prismaservice.channel.update({
+                    where: {
+                        name: dto.channelName
                     },
-                }
-            })
+                    data: {
+                        members: {
+                            disconnect: {
+                                login: dto.otherLogin
+                            }
+                        },
+                    }
+                })
             await this.prismaservice.userMutedInChannel.deleteMany({
                 where: {
                     user: {
-                        login: dto.user
+                        login: dto.otherLogin
                     },
                     channel: {
                         name: dto.channelName
@@ -164,18 +206,19 @@ export class ChannelsService {
         else
             throw new ForbiddenException("You are not admin or owner of this channel");
     }
+    }
 
     //use in channel gateway
-    async muteUserInChannel(dto: { channelName: string, user: string }) {
-        const isAdmin = await this.checkIfAdmin(dto);
-        const isOwner = await this.checkIfOwner(dto);
+    async muteUserInChannel(dto: {channelName: string, myLogin: string, otherLogin: string}) {
+        const isAdmin = await this.checkIfAdmin({channelName: dto.channelName, user: dto.myLogin});
+        const isOwner = await this.checkIfOwner({channelName: dto.channelName, user: dto.myLogin});
         if (isAdmin || isOwner){
             await this.prismaservice.userMutedInChannel.create({
                 data: {
                     dateEnd: new Date(Date.now() + 1000 * 60 * 60 * 24),
                     user: {
                         connect: {
-                            login: dto.user
+                            login: dto.otherLogin
                         }
                     },
                     channel: {
@@ -191,10 +234,10 @@ export class ChannelsService {
     }
 
     //use in channel gateway
-    async banUserFromChannel(dto: { channelName: string, user: string }) {
-        const isAdmin = await this.checkIfAdmin(dto);
-        const isOwner = await this.checkIfOwner(dto);
-        if (isAdmin || isOwner){
+    async banUserFromChannel(dto: {channelName: string, myLogin: string, otherLogin: string}) {
+        const isAdmin = await this.checkIfAdmin({channelName: dto.channelName, user: dto.myLogin});
+        const isOwner = await this.checkIfOwner({channelName: dto.channelName, user: dto.myLogin});
+        if (isOwner){
             await this.prismaservice.channel.update({
                 where: {
                     name: dto.channelName
@@ -202,9 +245,19 @@ export class ChannelsService {
                 data: {
                     banned: {
                         connect: {
-                            login: dto.user
+                            login: dto.otherLogin
                         }
-                    }
+                    },
+                    members: {
+                        disconnect: {
+                            login: dto.otherLogin
+                        }
+                    },
+                    admins: {
+                        disconnect: {
+                            login: dto.otherLogin
+                        }
+                    },
                 }
             })
         }
@@ -214,9 +267,9 @@ export class ChannelsService {
 
     // use in channel gateway
 
-    async unbanUserFromChannel(dto: { channelName: string, user: string }) {
-        const isAdmin = await this.checkIfAdmin(dto);
-        const isOwner = await this.checkIfOwner(dto);
+    async unbanUserFromChannel(dto: {channelName: string, myLogin: string, otherLogin: string}) {
+        const isAdmin = await this.checkIfAdmin({channelName: dto.channelName, user: dto.myLogin});
+        const isOwner = await this.checkIfOwner({channelName: dto.channelName, user: dto.myLogin});
         if (isAdmin || isOwner){
             await this.prismaservice.channel.update({
                 where: {
@@ -225,7 +278,7 @@ export class ChannelsService {
                 data: {
                     banned: {
                         disconnect: {
-                            login: dto.user
+                            login: dto.otherLogin
                         }
                     }
                 }
@@ -237,14 +290,19 @@ export class ChannelsService {
 
     // use in channel gateway
 
-    async addAdminToChannel(dto: { channelName: string, user: string }) {
-        const isOwner = await this.checkIfOwner(dto);
+    async addAdminToChannel(login, dto: { channelName: string, user: string }) {
+        const isOwner = await this.checkIfOwner({channelName: dto.channelName, user: login});
         if (!isOwner){
             await this.prismaservice.channel.update({
                 where: {
                     name: dto.channelName
                 },
                 data: {
+                    members: {
+                        disconnect: {
+                            login: dto.user
+                        }
+                    },
                     admins: {
                         connect: {
                             login: dto.user
@@ -258,8 +316,8 @@ export class ChannelsService {
     }
 
     // use in channel gateway
-    async removeAdminFromChannel(dto: { channelName: string, user: string }) {
-        const isOwner = await this.checkIfOwner(dto);
+    async removeAdminFromChannel(dto: {channelName: string, myLogin: string, otherLogin: string}) {
+        const isOwner = await this.checkIfOwner({channelName: dto.channelName, user: dto.myLogin});
         if (!isOwner){
             await this.prismaservice.channel.update({
                 where: {
@@ -268,7 +326,7 @@ export class ChannelsService {
                 data: {
                     admins: {
                         disconnect: {
-                            login: dto.user
+                            login: dto.otherLogin
                         }
                     }
                 }
@@ -333,7 +391,7 @@ export class ChannelsService {
         return 5;
     }
 
-    async listChannelMembers(dto: { channelName: string, user: string }) {
+    async listChannelMembers(login, dto: { channelName: string, user: string }) {
         const channel = await this.prismaservice.channel.findUnique({
             where: {
                 name: dto.channelName
@@ -345,8 +403,8 @@ export class ChannelsService {
                 banned: true
             }
         })
-        const isAdmin = await this.checkIfAdmin(dto);
-        const isOwner = await this.checkIfOwner(dto);
+        const isAdmin = await this.checkIfAdmin({channelName: dto.channelName, user: login});
+        const isOwner = await this.checkIfOwner({channelName: dto.channelName, user: login});
         const banned = (isAdmin || isOwner) ? channel.banned : []
         return {owner: channel.owner, admins: channel.admins, members: channel.members, banned: banned};
     }

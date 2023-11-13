@@ -14,18 +14,19 @@ export class ChannelsController {
     }
     @UseGuards(JwtGuard)
     @Post('add-user-to-channel')
-    addUserToChannel(@Req() req,@Body() dto: { channelName: string, user: string }) {
-        return this.channelsService.addNewUserToChannel(dto);
+    addUserToChannel(@Req() req, @Body() dto: { channelName: string, user: string }) {
+        return this.channelsService.addNewUserToChannel((req.user as User).login, dto);
     }
+
     @UseGuards(JwtGuard)
     @Post('add-admin-to-channel')
-    addAdminToChannel(@Req() req,@Body() dto: { channelName: string, user: string }) {
-        return this.channelsService.addAdminToChannel(dto);
+    addAdminToChannel(@Req() req, @Body() dto: { channelName: string, user: string }) {
+        return this.channelsService.addAdminToChannel((req.user as User).login, dto);
     }
     @UseGuards(JwtGuard)
     @Post('channel-members')
     getChannelMembers(@Req() req,@Body() dto: { channelName: string, user: string }) {
-        return this.channelsService.listChannelMembers(dto);
+        return this.channelsService.listChannelMembers((req.user as User).login, dto);
     }
     @UseGuards(JwtGuard)
     @Post('friend-list-for-channel')
