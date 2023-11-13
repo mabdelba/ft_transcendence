@@ -400,6 +400,7 @@ export class ChannelsService {
     const isOwner = await this.checkIfOwner({ channelName: dto.channelName, user: login });
     const banned = isAdmin || isOwner ? channel.banned : [];
     return {
+      iAm: await this.whoIam(dto),
       owner: channel.owner,
       admins: channel.admins,
       members: channel.members,
