@@ -273,22 +273,34 @@ export class DmsService {
     async channelsWithConversation(login: string){
         const channelsWithConversation = await this.prisma.channel.findMany({
             where: {
-                // AND: [
-                    // {
+                OR: [
+                    {
                         members: {
                         some: {
                             login: login
                         }
                      },
-                    // },
-                    // {
-                    //     messages: {
-                    //         some: {}
-                    //     }
-                    // }
-                // ],
+                    },
+                    {
+                        owner: {
+                            login: login
+                        }
+                    },
+                    {
+                        admins: {
+                            some: {
+                                login: login
+                            }
+                        }
+                    },
+                    
+                ],
+            },
+            include: {
+                messages: true,
             }
         });
+        if (!channelsWithConversation) return [];
         channelsWithConversation.sort((a, b) => {
             const getLastMessageDate = (channel) => {
               const dates = channel.messages.map((message) => message.dateOfSending);
