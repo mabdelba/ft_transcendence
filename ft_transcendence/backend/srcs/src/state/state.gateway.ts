@@ -5,6 +5,8 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Namespace, Server, Socket } from 'socket.io';
 import { JwtGuard } from 'src/auth/guards';
@@ -78,6 +80,11 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('users-with-conversation')
   getUsersWithConversation(client: Socket, data: {me: string, login: string}){
     this.dmsGateway.getUsersWithConversation(data, client);
+  }
+  @SubscribeMessage('channels-with-conversation')
+  async getChannelsWithConversation(@MessageBody() data: {channelName: string}, @ConnectedSocket() client: Socket){
+
+    this.dmsGateway.getChannelsWithConversation(data, client);
   }
 
   @SubscribeMessage('get-messages')

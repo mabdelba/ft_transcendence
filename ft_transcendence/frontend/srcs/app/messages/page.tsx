@@ -26,23 +26,23 @@ import Upload from "../../public/uploadIcon.svg"
 import BlackUpload from "../../public/blackupload.svg"
 
 
-const Groups = [
-  { owner: 'waelhamd', avatar: group   ,channelName : 'channel 01', type : 1, password : ''},
-  { owner: 'ozahid',  avatar: group   ,channelName : 'channel 02' , type : 1, password : ''},
-  { owner: 'aelabid', avatar: group ,channelName : 'channel 03',    type : 1, password : ''},
-  { owner: 'waelhamd', avatar: group   ,channelName : 'channel 04', type : 1, password : ''},
-  { owner: 'ozahid',  avatar: group   ,channelName : 'channel 05' , type : 1, password : ''},
-  { owner: 'aelabid', avatar: group ,channelName : 'channel 06',    type : 1, password : ''},
-  { owner: 'waelhamd', avatar: group   ,channelName : 'channel 07', type : 1, password : ''},
-  { owner: 'ozahid',  avatar: group   ,channelName : 'channel 08' , type : 2, password : ''},
-  { owner: 'aelabid', avatar: group ,channelName : 'channel 09',    type : 2, password : ''},
-  { owner: 'waelhamd', avatar: group   ,channelName : 'channel 10', type : 2, password : ''},
-  { owner: 'ozahid',  avatar: group   ,channelName : 'channel 11' , type : 0, password : ''},
-  { owner: 'aelabid', avatar: group ,channelName : 'channel 12',    type : 0, password : ''},
-  { owner: 'waelhamd', avatar: group   ,channelName : 'channel 13', type : 0, password : ''},
-  { owner: 'ozahid',  avatar: group   ,channelName : 'channel 14' , type : 0, password : ''},
-  { owner: 'aelabid', avatar: group ,channelName : 'channel 15',    type : 0, password : ''},
-];
+// const groups = [
+//   { owner: 'waelhamd', avatar: group   ,channelName : 'channel 01', type : 1, password : ''},
+//   { owner: 'ozahid',  avatar: group   ,channelName : 'channel 02' , type : 1, password : ''},
+//   { owner: 'aelabid', avatar: group ,channelName : 'channel 03',    type : 1, password : ''},
+//   { owner: 'waelhamd', avatar: group   ,channelName : 'channel 04', type : 1, password : ''},
+//   { owner: 'ozahid',  avatar: group   ,channelName : 'channel 05' , type : 1, password : ''},
+//   { owner: 'aelabid', avatar: group ,channelName : 'channel 06',    type : 1, password : ''},
+//   { owner: 'waelhamd', avatar: group   ,channelName : 'channel 07', type : 1, password : ''},
+//   { owner: 'ozahid',  avatar: group   ,channelName : 'channel 08' , type : 2, password : ''},
+//   { owner: 'aelabid', avatar: group ,channelName : 'channel 09',    type : 2, password : ''},
+//   { owner: 'waelhamd', avatar: group   ,channelName : 'channel 10', type : 2, password : ''},
+//   { owner: 'ozahid',  avatar: group   ,channelName : 'channel 11' , type : 0, password : ''},
+//   { owner: 'aelabid', avatar: group ,channelName : 'channel 12',    type : 0, password : ''},
+//   { owner: 'waelhamd', avatar: group   ,channelName : 'channel 13', type : 0, password : ''},
+//   { owner: 'ozahid',  avatar: group   ,channelName : 'channel 14' , type : 0, password : ''},
+//   { owner: 'aelabid', avatar: group ,channelName : 'channel 15',    type : 0, password : ''},
+// ];
 
 const groupMembers = [
   {login: 'mabdelba', avatar : alien, state: 'admin' },
@@ -105,6 +105,7 @@ function Messages() {
   const [roomSelected, setRoomSelected] = useState<string>('');
   const [message, setMessage] = useState('');
   const [conversations, setConversations] = useState<any>([]);
+  const [groups, setGroups] = useState<any>([]);
   const [chatArea, setChatArea] = useState<any>([]);
   const messageEl = useRef<any>();
   const [openModal, setOpenModal] = useState(false);
@@ -150,8 +151,6 @@ function Messages() {
           Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
         },
       }).then((response: any)=> {
-
-        console.log('ayeh n3amass ha data:: ', response.data.friends)
         setFriendList(response.friends);
         const _user : User = {...user, friendList : response.data.friends};
         setUser(_user);
@@ -204,6 +203,27 @@ function Messages() {
     }
   };
 
+  const channelsWithConversation =async () => {
+    if(socket){
+      if(!user.groups){
+        const _user : User = user;
+        if (!user.state) {
+          socket.emit('online', { token: localStorage.getItem('jwtToken') });
+          _user.state = 1;
+          setUser(_user);
+        }
+        socket.emit('channels-with-conversation', {channelName: user.login || 'mabdelba'});
+        socket.on('get-channels', (data : any) => {
+          console.log('this is all channels ', data);
+          setGroups(data);
+          _user.groups = data;
+          setUser(_user);
+        })
+      }
+      else
+        setGroups(user.groups);
+    }
+  }
   const usersWithConversation = async () => {
     if (socket) {
       if(!user.conversations || (user.conversations.length == 1 && user.conversations.isFrd)) {
@@ -215,7 +235,7 @@ function Messages() {
         }
         socket.emit('users-with-conversation', { login: user.login || 'mabdelba' });
         socket.on('get-users', (data: any) => {
-          console.log('this is all users === ', data);
+        
           data.map((obj: any) =>
             getImageByLogin(obj.login).then((image) => {
               obj.avatar = image;
@@ -240,7 +260,6 @@ function Messages() {
   // const [friendList, setFriendList] = useState(user.friendList);
 
   function recieveMessage(data: any) {
-    console.log('recieve message', data);
     if (data.senderLogin == roomSelected || data.receiverLogin == roomSelected)
       setChatArea([
         ...chatArea,
@@ -293,15 +312,16 @@ function Messages() {
   }, [chatArea, socket]);
 
   useEffect(() => {
-    if (conversations.length != 0) {
-  
-      selected == 0
-        ? (setShowArray(conversations), setRoomSelected(conversations[0].login || ''))
-        : selected == 1
-        ? (setShowArray(Groups), setRoomSelected(Groups[0].channelName))
-        : setShowArray([]);
-    }
-    usersWithConversation();
+
+    selected == 0
+      ? (setShowArray(conversations), setRoomSelected(conversations.length == 0 ? ''  :  conversations[0].login ))
+      : selected == 1
+      ? (setShowArray(groups), setRoomSelected(groups.length == 0 ? '' : conversations[0].channelName))
+      : setShowArray([]);
+    if(selected == 0)
+      usersWithConversation();
+    else if(selected == 1)
+      channelsWithConversation();
   }, [selected, user.state, user.conversations, conversations]);
 
   useEffect(() => {

@@ -34,6 +34,7 @@ export interface User{
     history?: any,
     messagesSocket?: any;
     conversations?: any;
+    groups?: any;
 
 }
 
