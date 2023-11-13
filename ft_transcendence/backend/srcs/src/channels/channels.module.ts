@@ -5,6 +5,6 @@ import { ChannelsGateway } from './channels.gateway';
 
 @Module({
   controllers: [ChannelsController],
-  providers: [ChannelsService, ChannelsGateway]
+  providers: [ChannelsService, ChannelsGateway],
 })
 export class ChannelsModule {}
