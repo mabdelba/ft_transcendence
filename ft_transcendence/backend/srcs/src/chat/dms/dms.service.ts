@@ -247,6 +247,7 @@ export class DmsService {
         }
     }
     // Check if user is in room before join it
+
     async getMessages(data: any, io: any, client: Socket){
         // this.checkIfInRoomAndJoin(senderLogin, receiverLogin, io, client);
         const roomName = data.isChannel ? data.receiverLogin : this.createRoomName(data.senderLogin, data.receiverLogin);
@@ -256,20 +257,21 @@ export class DmsService {
         const blockedList = await this.blockedList(data.senderLogin);
         const messagesWithoutBlocked = [];
         messages.forEach((message) => {
-            if (message.sender === data.senderLogin)
-            {
-                if (!blockedList.blockedList.map((user) => user.login).includes(message.reciever))
-                    messagesWithoutBlocked.push(message);
-            }
-            else if (message.reciever === data.senderLogin)
-            {
+            // if (message.sender === data.senderLogin)
+            // {
                 if (!blockedList.blockedList.map((user) => user.login).includes(message.sender))
                     messagesWithoutBlocked.push(message);
-            }
-        });
+            // }
+            // else if (message.reciever === data.senderLogin)
+            // {
+            //     if (!blockedList.blockedList.map((user) => user.login).includes(message.sender))
+            //     messagesWithoutBlocked.push(message);
+        // }
+    });
         return messagesWithoutBlocked;
     }
 
+    
     async channelsWithConversation(login: string){
         const channelsWithConversation = await this.prisma.channel.findMany({
             where: {

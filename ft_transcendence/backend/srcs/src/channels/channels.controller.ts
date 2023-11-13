@@ -27,4 +27,9 @@ export class ChannelsController {
     getChannelMembers(@Req() req,@Body() dto: { channelName: string, user: string }) {
         return this.channelsService.listChannelMembers(dto);
     }
+    @UseGuards(JwtGuard)
+    @Post('friend-list-for-channel')
+    getFriendListForChannel(@Req() req,@Body() dto: { channelName: string, user: string }) {
+        return this.channelsService.listFriendsForChannel(dto);
+    }
 }

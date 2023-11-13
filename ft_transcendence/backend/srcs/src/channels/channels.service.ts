@@ -4,6 +4,32 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class ChannelsService {
     constructor(private prismaservice: PrismaService) {}
+    async listFriendsForChannel(dto: { channelName: string, user: string }) {
+        const user = await this.prismaservice.user.findUnique({
+            where: {
+                login: dto.user
+            },
+            include: {
+                friends: true
+            }
+        })
+        const channel = await this.prismaservice.channel.findUnique({
+            where: {
+                name: dto.channelName
+            },
+            include: {
+                members: true,
+                owner: true,
+                admins: true,
+            }
+        })
+        const channelUsers = [...channel.members, channel.owner, ...channel.admins];
+        const friendsNotInChannel = user.friends.filter((friend) => {
+            return !channelUsers.some((member) => member.login === friend.login);
+        });
+        return friendsNotInChannel;
+    }
+
     async checkIfAdmin(dto: { channelName: string, user: string }) {
         const channel = await this.prismaservice.channel.findUnique({
             where: {

@@ -13,7 +13,7 @@ import { JwtGuard } from 'src/auth/guards';
 import { PrismaService } from 'src/prisma/prisma.service';
 import jwtDecode from 'jwt-decode';
 import { DmsGateway } from 'src/chat/dms/dms.gateway';
-
+import { ChannelsGateway } from 'src/channels/channels.gateway';
 
 @WebSocketGateway()
 export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {

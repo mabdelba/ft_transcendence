@@ -13,7 +13,7 @@ export class ChannelsGateway {
   async muteUserInChannel(data: {channelName: string, user: string}) {
     return this.channelService.muteUserInChannel(data);
   }
-  
+
   @SubscribeMessage('ban-user-in-channel')
   async banUserInChannel(data: {channelName: string, user: string}) {
     return this.channelService.banUserFromChannel(data);
@@ -23,10 +23,12 @@ export class ChannelsGateway {
   async unbanUserInChannel(data: {channelName: string, user: string}) {
     return this.channelService.unbanUserFromChannel(data);
   }
+
   @SubscribeMessage('remove-admin-from-channel')
   async removeAdminFromChannel(data: {channelName: string, user: string}) {
     return this.channelService.removeAdminFromChannel(data);
   }
+
   @SubscribeMessage('remove-channel')
   async removeChannel(data: {channelName: string, user: string}) {
     return this.channelService.removeChannel(data);
