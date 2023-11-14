@@ -141,24 +141,28 @@ export class ChannelsService {
     dto: { channelName: string; user: string; password?: string },
   ) {
     const channelType = await this.checkTypeOfChannel(dto);
+    const checkIfAdmin = await this.checkIfAdmin({ channelName: dto.channelName, user: login });
+    const checkIfOwner = await this.checkIfOwner({ channelName: dto.channelName, user: login });
     if (channelType == 2) {
-      const checkIfAdmin = await this.checkIfAdmin({ channelName: dto.channelName, user: login });
-      const checkIfOwner = await this.checkIfOwner({ channelName: dto.channelName, user: login });
-      if (!checkIfAdmin && !checkIfOwner) {
+      if (!(checkIfAdmin || checkIfOwner)) {
         throw new ForbiddenException('You are not admin or owner of this channel');
       }
     } else if (channelType == 1) {
-      if ((await this.getChannelPassword(dto)) != dto.password) {
-        throw new ForbiddenException('Wrong password');
+      if (!(checkIfAdmin || checkIfOwner))
+      {
+        if(!dto.password)
+          throw new ForbiddenException('This is a protected channel so it need a password');
+        if ((await this.getChannelPassword(dto)) != dto.password)
+          throw new ForbiddenException('Wrong password');
       }
     }
     const isBanned = await this.getBannedUsers(dto.channelName);
     if (isBanned.find((ban) => ban.login == dto.user))
-      throw new ForbiddenException('You are banned in this channel');
+      throw new ForbiddenException('You are banned from this channel');
     await this.prismaservice.channel.update({
-      where: {
+      where: { 
         name: dto.channelName,
-      },
+      },   
       data: {
         members: {
           connect: {
@@ -318,7 +322,11 @@ export class ChannelsService {
 
   async addAdminToChannel(login, dto: { channelName: string; user: string }) {
     const isOwner = await this.checkIfOwner({ channelName: dto.channelName, user: login });
-    if (!isOwner) {
+    const isAdmin = await this.checkIfAdmin({ channelName: dto.channelName, user: dto.user });
+    // console.log("log")
+    if (isAdmin)
+      throw new ForbiddenException('This user is already admin of this channel');
+    if (isOwner) {
       await this.prismaservice.channel.update({
         where: {
           name: dto.channelName,
