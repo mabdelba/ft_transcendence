@@ -407,11 +407,11 @@ export class ChannelsService {
         banned: true,
       },
     });
-    if (channel.owner.login == dto.user) return 0;
-    if (channel.admins.find((admin) => admin.login == dto.user)) return 1;
-    if (channel.members.find((member) => member.login == dto.user)) return 2;
-    if (channel.banned.find((ban) => ban.login == dto.user)) return 3;
-    if (await this.checkIfUserMuted(dto)) return 4;
+    if (channel.owner.login == dto.user) return "owner";
+    if (channel.admins.find((admin) => admin.login == dto.user)) return "admin";
+    if (channel.members.find((member) => member.login == dto.user)) return "member";
+    if (channel.banned.find((ban) => ban.login == dto.user)) return "banned";
+    if (await this.checkIfUserMuted(dto)) return "muted";
     return 5;
   }
 

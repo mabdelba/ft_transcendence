@@ -94,13 +94,16 @@ function Friends() {
     }
   };
 
-  const getFriend = () => {
+  const getFriend = async () => {
     if (friendListData) {
-      friendListData.friends.forEach((obj: any) => {
-        getImageByLogin(obj.login).then((imageBlog) => {
-          obj.avatar = imageBlog;
-        });
-      });
+      await Promise.all(
+        friendListData.friends.map(async (friend:any) => {
+          const response = await fetch(friend.avatarUrl);
+          const blob = await response.blob();
+          const imageBlob = URL.createObjectURL(blob) as string;
+          friend.avatar = imageBlob;
+        })
+      );
       setFriendsList(friendListData.friends);
       const _user: User = user;
       _user.friendList = friendListData.friends;

@@ -6,9 +6,16 @@ import { getAvatarFromLogin } from 'src/utils/get-avatar-from-login';
 @Injectable()
 export class FriendService {
   constructor(private prisma: PrismaService) {}
+  async getAvatarUrlFromLogin(login: string, avatar?: string) {
+    if (avatar !== null) {
+      return `http://localhost:3000/avatars/${login}.jpg`;
+    } else {
+      return `http://localhost:3000/avatars/avatar.png`;
+    }
+  }
   async getFriendList(user: User) {
     const friendList = await this.prisma.user.findUnique({
-      where: { 
+      where: {
         id: user.id,
       },
       select: {
@@ -21,10 +28,14 @@ export class FriendService {
         },
       },
     });
-    await Promise.all(friendList.friends.map(async (friend) => { 
-      friend['fileAvatar'] = await getAvatarFromLogin(friend.login, friend.avatar);
-    }));
-    return friendList;
+    const updatedFriendList = await Promise.all(
+      friendList.friends.map(async (friend) => {
+        const avatarUrl = await this.getAvatarUrlFromLogin(friend.login, friend.avatar);
+        return { ...friend, avatarUrl };
+      })
+    );
+  
+    return { ...friendList, friends: updatedFriendList };
   }
 
   async getFriendRequestsList(user: User) {
