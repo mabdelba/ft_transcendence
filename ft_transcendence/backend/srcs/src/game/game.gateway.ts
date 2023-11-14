@@ -60,12 +60,15 @@ export class GameGateway {
             console.log("start game", game.id1, game.id2, this.RandomGames.length);
             game.run();
         }
+        
     }
 
     @SubscribeMessage('MovePlayer')
     handleMovePlayer(@ConnectedSocket() socket: Socket, @MessageBody() data: { x: number}) {
         const index = this.RandomGames.findIndex((game) => (game.game.id1 == socket.id || game.game.id2 == socket.id));
         if (index >= 0){
+            //check if a player disconnected and if so end the game
+            //read comment in page.tsx useEffect
             const game: GameModel = this.RandomGames[index].game;
             game.movePlayer(socket.id, data.x);
         }
@@ -98,11 +101,13 @@ export class GameGateway {
         const ids = this.ConnectedUsers.get(decoded['login']);
         if (ids?.length > 1){
             ids.map((id) => {
+                console.log("disconnect you use many tab", id?.id);
                 id.emit('left game');
             });
         }
 
         // const gameIndex = this.RandomGames.findIndex((game) => game.game.id1 == socket.id || game.game.id2 == socket.id);
+        // this.RandomGames.splice(gameIndex, 1);
         
         // if (gameIndex >= 0){
         //     const game: GameModel = this.RandomGames[gameIndex].game;
