@@ -13,6 +13,9 @@ import { Console } from 'console';
 import { useRouter } from 'next/navigation';
 import { data } from 'autoprefixer';
 import { emit } from 'process';
+import Popup from '../components/shapes/Popup';
+import GamePopup from '../components/shapes/GamePopup';
+import { BiHappyAlt, BiSad } from 'react-icons/bi';
 
 let game: Game | null = null;
 
@@ -31,8 +34,9 @@ const gamePage = () => {
     const [{width, height}, setWindowSize] = useState({width: 0, height: 0})
     const [gameSocket, setGameSocket] = useState<Socket | null>(null)
     const [isLeft, setIsLeft] = useState(false);
-    const [gameEnded, setGameEnded] = useState(false);
+    const [gameEnded, setGameEnded] = useState<string>('lose');
     const router = useRouter();
+    const [openModal, setOpenModal] = useState(false);
 
 useEffect(() => {
         const handleResize = () => {
@@ -61,6 +65,10 @@ useEffect(() => {
                    socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
                        game?.setState(data.player1, data.player2, data.ball);
                });
+
+                socket?.on('gameEnded', (data: {state: string}) => {
+                    setGameEnded(data.state);
+                })
     
                setGameSocket(socket);
             
@@ -100,7 +108,7 @@ useEffect(() => {
         });
 
     const handleLeave = () => {
-        gameSocket?.disconnect();
+        gameSocket?.emit('endGame')
         game?.destroy();
         router.push('/queue');
     }
@@ -116,33 +124,41 @@ useEffect(() => {
         
     }, [isLeft, gameSocket])
     
+    //if game ended show popup you win or you lose and disconnect socket
     const youWinPopup = () => {
-        console.log('youWinPopup');
+        return (
+            <div className='fixed w-screen h-screen bg-black bg-opacity-50 flex justify-center items-center'>
+                <div className='bg-[#00B2FF] rounded-[20px] w-[500px] h-[300px] flex flex-col justify-center items-center'>
+                    <div className='text-[40px] text-white'>You Win</div>
+                    <button onClick={handleLeave} className='bg-white rounded-[20px] w-[200px] h-[50px]'>Leave</button>
+                </div>
+            </div>
+        )
+    }
+    const youLosePopup = () => {
+        return (
+            <div className='fixed w-screen h-screen bg-black bg-opacity-50 flex justify-center items-center'>
+                <div className='bg-[#FF0742] rounded-[20px] w-[500px] h-[300px] flex flex-col justify-center items-center'>
+                    <div className='text-[40px] text-white'>You Lose</div>
+                    <button onClick={handleLeave} className='bg-white rounded-[20px] w-[200px] h-[50px]'>Leave</button>
+                </div>
+            </div>
+        )
     }
 
-    const youLosePopup = () => {
-        console.log('youLosePopup');
-    }
 
     useEffect(() => {
-        let State : string = '';
-        gameSocket?.on('gameEnded', (data: {state: string}) => {
-            console.log('gameEnded');
-            setGameEnded(true);
-            State = data.state;
-        })
-        if(gameEnded){
-            if(State === 'win')
-                youWinPopup();
-            else if(State === 'lose' && !isLeft)
-                youLosePopup();
+
+        if(gameEnded !== ''){
+
+            setOpenModal(true)
             gameSocket?.disconnect();
             game?.destroy();
         }
     }, [gameEnded])
 
     return (
-        <div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
+        <><div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
             <div className='flex flex-row items-center w-[100%] justify-evenly'>
                 <div className="flex flex-row items-center m-2">
                     <div className='NeonShadowBord h-[70px] w-[70px] md:w-[90px] md:h-[90px] m-auto flex'>
@@ -164,18 +180,36 @@ useEffect(() => {
             <div className='text-[40px]'>
                 0 - 0
             </div>
-             <button
+            <button
                 type='button'
-                onClick={()=> {
+                onClick={() => {
                     console.log(gameSocket);
-                        gameSocket?.emit('StartGame', {map: 'map1'})
-                    }
-                }
-                 className='z-10 h-10 w-52 border'>Start Game</button>
+                    gameSocket?.emit('StartGame', { map: 'map1' });
+                } }
+                className='z-10 h-10 w-52 border'>Start Game</button>
             <div className='w-[100%] h-[80%] flex justify-center items-center' ref={gameDiv}>
             </div>
 
         </div>
+        <GamePopup  openModal={openModal} setOpenModal={setOpenModal}>
+            <div className={`h-[50%]  w-full font-Orbitron  text-xl md:text-[30px] 2xl:text-[50px] flex justify-center items-center space-x-4 ${gameEnded == 'win' ? 'text-green-400' : 'text-red-500'} `}>
+                {gameEnded === 'win' ? <>
+                    <h1>You won</h1>
+                    <BiHappyAlt  className="h-15 w-15"/></>
+                     : gameEnded === 'lose' && !isLeft ?
+                    <>
+                        <h1>You lost</h1>
+                        <BiSad  className="h-15 w-15"/>
+                    </> 
+                      : null}
+            </div>
+                    {/* // gameEnded === 'win' ?
+                    //     youWinPopup() :
+                    // gameEnded === 'lose' && isLeft === false ?
+                    //     youLosePopup() : null */}
+    
+        </GamePopup>
+            </>
     )
 }
 

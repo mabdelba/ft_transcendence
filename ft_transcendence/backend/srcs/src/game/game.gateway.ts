@@ -72,16 +72,17 @@ export class GameGateway {
     }
 
     @SubscribeMessage('endGame')
-    handleEndGame(@ConnectedSocket() socket: Socket, @MessageBody() data: { winner: number}) {
+    handleEndGame(@ConnectedSocket() socket: Socket) {
         const index = this.RandomGames.findIndex((game) => (game.game.id1 == socket.id || game.game.id2 == socket.id));
+        const game: GameModel = this.RandomGames[index].game;
         console.log("end game", index);
         if (index >= 0){
             const game: GameModel = this.RandomGames[index].game;
-            if (data.winner == 1){
+            if (socket.id == game.socket2.id){
                 game.socket1.emit('gameEnded', {state: 'win'});
                 game.socket2.emit('gameEnded', {state: 'lose'});
             }
-            else if(data.winner == 2){
+            else if(socket.id == game.socket1.id){
                 game.socket1.emit('gameEnded', {state: 'lose'});
                 game.socket2.emit('gameEnded', {state: 'win'});
             }
@@ -101,19 +102,19 @@ export class GameGateway {
             });
         }
 
-        const gameIndex = this.RandomGames.findIndex((game) => game.game.id1 == socket.id || game.game.id2 == socket.id);
+        // const gameIndex = this.RandomGames.findIndex((game) => game.game.id1 == socket.id || game.game.id2 == socket.id);
         
-        if (gameIndex >= 0){
-            const game: GameModel = this.RandomGames[gameIndex].game;
-            if (socket.id == game.socket1.id){
-                console.log("here111");
-                game.socket2?.emit('endGame', {winner: 2});
-            }
-            else if (socket.id == game.socket2.id){
-                console.log("here222");
-                game.socket1?.emit('endGame', {winner: 1});
-            }
-        }
+        // if (gameIndex >= 0){
+        //     const game: GameModel = this.RandomGames[gameIndex].game;
+        //     if (socket.id == game.socket1.id){
+        //         console.log("here111");
+        //         game.socket2?.emit('endGame', {winner: 2});
+        //     }
+        //     else if (socket.id == game.socket2.id){
+        //         console.log("here222");
+        //         game.socket1?.emit('endGame', {winner: 1});
+        //     }
+        // }
         this.ConnectedUsers.delete(decoded['login']);
         console.log("GameGateway handleDisconnect", socket.id, decoded['login']);
     }
