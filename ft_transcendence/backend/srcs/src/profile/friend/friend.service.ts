@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { getAvatarFromLogin } from 'src/utils/get-avatar-from-login';
 
 @Injectable()
 export class FriendService {
   constructor(private prisma: PrismaService) {}
   async getFriendList(user: User) {
     const friendList = await this.prisma.user.findUnique({
-      where: {
+      where: { 
         id: user.id,
       },
       select: {
@@ -20,6 +21,9 @@ export class FriendService {
         },
       },
     });
+    await Promise.all(friendList.friends.map(async (friend) => { 
+      friend['fileAvatar'] = await getAvatarFromLogin(friend.login, friend.avatar);
+    }));
     return friendList;
   }
 
@@ -38,6 +42,9 @@ export class FriendService {
         },
       },
     });
+    await Promise.all(friendRequestsList.recievedFriendRequestsBy.map(async (friend) => {
+      friend['fileAvatar'] = await getAvatarFromLogin(friend.login, friend.avatar);
+    }));
     return friendRequestsList;
   }
 
@@ -56,6 +63,9 @@ export class FriendService {
         },
       },
     });
+    await Promise.all(blockedUserList.blockedList.map(async (friend) => {
+      friend['fileAvatar'] = await getAvatarFromLogin(friend.login, friend.avatar);
+    }));
     return blockedUserList;
   }
 
