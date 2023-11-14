@@ -18,6 +18,19 @@ export class ChannelsService {
       });
     } else throw new ForbiddenException('You are not owner of this channel');
   }
+  async updateChannelPassword(login: string, dto: { channelName: string; password: string }) {
+    const isOwner = await this.checkIfOwner({ channelName: dto.channelName, user: login });
+    if (isOwner) {
+      await this.prismaservice.channel.update({
+        where: {
+          name: dto.channelName,
+        },
+        data: {
+          password: dto.password,
+        },
+      });
+    } else throw new ForbiddenException('You are not owner of this channel');
+  }
   async listFriendsForChannel(dto: { channelName: string; user: string }) {
     const user = await this.prismaservice.user.findUnique({
       where: {

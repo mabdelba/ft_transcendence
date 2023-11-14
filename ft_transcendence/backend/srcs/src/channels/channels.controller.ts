@@ -38,4 +38,9 @@ export class ChannelsController {
   addDescriptionToChannel(@Req() req, @Body() dto: { channelName: string; description: string }) {
     return this.channelsService.addDescriptionToChannel((req.user as User).login, dto);
   }
+  @UseGuards(JwtGuard)
+    @Post('update-channel-password')
+    updateChannelPassword(@Req() req, @Body() dto: { channelName: string; password: string }) {
+      return this.channelsService.updateChannelPassword((req.user as User).login, dto);
+    }
 }

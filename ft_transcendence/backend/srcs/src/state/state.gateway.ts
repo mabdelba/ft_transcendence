@@ -17,7 +17,7 @@ import { ChannelsGateway } from 'src/channels/channels.gateway';
 
 @WebSocketGateway()
 export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private prisma: PrismaService, private dmsGateway: DmsGateway) {}
+  constructor(private prisma: PrismaService, private dmsGateway: DmsGateway, private channelsGateway: ChannelsGateway) {}
   @WebSocketServer()
   io: Server;
   users = new Map();
@@ -102,5 +102,35 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
     data: { isChannel: boolean; senderLogin: string; receiverLogin: string; text: string },
   ) {
     this.dmsGateway.handleMessage(data, client, this.users, this.io);
+  }
+  
+  @SubscribeMessage('remove-user-from-channel')
+  removeUserFromChannel(data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.removeUserFromChannel(data);
+  }
+
+  @SubscribeMessage('mute-user-in-channel')
+  muteUserInChannel(data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.muteUserInChannel(data);
+  }
+
+  @SubscribeMessage('ban-user-in-channel')
+  banUserInChannel(data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.banUserInChannel(data);
+  }
+
+  @SubscribeMessage('unban-user-in-channel')
+  unbanUserInChannel(data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.unbanUserInChannel(data);
+  }
+
+  @SubscribeMessage('remove-admin-from-channel')
+  removeAdminFromChannel(data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.removeAdminFromChannel(data);
+  }
+
+  @SubscribeMessage('remove-channel')
+  removeChannel(data: { channelName: string; user: string }) {
+    this.channelsGateway.removeChannel(data);
   }
 }
