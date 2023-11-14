@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useContext, useEffect, useRef, useState, Fragment} from 'react';
+import { useCallback, useContext, useEffect, useRef, useState, Fragment, MouseEventHandler } from 'react';
 import OptionBar from '../components/forms/OptionBar';
 import ListBox from '../components/buttons/ListBox';
 import { User, context, SocketContext } from '../../context/context';
@@ -13,37 +13,18 @@ import { PiCircleFill } from 'react-icons/pi';
 import axios from 'axios';
 import MessageText from '../components/shapes/MessageText';
 import { Dialog, Transition } from '@headlessui/react';
-import {AiOutlineClose, AiOutlineUserAdd} from 'react-icons/ai'
+import { AiOutlineClose, AiOutlineUserAdd } from 'react-icons/ai';
 import SimpleButton from '../components/buttons/simpleButton';
 import SimpleInput from '../components/inputs/simpleInput';
 import SwitchButton from '../components/buttons/switchButton';
 import Popup from '../components/shapes/Popup';
-import seePass from '../../public/seePassword.svg'
-import hidePass from '../../public/hidepass.svg'
+import seePass from '../../public/seePassword.svg';
+import hidePass from '../../public/hidepass.svg';
 import DropDown from '../components/buttons/DropDown';
 import UploadAvatar from '../components/buttons/uploadAvatar';
-import Upload from "../../public/uploadIcon.svg"
-import BlackUpload from "../../public/blackupload.svg"
-
-
-
-// const groupMembers = [
-//   {login: 'mabdelba', avatar : alien, state: 'admin' },
-//   {login: 'ahel-bah', avatar : alien, state: 'moderator' },
-//   {login: 'flan 1', avatar : alien, state: 'member' },
-//   {login: 'flan 2', avatar : alien, state: 'member' },
-//   {login: 'flan 3', avatar : alien, state: 'member' },
-//   {login: 'flan 4', avatar : alien, state: 'member' },
-//   {login: 'flan 5', avatar : alien, state: 'member' },
-//   {login: 'flan 6', avatar : alien, state: 'moderator' },
-//   {login: 'flan 7', avatar : alien, state: 'moderator' },
-//   {login: 'flan 8', avatar : alien, state: 'moderator' },
-//   {login: 'flan 9', avatar : alien, state: 'moderator' },
-//   {login: 'flan 10', avatar : alien, state: 'admin' },
-//   {login: 'flan 11', avatar : alien, state: 'admin' },
-//   {login: 'flan 12', avatar : alien, state: 'admin' },
-//   {login: 'flan 13', avatar : alien, state: 'admin' }
-// ]
+import Upload from '../../public/uploadIcon.svg';
+import BlackUpload from '../../public/blackupload.svg';
+import { toast } from 'react-toastify';
 
 type ChatText = {
   sender: string;
@@ -77,9 +58,6 @@ const getImageByLogin = async (login: string): Promise<string | null> => {
 };
 
 function Messages() {
-
-
-
   const [showSideBar, setShowSideBar] = useState(false);
   const [selected, setSelected] = useState(0);
   const { user, setUser } = useContext(context);
@@ -93,101 +71,112 @@ function Messages() {
   const messageEl = useRef<any>();
   const [openModal, setOpenModal] = useState(false);
   const [openMembersModal, setOpenMembersModal] = useState(false);
-  const [openSettingModal , setOpenSettingModal] = useState(false);
+  const [openSettingModal, setOpenSettingModal] = useState(false);
   const [openInviteModal, setOpenInviteModal] = useState(false);
-  const [groupName , setGroupName ] = useState('');
+  const [groupName, setGroupName] = useState('');
   const [groupPassword, setGroupPassword] = useState('');
   const [error, setError] = useState(false);
   const [enabled, setEnabled] = useState(false);
-  const [fileName, setFilename] = useState("");
-  const [description, setDescripion] = useState("");
-  const [avatarToUpload, setAvatarToUpload] = useState("");
+  const [fileName, setFilename] = useState('');
+  const [description, setDescripion] = useState('');
+  const [avatarToUpload, setAvatarToUpload] = useState('');
   const [friendList, setFriendList] = useState<any>();
   const [groupMembers, setGroupMembers] = useState<any>([]);
 
   const handleImage = (e: any) => {
-
     setFilename(e.target.files[0].name);
     setAvatarToUpload(e.target.files[0]);
-   
-  }
+  };
 
-  useEffect(()=> {
+  useEffect(() => {
+    if (selected == 1 && roomSelected != '') {
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/channel-members';
+      axios
+        .post(
+          apiUrl,
+          { channelName: roomSelected, user: user.login },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+            },
+          },
+        )
+        .then((response: any) => {
+          response.data.owner.state = 'owner';
+          response.data.admins.forEach((obj: any) => {
+            obj.state = 'admin';
+          });
+          response.data.members.forEach((obj: any) => {
+            obj.state = 'member';
+          });
+          let tempMembers: any[] = [];
+          tempMembers[0] = response.data.owner;
+          tempMembers = [...tempMembers, ...response.data.admins, ...response.data.members];
 
-    if(selected == 1 && roomSelected != ''){
-      const apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/channel-members";
-      axios.post(apiUrl, {channelName : roomSelected, user: user.login} , {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
-        },
-    }).then((response:any)=> {
-      response.data.owner.state = 'owner';
-      response.data.admins.forEach((obj : any) => {
-        obj.state = 'admin';
-      })
-      response.data.members.forEach((obj: any) => {
-        obj.state = 'member';
-      })
-      let tempMembers : any[] = [];
-      tempMembers[0] = response.data.owner;
-      tempMembers = [...tempMembers, ...response.data.admins , ...response.data.members]
-     
+          setGroupMembers(tempMembers);
+        })
+        .catch();
+    }
+  }, [roomSelected, user.login]);
 
-      setGroupMembers(tempMembers);
-
-    }).catch()
-  }
-  }, [roomSelected, user.login])
-
-  const addNewGroup = (e: any) =>{
+  const addNewGroup = (e: any) => {
     e.preventDefault();
-    if(groupName != '')
-    {
+    if (groupName != '') {
       let groupType = 0;
-      enabled ? groupType = 1 : groupPassword != '' ? groupType = 2 : groupType = 0;
+      enabled ? (groupType = 1) : groupPassword != '' ? (groupType = 2) : (groupType = 0);
       // const newChannel = [{ownerLogin: user.login, name : groupName, password: groupPassword, type : groupType}];
-      const  apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/add-new-channel";
-      axios.post(apiUrl, {channelName: groupName, type: groupType, password: groupPassword},{
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
-        },
-      }).then((response : any)=> {
-        
-        const tempGroup = [...groups, {name : groupName, ownerLogin: user.login, type: groupType}];
-        setGroups(tempGroup);
-        const _user: User = {...user, groups : tempGroup};
-        setUser(_user);
-      }).catch();
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/add-new-channel';
+      axios
+        .post(
+          apiUrl,
+          { channelName: groupName, type: groupType, password: groupPassword },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+            },
+          },
+        )
+        .then((response: any) => {
+          const tempGroup = [
+            ...groups,
+            { name: groupName, ownerLogin: user.login, type: groupType },
+          ];
+          setGroups(tempGroup);
+          const _user: User = { ...user, groups: tempGroup };
+          setUser(_user);
+        })
+        .catch();
       setError(false);
       setOpenModal(false);
+    } else setError(true);
+  };
+
+  useEffect(() => {
+    if (selected == 1 && roomSelected != '') {
+      // console.log("7na dakhlin");
+      const urlreq = 'http://localhost:3000/api/atari-pong/v1/channels/friend-list-for-channel';
+      axios
+        .post(
+          urlreq,
+          { channelName: roomSelected, user: user.login },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+            },
+          },
+        )
+        .then((response: any) => {
+          // console.log('ljadid: ', response);
+          setFriendList(response.data);
+          // setUser(_user);
+        })
+        .catch();
     }
-    else
-      setError(true);
-  }
+  }, [roomSelected, user.login]);
 
-  useEffect(()=> {
-    if(!user.friendList)
-    {
-      const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-list';
-      axios.get(urlreq, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
-        },
-      }).then((response: any)=> {
-        setFriendList(response.friends);
-        const _user : User = {...user, friendList : response.data.friends};
-        setUser(_user);
-      })
-    }
-    else
-      setFriendList(user.friendList);
-  }, [user.friendList])
-
-  useEffect(()=> {
-
-    if(enabled)
-      setGroupPassword('');
-  }, [enabled])
+  useEffect(() => {
+    if (enabled) setGroupPassword('');
+  }, [enabled]);
 
   const handleSend = (e: any) => {
     e.preventDefault();
@@ -199,73 +188,66 @@ function Messages() {
         receiverLogin: roomSelected,
         text: message,
         senderAvatar: user.avatar,
-        state: user.state
+        state: user.state,
       });
       const _chatArea = [
         ...chatArea,
         { sender: user.login, reciever: roomSelected, text: message },
-      ]; 
+      ];
       setChatArea(_chatArea);
       //   setChangeList(false);
       setMessage('');
-      if(selected == 0 && conversations[0].login != roomSelected ){
-
+      if (selected == 0 && conversations[0].login != roomSelected) {
         const tempConversation = conversations;
-        const indexOfElementToMove = tempConversation.findIndex((obj: any) => obj.login == roomSelected);
+        const indexOfElementToMove = tempConversation.findIndex(
+          (obj: any) => obj.login == roomSelected,
+        );
         const elementToMove = tempConversation[indexOfElementToMove];
-        if(indexOfElementToMove != -1)
-        {
+        if (indexOfElementToMove != -1) {
           tempConversation.splice(indexOfElementToMove, 1);
           tempConversation.unshift(elementToMove);
-          const _user : User = {...user, }
+          const _user: User = { ...user };
           _user.conversations = tempConversation;
           setUser(_user);
           setConversations(tempConversation);
         }
-      }
-      else if(selected == 1 && groups[0].name != roomSelected){
-
+      } else if (selected == 1 && groups[0].name != roomSelected) {
         const tempGroup = groups;
         const indexOfElementToMove = tempGroup.findIndex((obj: any) => obj.name == roomSelected);
         const elementToMove = tempGroup[indexOfElementToMove];
-        if(indexOfElementToMove != -1)
-        {
+        if (indexOfElementToMove != -1) {
           tempGroup.splice(indexOfElementToMove, 1);
           tempGroup.unshift(elementToMove);
-          const _user : User = {...user, }
+          const _user: User = { ...user };
           _user.groups = tempGroup;
           setUser(_user);
           setGroups(tempGroup);
         }
-
       }
     }
   };
 
-  const channelsWithConversation =async () => {
-    if(socket){
-      if(!user.groups){
-        const _user : User = user;
+  const channelsWithConversation = async () => {
+    if (socket) {
+      if (!user.groups) {
+        const _user: User = user;
         if (!user.state) {
           socket.emit('online', { token: localStorage.getItem('jwtToken') });
           _user.state = 1;
           setUser(_user);
         }
-        socket.emit('channels-with-conversation', {channelName: user.login || 'mabdelba'});
-        socket.on('get-channels', (data : any) => {
-
+        socket.emit('channels-with-conversation', { channelName: user.login || 'mabdelba' });
+        socket.on('get-channels', (data: any) => {
           setGroups(data);
           _user.groups = data;
           setUser(_user);
-        })
-      }
-      else
-        setGroups(user.groups);
+        });
+      } else setGroups(user.groups);
     }
-  }
+  };
   const usersWithConversation = async () => {
     if (socket) {
-      if(!user.conversations || (user.conversations.length == 1 && user.conversations.isFrd)) {
+      if (!user.conversations || (user.conversations.length == 1 && user.conversations.isFrd)) {
         const _user: User = { ...user };
         if (!user.state) {
           socket.emit('online', { token: localStorage.getItem('jwtToken') });
@@ -274,26 +256,21 @@ function Messages() {
         }
         socket.emit('users-with-conversation', { login: user.login || 'mabdelba' });
         socket.on('get-users', (data: any) => {
-        
           data.map((obj: any) =>
             getImageByLogin(obj.login).then((image) => {
               obj.avatar = image;
             }),
           );
-        if(user.conversations)
-        {
-          data.map((obj: any) => {
-            if(obj.login != _user.conversations[0].login)
-              _user.conversations = [..._user.conversations, obj]
-          })
-        }
-        else
-         _user.conversations = data;
-        setUser(_user);
-        setConversations(_user.conversations);
+          if (user.conversations) {
+            data.map((obj: any) => {
+              if (obj.login != _user.conversations[0].login)
+                _user.conversations = [..._user.conversations, obj];
+            });
+          } else _user.conversations = data;
+          setUser(_user);
+          setConversations(_user.conversations);
         });
-      }
-      else setConversations(user.conversations);
+      } else setConversations(user.conversations);
     }
   };
   // const [friendList, setFriendList] = useState(user.friendList);
@@ -304,47 +281,49 @@ function Messages() {
         ...chatArea,
         { sender: data.senderLogin, reciever: data.receiverLogin, text: data.text },
       ]);
-    if(selected == 0) {
+    if (selected == 0) {
       // console.log('heeeereeeeeee');
 
       const tempConversation = conversations;
-      const indexOfElementToMove = tempConversation.findIndex((obj: any) => (obj.login == data.senderLogin || obj.login == data.receiverLogin));
+      const indexOfElementToMove = tempConversation.findIndex(
+        (obj: any) => obj.login == data.senderLogin || obj.login == data.receiverLogin,
+      );
       const elementToMove = tempConversation[indexOfElementToMove];
-      if(indexOfElementToMove != -1)
-      {
+      if (indexOfElementToMove != -1) {
         tempConversation.splice(indexOfElementToMove, 1);
         tempConversation.unshift(elementToMove);
-        const _user : User = {...user, }
+        const _user: User = { ...user };
+        _user.conversations = tempConversation;
+        setUser(_user);
+        setConversations(tempConversation);
+      } else {
+        tempConversation.unshift({
+          login: data.senderLogin,
+          avatar: data.senderAvatar,
+          state: data.state,
+        });
+        const _user: User = { ...user };
         _user.conversations = tempConversation;
         setUser(_user);
         setConversations(tempConversation);
       }
-      else
-      {
-        tempConversation.unshift({login: data.senderLogin, avatar: data.senderAvatar, state: data.state});
-        const _user : User = {...user}
-        _user.conversations = tempConversation;
-        setUser(_user);
-        setConversations(tempConversation);
-      }
-    }
-    else if(selected == 1){
-
+    } else if (selected == 1) {
       const tempGroup = groups;
-      const indexOfElementToMove = tempGroup.findIndex((obj: any) => (obj.name == data.senderLogin || obj.name == data.receiverLogin));
+      const indexOfElementToMove = tempGroup.findIndex(
+        (obj: any) => obj.name == data.senderLogin || obj.name == data.receiverLogin,
+      );
       const elementToMove = tempGroup[indexOfElementToMove];
-      if(indexOfElementToMove != -1)
-      {
+      if (indexOfElementToMove != -1) {
         tempGroup.splice(indexOfElementToMove, 1);
         tempGroup.unshift(elementToMove);
-        const _user : User = {...user, }
+        const _user: User = { ...user };
         _user.groups = tempGroup;
         setUser(_user);
         setGroups(tempGroup);
-      }  
+      }
     }
   }
-  
+
   useEffect(() => {
     if (socket) {
       socket.on('receive-message', recieveMessage);
@@ -354,31 +333,26 @@ function Messages() {
 
   useEffect(() => {
     if (socket && roomSelected != '') {
-    
-        socket.emit('get-messages', {
-          senderLogin: user.login || 'mabdelba',
-          receiverLogin: roomSelected,
-          isChannel : selected == 1 ? true : false ,
-        });
-        socket.on('get-messages', (data: any) => {
-          setChatArea(data);
-        });
-      }
-    else setChatArea([]);
+      socket.emit('get-messages', {
+        senderLogin: user.login || 'mabdelba',
+        receiverLogin: roomSelected,
+        isChannel: selected == 1 ? true : false,
+      });
+      socket.on('get-messages', (data: any) => {
+        setChatArea(data);
+      });
+    } else setChatArea([]);
   }, [roomSelected, socket]);
 
-
   useEffect(() => {
-
     selected == 0
-      ? (setShowArray(conversations), setRoomSelected(conversations.length == 0 ? ''  :  conversations[0].login ))
+      ? (setShowArray(conversations),
+        setRoomSelected(conversations.length == 0 ? '' : conversations[0].login))
       : selected == 1
       ? (setShowArray(groups), setRoomSelected(groups.length == 0 ? '' : groups[0].name))
       : setShowArray([]);
-    if(selected == 0)
-      usersWithConversation();
-    else if(selected == 1)
-      channelsWithConversation();
+    if (selected == 0) usersWithConversation();
+    else if (selected == 1) channelsWithConversation();
   }, [selected, user.state, user.conversations, conversations, user.groups, groups]);
 
   useEffect(() => {
@@ -388,6 +362,33 @@ function Messages() {
     }
   }, [chatArea]);
 
+  const handleAddToGroup  = ( login: string) => {
+
+    const apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/add-user-to-channel";
+    const config =   {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+      },
+    };
+    axios.post(apiUrl, {channelName : roomSelected, user : login}, config)
+    .then((response: any)=> {
+      toast.success(`${login} added to ${roomSelected} successfully!`);
+      let indexOfElementToMove = friendList.findIndex((obj: any) => obj.login == login);
+      let elementToMove = friendList[indexOfElementToMove];
+      elementToMove.state = 'member';
+      const tempInviteList = friendList;
+      tempInviteList.splice(indexOfElementToMove, 1);
+      setFriendList(tempInviteList);
+      const tempMembers = [...groupMembers, elementToMove];
+      setGroupMembers(tempMembers);
+
+    })
+    .catch((error : any) => {
+      if(error.response.data)
+      toast.error(error.response.data.message);
+    })
+
+  }
   return (
     <OptionBar flag={3}>
       <main className="w-full h-full    flex flex-col items-center  font-Orbitron min-h-[550px]  min-w-[280px] pb-2 px-6  md:px-12  ">
@@ -404,53 +405,68 @@ function Messages() {
               <ListBox setSelected={setSelected} setOpenModal={setOpenModal} />
             </div>
             <div className="h-[60vh] w-full flex flex-col pt-2 2xl:pt-4 overflow-y-hidden ">
-              <div className=' h-full  overflow-y-auto w-full '>
-              {
-                showArray &&
-                showArray.map(
-                  (obj: any) =>
-                  !obj.isBlocked && (
-                    <button
-                    onClick={() => {
-                      setRoomSelected(selected == 0 ? obj.login : obj.name);
-                    }}
-                    key={selected == 0 ?obj.login : obj.channelName}
-                    className={`w-full h-14 ease-in-out 2xl:h-[68px]  truncate   text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 2xl:space-x-6 md:pl-5 2xl:pl-7 items-center transition-all duration-500 tracking-wide  ${
-                      roomSelected == obj.login || roomSelected == obj.name
-                      ? ' text-white  hover:bg-[#EDEDED] border-[#00B2FF] hover:text-black  md:border-b-2   2xl:border-b-4   font-bold  underline-offset-8 '
-                      : ' hover:bg-[#EDEDED] hover:text-black  hover:blueShadow '
-                    }`}
-                    >
-                      {
-                        <Image
-                        src={obj.avatar == `public/avatars/${obj.login}.jpg` ? alien : selected == 0 ? obj.avatar : group}
-                        alt="image"
-                        width="50"
-                        height="50"
-                        className={`rounded-full border-2 2xl:border-[3px] w-10 h-10  2xl:w-12 2xl:h-12 border-inherit bg-slate-800 `}
-                        />
-                      }
-                      <span className="hidden  text-left pt-1 md:flex flex-col 2xl:-space-y-1">
-                        <div className="flex flex-row  items-center justify-between">
-                          <h1 className='truncate w-[70%]'>{selected == 0 ? obj.login : obj.name}</h1>
-                          {selected == 0 && (
-                            <PiCircleFill
-                            className={`${
-                              obj.state == 1
-                              ? 'text-green-500 border  border-neutral-500 rounded-full '
-                              : 'text-gray-500'
-                            } `}
+              <div className=" h-full  overflow-y-auto w-full ">
+                {showArray &&
+                  showArray.map(
+                    (obj: any) =>
+                      !obj.isBlocked && (
+                        <button
+                          onClick={() => {
+                            setRoomSelected(selected == 0 ? obj.login : obj.name);
+                          }}
+                          key={selected == 0 ? obj.login : obj.channelName}
+                          className={`w-full h-14 ease-in-out 2xl:h-[68px]  truncate   text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 2xl:space-x-6 md:pl-5 2xl:pl-7 items-center transition-all duration-500 tracking-wide  ${
+                            roomSelected == obj.login || roomSelected == obj.name
+                              ? '   md:bg-[#EDEDED] border-[#36494e]  text-black  md:border-b-2   2xl:border-b-4   font-bold  underline-offset-8 '
+                              : ' hover:md:border-b-2 hover:2xl:border-b-4 hover:border-[#36494e] '
+                          }`}
+                        >
+                          {
+                            <Image
+                              src={
+                                obj.avatar == `public/avatars/${obj.login}.jpg`
+                                  ? alien
+                                  : selected == 0
+                                  ? obj.avatar
+                                  : group
+                              }
+                              alt="image"
+                              width="50"
+                              height="50"
+                              className={`rounded-full border-2 2xl:border-[3px] w-10 h-10  2xl:w-12 2xl:h-12 border-inherit bg-slate-800 `}
                             />
-                            )}
-                        </div>
-                        <h6 className="text-[7px] 2xl:text-[10px] antialiased  truncate w-24 2xl:w-44 overflow-hidden font-normal tracking-normal text-[#484848]">
-                          {selected == 0 ? obj.state == 1 ? `${obj.login} is available` : 'Disconnected' : obj.type == 0 ? 'Public' : obj.type == 1 ? 'Private' : 'Protected'}
-                        </h6>
-                      </span>
-                    </button>
-                  ),
+                          }
+                          <span className="hidden  text-left pt-1 md:flex flex-col 2xl:-space-y-1">
+                            <div className="flex flex-row  items-center justify-between">
+                              <h1 className="truncate w-[70%]">
+                                {selected == 0 ? obj.login : obj.name}
+                              </h1>
+                              {selected == 0 && (
+                                <PiCircleFill
+                                  className={`${
+                                    obj.state == 1
+                                      ? 'text-green-500 border  border-neutral-500 rounded-full '
+                                      : 'text-gray-500'
+                                  } `}
+                                />
+                              )}
+                            </div>
+                            <h6 className="text-[7px] 2xl:text-[10px] antialiased  truncate w-24 2xl:w-44 overflow-hidden font-normal tracking-normal text-[#484848]">
+                              {selected == 0
+                                ? obj.state == 1
+                                  ? `${obj.login} is available`
+                                  : 'Disconnected'
+                                : obj.type == 0
+                                ? 'Public'
+                                : obj.type == 1
+                                ? 'Private'
+                                : 'Protected'}
+                            </h6>
+                          </span>
+                        </button>
+                      ),
                   )}
-                  </div>
+              </div>
             </div>
           </div>
           <div className="h-full w-full flex flex-col justify-between">
@@ -459,15 +475,24 @@ function Messages() {
                 <BurgButton setFlag={setShowSideBar} val={showSideBar} />
               </div>
               <span className="text-xs md:text-base lg:text-lg truncate e">{roomSelected}</span>
-              {roomSelected != "" && <MyMenu slected={selected} setOpenMembers={setOpenMembersModal} roomSelected={roomSelected} setOpenSettings={setOpenSettingModal} setOpenInvite={setOpenInviteModal}/>}
+              {roomSelected != '' && (
+                <MyMenu
+                  slected={selected}
+                  setOpenMembers={setOpenMembersModal}
+                  roomSelected={roomSelected}
+                  setOpenSettings={setOpenSettingModal}
+                  setOpenInvite={setOpenInviteModal}
+                />
+              )}
             </div>
             <div className="  border-yellow-400 h-[60vh] w-full overflow-y-auto flex flex-col-reverse justify-end pb-4">
               <div className="h-auto  overflow-y-auto scroll-smooth" ref={messageEl}>
-                {chatArea && chatArea.map((obj: ChatText) => (
-                  <div key={obj.id} className=" w-full h-auto">
-                    <MessageText sender={obj.sender} message={obj.text} selected={selected} />
-                  </div>
-                ))}
+                {chatArea &&
+                  chatArea.map((obj: ChatText) => (
+                    <div key={obj.id} className=" w-full h-auto">
+                      <MessageText sender={obj.sender} message={obj.text} selected={selected} />
+                    </div>
+                  ))}
               </div>
             </div>
             <div className="h-16  2xl:h-20  border-t-[3px] lineshad">
@@ -476,107 +501,183 @@ function Messages() {
           </div>
         </div>
       </main>
-      <Popup  openModal={openModal} setOpenModal={setOpenModal} >
-          <div className='h-[10%] w-full flex justify-end items-center pr-3 NeonShadow'>
-            <AiOutlineClose  onClick={()=> {setOpenModal(false)}}  className="cursor-pointer h-7 w-7  lg:h-10 lg:w-10"/>
+      <Popup openModal={openModal} setOpenModal={setOpenModal}>
+        <div className="h-[10%] w-full flex justify-end items-center pr-3 NeonShadow">
+          <AiOutlineClose
+            onClick={() => {
+              setOpenModal(false);
+            }}
+            className="cursor-pointer h-7 w-7  lg:h-10 lg:w-10"
+          />
+        </div>
+        <h1 className="h-[10%] w-full font-Orbitron NeonShadow text-base md:text-xl 2xl:text-3xl flex justify-center items-center">
+          Add new group
+        </h1>
+        <form className="h-[75%] flex flex-col  justify-between w-full p-2 sm:p-10 ">
+          <div className="h-1/5">
+            <SimpleInput
+              holder={'Group name'}
+              type1={'text'}
+              SetValue={setGroupName}
+              val={''}
+              setError={setError}
+              isVerif={false}
+            />
           </div>
-          <h1 className='h-[10%] w-full font-Orbitron NeonShadow text-base md:text-xl 2xl:text-3xl flex justify-center items-center'>Add new group</h1>
-          <form className='h-[75%] flex flex-col  justify-between w-full p-2 sm:p-10 '>
-            <div className='h-1/5'>
-              <SimpleInput holder={'Group name'} type1={'text'} SetValue={setGroupName} val={''} setError={setError} isVerif={false}  />
-            </div>
-            <div className='h-1/5 flex justify-around min-h-[45px] items-center overflow-hidden'>
-              <h1 className='font-Orbitron  text-sm truncate md:text-base 2xl:text-3xl'>Private group</h1>
-              <SwitchButton enabled={enabled} setEnabled={setEnabled} />
-            </div>
-            <div className='h-1/5'>
-              <SimpleInput readonly={enabled} holder={'Password (optional)'} type1={'password'} type2='text' icon={seePass} icon2={hidePass} SetValue={setGroupPassword} val={groupPassword} flag={true} setError={setError} isVerif={false}  />
-            </div>
-            <div className='h-1/5'>
-              <SimpleButton content='Add group' buttonType={"submit"} handleClick={addNewGroup}/>
-            </div>
-          </form>
+          <div className="h-1/5 flex justify-around min-h-[45px] items-center overflow-hidden">
+            <h1 className="font-Orbitron  text-sm truncate md:text-base 2xl:text-3xl">
+              Private group
+            </h1>
+            <SwitchButton enabled={enabled} setEnabled={setEnabled} />
+          </div>
+          <div className="h-1/5">
+            <SimpleInput
+              readonly={enabled}
+              holder={'Password (optional)'}
+              type1={'password'}
+              type2="text"
+              icon={seePass}
+              icon2={hidePass}
+              SetValue={setGroupPassword}
+              val={groupPassword}
+              flag={true}
+              setError={setError}
+              isVerif={false}
+            />
+          </div>
+          <div className="h-1/5">
+            <SimpleButton content="Add group" buttonType={'submit'} handleClick={addNewGroup} />
+          </div>
+        </form>
       </Popup>
       <Popup openModal={openMembersModal} setOpenModal={setOpenMembersModal}>
-          <div className='h-[10%] w-full flex justify-end items-center pr-3 NeonShadow'>
-            <AiOutlineClose  onClick={()=> {setOpenMembersModal(false)}}  className="cursor-pointer h-7 w-7  lg:h-10 lg:w-10"/>
+        <div className="h-[10%] w-full flex justify-end items-center pr-3 NeonShadow">
+          <AiOutlineClose
+            onClick={() => {
+              setOpenMembersModal(false);
+            }}
+            className="cursor-pointer h-7 w-7  lg:h-10 lg:w-10"
+          />
+        </div>
+        <h1 className="h-[10%] w-full font-Orbitron NeonShadow text-base md:text-xl 2xl:text-3xl flex justify-center items-center">
+          Group members
+        </h1>
+        <div className="h-[75%] flex flex-col font-Orbitron  justify-between w-full p-2 sm:p-10">
+          <div className=" w-full h-full flex items-center flex-col  mb-8 overflow-x-hidden  overflow-y-auto">
+            <ul className="w-full">
+              {groupMembers &&
+                groupMembers.map((member: any, index: number) => (
+                  <li key={index}>
+                    <div className="flex flex-row items-center my-[10px] justify-between">
+                      <div className="flex flex-row">
+                        <div className="NeonShadowBord h-[60px] w-[60px] flex items-center mr-[10px]">
+                          <Image
+                            src={
+                              !member.avatar ||
+                              member.avatar == `public/avatars/${member.login}.jpg`
+                                ? alien
+                                : member.avatar
+                            }
+                            alt="avatar"
+                            width="50"
+                            height="50"
+                            className="h-auto w-auto"
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="truncate">{member.login}</span>
+                          <p className="text-[12px] text-yellow-400">{member.state}</p>
+                        </div>
+                      </div>
+                      <div className="ml-[30px]">{member.state != 'owner' && <DropDown />}</div>
+                    </div>
+                  </li>
+                ))}
+            </ul>
           </div>
-          <h1 className='h-[10%] w-full font-Orbitron NeonShadow text-base md:text-xl 2xl:text-3xl flex justify-center items-center'>Group members</h1>
-          <div className='h-[75%] flex flex-col font-Orbitron  justify-between w-full p-2 sm:p-10'>
-						<div className=' w-full h-full flex items-center flex-col  mb-8 overflow-x-hidden  overflow-y-auto'>
-							<ul className='w-full'>
-								{groupMembers && groupMembers.map((member : any, index : number) => (
-								<li key={index}>
-									<div className='flex flex-row items-center my-[10px] justify-between'>
-										<div className='flex flex-row'>
-											<div className='NeonShadowBord h-[60px] w-[60px] flex items-center mr-[10px]'>
-												<Image src={!member.avatar|| member.avatar == `public/avatars/${member.login}.jpg`  ? alien : member.avatar} alt="avatar" width="50" height="50" className='h-auto w-auto' />
-											</div>
-											<div className='flex flex-col'>
-												<span className='truncate'>{member.login}</span>
-												<p className='text-[12px] text-yellow-400'>{member.state}</p>
-											</div>
-										</div>
-										<div className='ml-[30px]'>
-											{member.state != 'owner' && <DropDown />}
-										</div>
-									</div>
-								</li>))}
-							</ul>
-						</div>
-					  </div>
+        </div>
       </Popup>
-      <Popup openModal={openSettingModal} setOpenModal={setOpenSettingModal} >
-          <div className='h-[10%] w-full flex justify-end items-center pr-3 NeonShadow'>
-            <AiOutlineClose  onClick={()=> {setOpenSettingModal(false)}}  className="cursor-pointer h-7 w-7  lg:h-10 lg:w-10"/>
+      <Popup openModal={openSettingModal} setOpenModal={setOpenSettingModal}>
+        <div className="h-[10%] w-full flex justify-end items-center pr-3 NeonShadow">
+          <AiOutlineClose
+            onClick={() => {
+              setOpenSettingModal(false);
+            }}
+            className="cursor-pointer h-7 w-7  lg:h-10 lg:w-10"
+          />
+        </div>
+        <h1 className="h-[10%] w-full font-Orbitron NeonShadow text-base md:text-xl 2xl:text-3xl flex justify-center items-center">
+          Group settings
+        </h1>
+        <form className="h-[78%] flex flex-col  justify-between w-full p-2 sm:p-10 ">
+          <div className="h-1/5 w-full z-10">
+            <textarea
+              onChange={(e) => setDescripion(e.target.value)}
+              placeholder="Group description"
+              className="h-full min-h-[60px]
+               sm:min-h-[70px] p-4 text-sm md:text-lg lg:text-xl font-Orbitron  text-white outline-none placeholder-[#484848] max-h-36 sm:max-h-44 z-10 w-full NeonShadowBord bg-[#272727]"
+            />
           </div>
-          <h1 className='h-[10%] w-full font-Orbitron NeonShadow text-base md:text-xl 2xl:text-3xl flex justify-center items-center'>Group settings</h1>
-          <form className='h-[78%] flex flex-col  justify-between w-full p-2 sm:p-10 '>
-            <div className='h-1/5 w-full z-10'>
-              <textarea onChange={(e) => setDescripion(e.target.value)} placeholder='Group description' className='h-full min-h-[60px]
-               sm:min-h-[70px] p-4 text-sm md:text-lg lg:text-xl font-Orbitron  text-white outline-none placeholder-[#484848] max-h-36 sm:max-h-44 z-10 w-full NeonShadowBord bg-[#272727]' />
+          <div className="h-1/5 z-0">
+            <div className="mb-1 font-Orbitron lg:mb-4 truncate">
+              Group avatar : <span className="text-cyan-400 truncate">{fileName}</span>
             </div>
-            <div className='h-1/5 z-0'>
-            <div className="mb-1 font-Orbitron lg:mb-4 truncate">Group avatar : <span className='text-cyan-400 truncate'>{fileName}</span></div>
-                <input 
-                    onChange={handleImage}
-                    type="file" id="files" className="hidden" />
-                <label htmlFor="files">
-                    <UploadAvatar content="Upload avatar" icon2={BlackUpload} icon={Upload} />
-                </label>
-            </div>
-            <div className='h-1/5 z-0'>
-              <SimpleButton content='Save' buttonType={"submit"} handleClick={()=>{}}/>
-            </div>
-          </form>
+            <input onChange={handleImage} type="file" id="files" className="hidden" />
+            <label htmlFor="files">
+              <UploadAvatar content="Upload avatar" icon2={BlackUpload} icon={Upload} />
+            </label>
+          </div>
+          <div className="h-1/5 z-0">
+            <SimpleButton content="Save" buttonType={'submit'} handleClick={() => {}} />
+          </div>
+        </form>
       </Popup>
       <Popup openModal={openInviteModal} setOpenModal={setOpenInviteModal}>
-      <div className='h-[10%] w-full flex justify-end items-center pr-3 NeonShadow'>
-            <AiOutlineClose  onClick={()=> {setOpenInviteModal(false)}}  className="cursor-pointer h-7 w-7  lg:h-10 lg:w-10"/>
+        <div className="h-[10%] w-full flex justify-end items-center pr-3 NeonShadow">
+          <AiOutlineClose
+            onClick={() => {
+              setOpenInviteModal(false);
+            }}
+            className="cursor-pointer h-7 w-7  lg:h-10 lg:w-10"
+          />
+        </div>
+        <h1 className="h-[10%] w-full font-Orbitron NeonShadow text-base md:text-xl 2xl:text-3xl flex justify-center items-center">
+          Invite Members
+        </h1>
+        <div className="h-[75%] flex flex-col font-Orbitron  justify-between w-full p-2 sm:p-10">
+          <div className=" w-full flex items-center flex-col  mb-8 overflow-x-hidden  overflow-y-auto">
+            <ul className="w-full">
+              {friendList &&
+                friendList.map((member: any, index: number) => (
+                  <li key={index}>
+                    <div className="flex flex-row items-center my-[10px] justify-between">
+                      <div className="flex flex-row">
+                        <div className="NeonShadowBord h-[60px] w-[60px] flex items-center mr-[10px]">
+                          <Image
+                            src={
+                              member.avatar && member.avatar != `public/avatars/${member.login}.jpg`
+                                ? member.avatar
+                                : alien
+                            }
+                            alt="avatar"
+                            width="50"
+                            height="50"
+                            className="h-auto w-auto"
+                          />
+                        </div>
+                        <div className="flex flex-col justify-center">
+                          <span>{member.login}</span>
+                        </div>
+                      </div>
+                      <button onClick={()=> handleAddToGroup(member.login)} className="mr-5 p-1 text-[20px]">
+                        <AiOutlineUserAdd className="md:h-8 md:w-8 md:hover:h-9 md:hover:w-9 focus:outline-none hover:font-extrabold hover:text-cyan-500 duration-500" />
+                      </button>
+                    </div>
+                  </li>
+                ))}
+            </ul>
           </div>
-          <h1 className='h-[10%] w-full font-Orbitron NeonShadow text-base md:text-xl 2xl:text-3xl flex justify-center items-center'>Invite Members</h1>
-          <div className='h-[75%] flex flex-col font-Orbitron  justify-between w-full p-2 sm:p-10'>
-						<div className=' w-full flex items-center flex-col  mb-8 overflow-x-hidden  overflow-y-auto'>
-							<ul className='w-full'>
-								{friendList && friendList.map((member : any, index : number) => (
-								<li key={index}>
-									<div className='flex flex-row items-center my-[10px] justify-between'>
-										<div className='flex flex-row'>
-											<div className='NeonShadowBord h-[60px] w-[60px] flex items-center mr-[10px]'>
-												<Image src={member.avatar != `public/avatars/${member.login}.jpg` ? member.avatar : alien} alt="avatar" width="50" height="50" className='h-auto w-auto' />
-											</div>
-											<div className='flex flex-col justify-center'>
-												<span>{member.login}</span>
-											</div>
-										</div>
-										<button className='mr-5 p-1 text-[20px]'>
-											<AiOutlineUserAdd className="md:h-8 md:w-8 md:hover:h-9 md:hover:w-9 focus:outline-none hover:font-extrabold hover:text-cyan-500 duration-500" />
-										</button>
-									</div>
-								</li>))}
-							</ul>
-						</div>
-					  </div>
+        </div>
       </Popup>
     </OptionBar>
   );
