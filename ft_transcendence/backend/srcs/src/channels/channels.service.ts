@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { channel } from 'diagnostics_channel';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { getAvatarFromLogin } from 'src/utils/get-avatar-from-login';
 
 @Injectable()
 export class ChannelsService {
@@ -53,6 +54,9 @@ export class ChannelsService {
     const channelUsers = [...channel.members, channel.owner, ...channel.admins];
     const friendsNotInChannel = user.friends.filter((friend) => {
       return !channelUsers.some((member) => member.login === friend.login);
+    });
+    friendsNotInChannel.forEach((friend) => {
+      friend['fileAvatar'] = getAvatarFromLogin(friend.login, friend.avatar);
     });
     return friendsNotInChannel;
   }
@@ -178,7 +182,7 @@ export class ChannelsService {
     return false;
   }
   /// use in channel gateway
-  async removeUserFromChannel(dto: { channelName: string; myLogin: string; otherLogin: string }) {
+  async removeUserFromChannel(client: any, dto: { channelName: string; myLogin: string; otherLogin: string }) {
     const isAdmin = await this.checkIfAdmin({ channelName: dto.channelName, user: dto.myLogin });
     const isOwner = await this.checkIfOwner({ channelName: dto.channelName, user: dto.myLogin });
     const isOtherAdmin = await this.checkIfAdmin({
@@ -230,10 +234,11 @@ export class ChannelsService {
         });
       } else throw new ForbiddenException('You are not admin or owner of this channel');
     }
+    client.to(dto.channelName).emit('user-removed-from-channel', dto.otherLogin);
   }
 
   //use in channel gateway
-  async muteUserInChannel(dto: { channelName: string; myLogin: string; otherLogin: string }) {
+  async muteUserInChannel(client :any, dto: { channelName: string; myLogin: string; otherLogin: string }) {
     const isAdmin = await this.checkIfAdmin({ channelName: dto.channelName, user: dto.myLogin });
     const isOwner = await this.checkIfOwner({ channelName: dto.channelName, user: dto.myLogin });
     if (isAdmin || isOwner) {
@@ -253,10 +258,11 @@ export class ChannelsService {
         },
       });
     } else throw new ForbiddenException('You are not admin or owner of this channel');
+    client.to(dto.channelName).emit('user-muted-in-channel', dto.otherLogin);
   }
 
   //use in channel gateway
-  async banUserFromChannel(dto: { channelName: string; myLogin: string; otherLogin: string }) {
+  async banUserFromChannel(client: any, dto: { channelName: string; myLogin: string; otherLogin: string }) {
     const isAdmin = await this.checkIfAdmin({ channelName: dto.channelName, user: dto.myLogin });
     const isOwner = await this.checkIfOwner({ channelName: dto.channelName, user: dto.myLogin });
     if (isOwner) {
@@ -283,11 +289,12 @@ export class ChannelsService {
         },
       });
     } else throw new ForbiddenException('You are not admin or owner of this channel');
+    client.to(dto.channelName).emit('user-banned-from-channel', dto.otherLogin);
   }
 
   // use in channel gateway
 
-  async unbanUserFromChannel(dto: { channelName: string; myLogin: string; otherLogin: string }) {
+  async unbanUserFromChannel(client: any, dto: { channelName: string; myLogin: string; otherLogin: string }) {
     const isAdmin = await this.checkIfAdmin({ channelName: dto.channelName, user: dto.myLogin });
     const isOwner = await this.checkIfOwner({ channelName: dto.channelName, user: dto.myLogin });
     if (isAdmin || isOwner) {
@@ -304,6 +311,7 @@ export class ChannelsService {
         },
       });
     } else throw new ForbiddenException('You are not admin or owner of this channel');
+    client.to(dto.channelName).emit('user-unbanned-from-channel', dto.otherLogin);
   }
 
   // use in channel gateway
@@ -332,7 +340,7 @@ export class ChannelsService {
   }
 
   // use in channel gateway
-  async removeAdminFromChannel(dto: { channelName: string; myLogin: string; otherLogin: string }) {
+  async removeAdminFromChannel(client: any, dto: { channelName: string; myLogin: string; otherLogin: string }) {
     const isOwner = await this.checkIfOwner({ channelName: dto.channelName, user: dto.myLogin });
     if (!isOwner) {
       await this.prismaservice.channel.update({
@@ -348,10 +356,11 @@ export class ChannelsService {
         },
       });
     } else throw new ForbiddenException('You are not owner of this channel');
+    client.to(dto.channelName).emit('admin-removed-from-channel', dto.otherLogin);
   }
 
   // use in channel gateway
-  async removeChannel(dto: { channelName: string; user: string }) {
+  async removeChannel(client: any, dto: { channelName: string; user: string }) {
     const isOwner = await this.checkIfOwner(dto);
     if (isOwner) {
       await this.prismaservice.channel.delete({
@@ -360,6 +369,7 @@ export class ChannelsService {
         },
       });
     } else throw new ForbiddenException('You are not owner of this channel');
+    client.to(dto.channelName).emit('channel-removed', dto.channelName);
   }
 
   async checkIfUserMuted(dto: { channelName: string; user: string }) {
@@ -397,6 +407,18 @@ export class ChannelsService {
     return 5;
   }
 
+  async getUsersAvatars(owner, admins, members, banned) {
+    owner['fileAvatar'] = getAvatarFromLogin(owner.login, owner.avatar);
+    admins.forEach((admin) => {
+      admin['fileAvatar'] = getAvatarFromLogin(admin.login, admin.avatar);
+    });
+    members.forEach((member) => {
+      member['fileAvatar'] = getAvatarFromLogin(member.login, member.avatar);
+    });
+    banned.forEach((ban) => {
+      ban['fileAvatar'] = getAvatarFromLogin(ban.login, ban.avatar);
+    });
+  }
   async listChannelMembers(login, dto: { channelName: string; user: string }) {
     const channel = await this.prismaservice.channel.findUnique({
       where: {
@@ -412,6 +434,7 @@ export class ChannelsService {
     const isAdmin = await this.checkIfAdmin({ channelName: dto.channelName, user: login });
     const isOwner = await this.checkIfOwner({ channelName: dto.channelName, user: login });
     const banned = isAdmin || isOwner ? channel.banned : [];
+    this.getUsersAvatars(channel.owner, channel.admins, channel.members, banned);
     return {
       iAm: await this.whoIam(dto),
       owner: channel.owner,

@@ -105,32 +105,32 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
   
   @SubscribeMessage('remove-user-from-channel')
-  removeUserFromChannel(data: { channelName: string; myLogin: string; otherLogin: string }) {
-    this.channelsGateway.removeUserFromChannel(data);
+  removeUserFromChannel(client: Socket, data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.removeUserFromChannel(client, data);
   }
 
   @SubscribeMessage('mute-user-in-channel')
-  muteUserInChannel(data: { channelName: string; myLogin: string; otherLogin: string }) {
-    this.channelsGateway.muteUserInChannel(data);
+  muteUserInChannel(client: Socket, data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.muteUserInChannel(client, data);
   }
 
   @SubscribeMessage('ban-user-in-channel')
-  banUserInChannel(data: { channelName: string; myLogin: string; otherLogin: string }) {
-    this.channelsGateway.banUserInChannel(data);
+  banUserInChannel(client: Socket, data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.banUserInChannel(client, data);
   }
 
   @SubscribeMessage('unban-user-in-channel')
-  unbanUserInChannel(data: { channelName: string; myLogin: string; otherLogin: string }) {
-    this.channelsGateway.unbanUserInChannel(data);
+  unbanUserInChannel(client: Socket, data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.unbanUserInChannel(client, data);
   }
 
   @SubscribeMessage('remove-admin-from-channel')
-  removeAdminFromChannel(data: { channelName: string; myLogin: string; otherLogin: string }) {
-    this.channelsGateway.removeAdminFromChannel(data);
+  removeAdminFromChannel(client: Socket, data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.removeAdminFromChannel(client, data);
   }
 
   @SubscribeMessage('remove-channel')
-  removeChannel(data: { channelName: string; user: string }) {
-    this.channelsGateway.removeChannel(data);
+  removeChannel(client: Socket, data: { channelName: string; user: string }) {
+    this.channelsGateway.removeChannel(client, data);
   }
 }

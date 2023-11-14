@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import jwtDecode from 'jwt-decode';
 import { Socket } from 'socket.io';
+import { getAvatarFromLogin } from 'src/utils/get-avatar-from-login';
+import { channel } from 'diagnostics_channel';
 
 @Injectable()
 export class DmsService {
@@ -225,6 +227,7 @@ export class DmsService {
         avatar: user.avatar,
         isBlocked: blockedListLogins.includes(user.login),
       });
+      users['fileAvatar'] = getAvatarFromLogin(user.login);
       console.log(login, 'join ', this.createRoomName(login, user.login));
       client.join(this.createRoomName(login, user.login));
     });
@@ -271,7 +274,7 @@ export class DmsService {
     return messagesWithoutBlocked;
   }
 
-  async channelsWithConversation(login: string) {
+  async channelsWithConversation(client: any, login: string) {
     const channelsWithConversation = await this.prisma.channel.findMany({
       where: {
         OR: [
@@ -317,6 +320,9 @@ export class DmsService {
         return 1;
       }
       return 0;
+    });
+    channelsWithConversation.forEach((channel) => {
+      client.join(channel.name);
     });
     return channelsWithConversation;
   }
