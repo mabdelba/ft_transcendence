@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { channel } from 'diagnostics_channel';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { getAvatarFromLogin } from 'src/utils/get-avatar-from-login';
+import { getAvatarFromLogin, getAvatarUrlFromLogin } from 'src/utils/get-avatar-from-login';
 
 @Injectable()
 export class ChannelsService {
@@ -56,7 +56,7 @@ export class ChannelsService {
       return !channelUsers.some((member) => member.login === friend.login);
     });
     friendsNotInChannel.forEach((friend) => {
-      friend['fileAvatar'] = getAvatarFromLogin(friend.login, friend.avatar);
+      friend['avatarUrl'] = getAvatarUrlFromLogin(friend.login, friend.avatar);
     });
     return friendsNotInChannel;
   }
@@ -416,15 +416,15 @@ export class ChannelsService {
   }
 
   async getUsersAvatars(owner, admins, members, banned) {
-    owner['fileAvatar'] = getAvatarFromLogin(owner.login, owner.avatar);
+    owner['avatarUrl'] = getAvatarUrlFromLogin(owner.login, owner.avatar);
     admins.forEach((admin) => {
-      admin['fileAvatar'] = getAvatarFromLogin(admin.login, admin.avatar);
+      admin['avatarUrl'] = getAvatarUrlFromLogin(admin.login, admin.avatar);
     });
     members.forEach((member) => {
-      member['fileAvatar'] = getAvatarFromLogin(member.login, member.avatar);
+      member['avatarUrl'] = getAvatarUrlFromLogin(member.login, member.avatar);
     });
     banned.forEach((ban) => {
-      ban['fileAvatar'] = getAvatarFromLogin(ban.login, ban.avatar);
+      ban['avatarUrl'] = getAvatarUrlFromLogin(ban.login, ban.avatar);
     });
   }
   async listChannelMembers(login, dto: { channelName: string; user: string }) {

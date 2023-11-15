@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import jwtDecode from 'jwt-decode';
 import { Socket } from 'socket.io';
-import { getAvatarFromLogin } from 'src/utils/get-avatar-from-login';
+import { getAvatarFromLogin, getAvatarUrlFromLogin } from 'src/utils/get-avatar-from-login';
 import { channel } from 'diagnostics_channel';
 
 @Injectable()
@@ -227,7 +227,7 @@ export class DmsService {
         avatar: user.avatar,
         isBlocked: blockedListLogins.includes(user.login),
       });
-      users['fileAvatar'] = getAvatarFromLogin(user.login);
+      users['avatarUrl'] = getAvatarUrlFromLogin(user.login, user.avatar);
       console.log(login, 'join ', this.createRoomName(login, user.login));
       client.join(this.createRoomName(login, user.login));
     });

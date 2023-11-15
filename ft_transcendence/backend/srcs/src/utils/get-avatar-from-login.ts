@@ -13,5 +13,11 @@ async function getAvatarFromLogin(login:string, avatar?: string){
           return new StreamableFile(file);
         }
 }
-
-export { getAvatarFromLogin };
+async function getAvatarUrlFromLogin(login: string, avatar?: string) {
+  if (avatar !== null) {
+    return `http://localhost:3000/avatars/${login}.jpg`;
+  } else {
+    return `http://localhost:3000/avatars/avatar.png`;
+  }
+}
+export { getAvatarFromLogin, getAvatarUrlFromLogin };

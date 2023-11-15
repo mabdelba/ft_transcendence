@@ -1,18 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { getAvatarFromLogin } from 'src/utils/get-avatar-from-login';
+import { getAvatarUrlFromLogin } from 'src/utils/get-avatar-from-login';
 
 @Injectable()
 export class FriendService {
   constructor(private prisma: PrismaService) {}
-  async getAvatarUrlFromLogin(login: string, avatar?: string) {
-    if (avatar !== null) {
-      return `http://localhost:3000/avatars/${login}.jpg`;
-    } else {
-      return `http://localhost:3000/avatars/avatar.png`;
-    }
-  }
+  
+
   async getFriendList(user: User) {
     const friendList = await this.prisma.user.findUnique({
       where: {
@@ -30,7 +25,7 @@ export class FriendService {
     });
     const updatedFriendList = await Promise.all(
       friendList.friends.map(async (friend) => {
-        const avatarUrl = await this.getAvatarUrlFromLogin(friend.login, friend.avatar);
+        const avatarUrl = await getAvatarUrlFromLogin(friend.login, friend.avatar);
         return { ...friend, avatarUrl };
       })
     );
@@ -53,10 +48,14 @@ export class FriendService {
         },
       },
     });
-    await Promise.all(friendRequestsList.recievedFriendRequestsBy.map(async (friend) => {
-      friend['fileAvatar'] = await getAvatarFromLogin(friend.login, friend.avatar);
-    }));
-    return friendRequestsList;
+    const updatedFriendReqList = await Promise.all(
+      friendRequestsList.recievedFriendRequestsBy.map(async (friend) => {
+        const avatarUrl = await getAvatarUrlFromLogin(friend.login, friend.avatar);
+        return { ...friend, avatarUrl };
+      })
+    );
+  
+    return { ...friendRequestsList, friends: updatedFriendReqList };
   }
 
   async getBlockedUserList(user: User) {
@@ -74,10 +73,14 @@ export class FriendService {
         },
       },
     });
-    await Promise.all(blockedUserList.blockedList.map(async (friend) => {
-      friend['fileAvatar'] = await getAvatarFromLogin(friend.login, friend.avatar);
-    }));
-    return blockedUserList;
+    const updatedFriendBlockedList = await Promise.all(
+      blockedUserList.blockedList.map(async (friend) => {
+        const avatarUrl = await getAvatarUrlFromLogin(friend.login, friend.avatar);
+        return { ...friend, avatarUrl };
+      })
+    );
+    return { ...blockedUserList, friends: updatedFriendBlockedList };
+
   }
 
   async sendFriendRequest(user: User, recieverId: number) {
