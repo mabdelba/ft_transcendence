@@ -52,37 +52,42 @@ function Friends() {
   const { data: requestListData, status } = useQuery('requestList', fetchRequestList);
   const { data: friendListData, status: status_ } = useQuery('friendList', fetchFriendList);
   const { data: blockedListData, status: status__ } = useQuery('blockedList', fetchBlockedList);
-  const getImageByLogin = async (login: string): Promise<string | null> => {
-    return new Promise<string | null>(async (resolve) => {
-      if (login != '') {
-        await axios
-          .post(
-            'http://localhost:3000/api/atari-pong/v1/user/avatar',
-            { userLogin: login },
-            {
-              headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-              responseType: 'blob',
-            },
-          )
-          .then((response) => {
-            const imageBlob = URL.createObjectURL(response.data) as string;
-            if (imageBlob) resolve(imageBlob);
-            else resolve(alien);
-          })
-          .catch(() => {
-            // resolve(alien);
-          });
-      }
-    });
-  };
+  // const getImageByLogin = async (login: string): Promise<string | null> => {
+  //   return new Promise<string | null>(async (resolve) => {
+  //     if (login != '') {
+  //       await axios
+  //         .post(
+  //           'http://localhost:3000/api/atari-pong/v1/user/avatar',
+  //           { userLogin: login },
+  //           {
+  //             headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+  //             responseType: 'blob',
+  //           },
+  //         )
+  //         .then((response) => {
+  //           const imageBlob = URL.createObjectURL(response.data) as string;
+  //           if (imageBlob) resolve(imageBlob);
+  //           else resolve(alien);
+  //         })
+  //         .catch(() => {
+  //           // resolve(alien);
+  //         });
+  //     }
+  //   });
+  // };
 
-  const getReq = () => {
+  const getReq = async () => {
     if (requestListData) {
-      requestListData.recievedFriendRequestsBy.forEach((obj: any) => {
-        getImageByLogin(obj.login).then((imageBlog) => {
-          obj.avatar = imageBlog;
-        });
-      });
+      await Promise.all(
+        requestListData.recievedFriendRequestsBy.map(async (friend:any) => {
+          const url : any = `http://localhost:3000/avatars/${friend.login}.jpg`
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const imageBlob = URL.createObjectURL(blob) as string;
+        if(friend.avatar)
+        friend.avatar = imageBlob;
+      })
+    );
       setRequest(requestListData.recievedFriendRequestsBy);
       const _user: User = user;
       _user.friendRequestList = requestListData.recievedFriendRequestsBy;
@@ -98,10 +103,12 @@ function Friends() {
     if (friendListData) {
       await Promise.all(
         friendListData.friends.map(async (friend:any) => {
-          const response = await fetch(friend.avatarUrl);
+          const url : any = `http://localhost:3000/avatars/${friend.login}.jpg`
+          const response = await fetch(url);
           const blob = await response.blob();
           const imageBlob = URL.createObjectURL(blob) as string;
-          friend.avatar = imageBlob;
+          if(friend.avatar)
+            friend.avatar = imageBlob;
         })
       );
       setFriendsList(friendListData.friends);
@@ -111,13 +118,18 @@ function Friends() {
     }
   };
 
-  const getBlocked = () => {
+  const getBlocked = async () => {
     if (blockedListData) {
-      blockedListData.blockedList.forEach((obj: any) => {
-        getImageByLogin(obj.login).then((imageBlog) => {
-          obj.avatar = imageBlog;
-        });
-      });
+      await Promise.all(
+          blockedListData.blockedList.map(async (friend:any) => {
+          const url : any = `http://localhost:3000/avatars/${friend.login}.jpg`
+          const response = await fetch(url);
+          const blob = await response.blob();
+          const imageBlob = URL.createObjectURL(blob) as string;
+          if(friend.avatar)
+          friend.avatar = imageBlob;
+        })
+      );
       setBlockedList(blockedListData.blockedList);
       const _user: User = user;
       _user.blockedList = blockedListData.blockedList;

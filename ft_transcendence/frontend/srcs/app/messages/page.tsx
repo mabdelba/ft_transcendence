@@ -80,8 +80,9 @@ function Messages() {
   const [fileName, setFilename] = useState('');
   const [description, setDescripion] = useState('');
   const [avatarToUpload, setAvatarToUpload] = useState('');
-  const [friendList, setFriendList] = useState<any>();
+  const [friendList, setFriendList] = useState<any>([]);
   const [groupMembers, setGroupMembers] = useState<any>([]);
+  const [iAm, setIam] = useState('');
 
   const handleImage = (e: any) => {
     setFilename(e.target.files[0].name);
@@ -90,6 +91,8 @@ function Messages() {
 
   useEffect(() => {
     if (selected == 1 && roomSelected != '') {
+      setIam('');
+      setGroupMembers([]);
       const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/channel-members';
       axios
         .post(
@@ -101,13 +104,33 @@ function Messages() {
             },
           },
         )
-        .then((response: any) => {
+        .then(async (response: any) => {
+          // console.log('for debug: ', response.data)
+          setIam(response.data.iAm);
           response.data.owner.state = 'owner';
-          response.data.admins.forEach((obj: any) => {
+          const url : any = `http://localhost:3000/avatars/${response.data.owner.login}.jpg`
+          const res = await fetch(url);
+          const blob = await res.blob();
+          const imageBlob = URL.createObjectURL(blob) as string;
+          if(response.data.owner.avatar)
+            response.data.owner.avatar = imageBlob;
+          response.data.admins.forEach( async (obj: any) => {
             obj.state = 'admin';
+            const url : any = `http://localhost:3000/avatars/${obj.login}.jpg`
+            const res = await fetch(url);
+            const blob = await res.blob();
+            const imageBlob = URL.createObjectURL(blob) as string;
+            if(obj.avatar)
+              obj.avatar = imageBlob;
           });
-          response.data.members.forEach((obj: any) => {
+          response.data.members.forEach(async (obj: any) => {
             obj.state = 'member';
+            const url : any = `http://localhost:3000/avatars/${obj.login}.jpg`
+            const res = await fetch(url);
+            const blob = await res.blob();
+            const imageBlob = URL.createObjectURL(blob) as string;
+            if(obj.avatar)
+              obj.avatar = imageBlob;
           });
           let tempMembers: any[] = [];
           tempMembers[0] = response.data.owner;
@@ -153,7 +176,7 @@ function Messages() {
 
   useEffect(() => {
     if (selected == 1 && roomSelected != '') {
-      // console.log("7na dakhlin");
+      setFriendList([]);
       const urlreq = 'http://localhost:3000/api/atari-pong/v1/channels/friend-list-for-channel';
       axios
         .post(
@@ -167,6 +190,14 @@ function Messages() {
         )
         .then((response: any) => {
           // console.log('ljadid: ', response);
+          response.data.forEach(async (obj: any)=> {
+            const url : any = `http://localhost:3000/avatars/${obj.login}.jpg`
+            const res = await fetch(url);
+            const blob = await res.blob();
+            const imageBlob = URL.createObjectURL(blob) as string;
+            if(obj.avatar)
+              obj.avatar = imageBlob;
+          } )
           setFriendList(response.data);
           // setUser(_user);
         })
@@ -256,10 +287,16 @@ function Messages() {
         }
         socket.emit('users-with-conversation', { login: user.login || 'mabdelba' });
         socket.on('get-users', (data: any) => {
-          data.map((obj: any) =>
-            getImageByLogin(obj.login).then((image) => {
-              obj.avatar = image;
-            }),
+          data.map(async (obj: any) =>
+            { 
+              const url : any = `http://localhost:3000/avatars/${obj.login}.jpg`
+              const res = await fetch(url);
+              const blob = await res.blob();
+              const imageBlob = URL.createObjectURL(blob) as string;
+              if(obj.avatar)
+                obj.avatar = imageBlob;
+            }
+          
           );
           if (user.conversations) {
             data.map((obj: any) => {
@@ -424,7 +461,7 @@ function Messages() {
                           {
                             <Image
                               src={
-                                obj.avatar == `public/avatars/${obj.login}.jpg`
+                                 !obj.avatar || obj.avatar == `public/avatars/${obj.login}.jpg`
                                   ? alien
                                   : selected == 0
                                   ? obj.avatar
@@ -589,7 +626,7 @@ function Messages() {
                           <p className="text-[12px] text-yellow-400">{member.state}</p>
                         </div>
                       </div>
-                      <div className="ml-[30px]">{member.state != 'owner' && <DropDown />}</div>
+                      <div className="ml-[30px]">{((iAm == 'owner' && member.state != 'owner') || (iAm == 'admin' && member.state == 'member')) && <DropDown />}</div>
                     </div>
                   </li>
                 ))}
@@ -670,7 +707,10 @@ function Messages() {
                         </div>
                       </div>
                       <button onClick={()=> handleAddToGroup(member.login)} className="mr-5 p-1 text-[20px]">
-                        <AiOutlineUserAdd className="md:h-8 md:w-8 md:hover:h-9 md:hover:w-9 focus:outline-none hover:font-extrabold hover:text-cyan-500 duration-500" />
+                        {
+                          (iAm != 'member') &&
+                          <AiOutlineUserAdd className="md:h-8 md:w-8 md:hover:h-9 md:hover:w-9 focus:outline-none hover:font-extrabold hover:text-cyan-500 duration-500" />
+                        }
                       </button>
                     </div>
                   </li>
