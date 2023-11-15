@@ -400,12 +400,19 @@ export class ChannelsService {
       where: {
         name: dto.channelName,
       },
-      include: {
+      // include: {
+      //   owner: true,
+      //   admins: true,
+      //   members: true,
+      //   banned: true,
+      // },
+      select: {
         owner: true,
         admins: true,
         members: true,
         banned: true,
-      },
+        type: true,
+      }
     });
     if (channel.owner.login == dto.user) return "owner";
     if (channel.admins.find((admin) => admin.login == dto.user)) return "admin";

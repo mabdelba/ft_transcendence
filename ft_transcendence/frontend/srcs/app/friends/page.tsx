@@ -101,16 +101,6 @@ function Friends() {
 
   const getFriend = async () => {
     if (friendListData) {
-      await Promise.all(
-        friendListData.friends.map(async (friend:any) => {
-          const url : any = `http://localhost:3000/avatars/${friend.login}.jpg`
-          const response = await fetch(url);
-          const blob = await response.blob();
-          const imageBlob = URL.createObjectURL(blob) as string;
-          if(friend.avatar)
-            friend.avatar = imageBlob;
-        })
-      );
       setFriendsList(friendListData.friends);
       const _user: User = user;
       _user.friendList = friendListData.friends;
