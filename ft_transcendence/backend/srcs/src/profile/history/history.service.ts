@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { getAvatarFromLogin } from 'src/utils/get-avatar-from-login';
 import { getUserFromId, getUserFromLogin } from 'src/utils/get-user-from-id';
 
 @Injectable()
@@ -31,11 +32,11 @@ export class HistoryService {
         id: match.id,
         me: me.login,
         other: other.login,
-        avatar: other.avatar,
+        myAvatar: getAvatarFromLogin(me.login),
+        otherAvatar: getAvatarFromLogin(other.login),
         myScore: me.id == match.player1Id ? match.scoreOfPlayer1 : match.scoreOfPlayer2,
         otherScore: other.id == match.player1Id ? match.scoreOfPlayer1 : match.scoreOfPlayer2,
       };
-
       matches.push(matchData);
     }
     return matches;
