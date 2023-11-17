@@ -109,29 +109,12 @@ function Messages() {
           // console.log('for debug: ', response.data)
           setIam(response.data.iAm);
           response.data.owner.state = 'owner';
-          const url : any = `http://localhost:3000/avatars/${response.data.owner.login}.jpg`
-          const res = await fetch(url);
-          const blob = await res.blob();
-          const imageBlob = URL.createObjectURL(blob) as string;
-          if(response.data.owner.avatar)
-            response.data.owner.avatar = imageBlob;
+
           response.data.admins.forEach( async (obj: any) => {
             obj.state = 'admin';
-            const url : any = `http://localhost:3000/avatars/${obj.login}.jpg`
-            const res = await fetch(url);
-            const blob = await res.blob();
-            const imageBlob = URL.createObjectURL(blob) as string;
-            if(obj.avatar)
-              obj.avatar = imageBlob;
           });
           response.data.members.forEach(async (obj: any) => {
             obj.state = 'member';
-            const url : any = `http://localhost:3000/avatars/${obj.login}.jpg`
-            const res = await fetch(url);
-            const blob = await res.blob();
-            const imageBlob = URL.createObjectURL(blob) as string;
-            if(obj.avatar)
-              obj.avatar = imageBlob;
           });
           let tempMembers: any[] = [];
           tempMembers[0] = response.data.owner;
@@ -191,14 +174,6 @@ function Messages() {
         )
         .then((response: any) => {
           // console.log('ljadid: ', response);
-          response.data.forEach(async (obj: any)=> {
-            const url : any = `http://localhost:3000/avatars/${obj.login}.jpg`
-            const res = await fetch(url);
-            const blob = await res.blob();
-            const imageBlob = URL.createObjectURL(blob) as string;
-            if(obj.avatar)
-              obj.avatar = imageBlob;
-          } )
           setFriendList(response.data);
           // setUser(_user);
         })
@@ -288,17 +263,7 @@ function Messages() {
         }
         socket.emit('users-with-conversation', { login: user.login || 'mabdelba' });
         socket.on('get-users', (data: any) => {
-          data.map(async (obj: any) =>
-            { 
-              const url : any = `http://localhost:3000/avatars/${obj.login}.jpg`
-              const res = await fetch(url);
-              const blob = await res.blob();
-              const imageBlob = URL.createObjectURL(blob) as string;
-              if(obj.avatar)
-                obj.avatar = imageBlob;
-            }
           
-          );
           if (user.conversations) {
             data.map((obj: any) => {
               if (obj.login != _user.conversations[0].login)
@@ -306,6 +271,7 @@ function Messages() {
             });
           } else _user.conversations = data;
           setUser(_user);
+          // console.log("nchufo hadi", _user.conversations);
           setConversations(_user.conversations);
         });
       } else setConversations(user.conversations);
@@ -463,10 +429,10 @@ function Messages() {
                           {
                             <Image
                               src={
-                                 !obj.avatar || obj.avatar == `public/avatars/${obj.login}.jpg`
+                                 !obj.avatar 
                                   ? alien
                                   : selected == 0
-                                  ? obj.avatar
+                                  ? obj.avatarUrl
                                   : group
                               }
                               alt="image"
@@ -615,10 +581,9 @@ function Messages() {
                         <div className="NeonShadowBord h-[60px] w-[60px] flex items-center mr-[10px]">
                           <Image
                             src={
-                              !member.avatar ||
-                              member.avatar == `public/avatars/${member.login}.jpg`
-                                ? alien
-                                : member.avatar
+                                member.avatar
+                                  ? member.avatarUrl
+                                  : alien
                             }
                             alt="avatar"
                             width="50"
@@ -697,8 +662,8 @@ function Messages() {
                         <div className="NeonShadowBord h-[60px] w-[60px] flex items-center mr-[10px]">
                           <Image
                             src={
-                              member.avatar && member.avatar != `public/avatars/${member.login}.jpg`
-                                ? member.avatar
+                              member.avatar
+                                ? member.avatarUrl
                                 : alien
                             }
                             alt="avatar"

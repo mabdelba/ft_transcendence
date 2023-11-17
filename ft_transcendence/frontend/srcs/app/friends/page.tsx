@@ -79,6 +79,7 @@ function Friends() {
   const getReq = async () => {
     if (requestListData) {
 
+      
       setRequest(requestListData.recievedFriendRequestsBy);
       const _user: User = user;
       _user.friendRequestList = requestListData.recievedFriendRequestsBy;
@@ -92,6 +93,7 @@ function Friends() {
 
   const getFriend = async () => {
     if (friendListData) {
+      
       setFriendsList(friendListData.friends);
       const _user: User = user;
       _user.friendList = friendListData.friends;
@@ -101,6 +103,7 @@ function Friends() {
 
   const getBlocked = async () => {
     if (blockedListData) {
+      // console.log("test all: ", blockedListData.blockedList);
       setBlockedList(blockedListData.blockedList);
       const _user: User = user;
       _user.blockedList = blockedListData.blockedList;
