@@ -78,16 +78,7 @@ function Friends() {
 
   const getReq = async () => {
     if (requestListData) {
-      await Promise.all(
-        requestListData.recievedFriendRequestsBy.map(async (friend:any) => {
-          const url : any = `http://localhost:3000/avatars/${friend.login}.jpg`
-        const response = await fetch(url);
-        const blob = await response.blob();
-        const imageBlob = URL.createObjectURL(blob) as string;
-        if(friend.avatar)
-        friend.avatar = imageBlob;
-      })
-    );
+
       setRequest(requestListData.recievedFriendRequestsBy);
       const _user: User = user;
       _user.friendRequestList = requestListData.recievedFriendRequestsBy;
@@ -110,16 +101,6 @@ function Friends() {
 
   const getBlocked = async () => {
     if (blockedListData) {
-      await Promise.all(
-          blockedListData.blockedList.map(async (friend:any) => {
-          const url : any = `http://localhost:3000/avatars/${friend.login}.jpg`
-          const response = await fetch(url);
-          const blob = await response.blob();
-          const imageBlob = URL.createObjectURL(blob) as string;
-          if(friend.avatar)
-          friend.avatar = imageBlob;
-        })
-      );
       setBlockedList(blockedListData.blockedList);
       const _user: User = user;
       _user.blockedList = blockedListData.blockedList;

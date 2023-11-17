@@ -83,6 +83,7 @@ function Messages() {
   const [friendList, setFriendList] = useState<any>([]);
   const [groupMembers, setGroupMembers] = useState<any>([]);
   const [iAm, setIam] = useState('');
+  const [roomSelectedType, setRoomSelectedType] = useState(0);
 
   const handleImage = (e: any) => {
     setFilename(e.target.files[0].name);
@@ -450,6 +451,7 @@ function Messages() {
                         <button
                           onClick={() => {
                             setRoomSelected(selected == 0 ? obj.login : obj.name);
+                            setRoomSelectedType(selected == 1 ? obj.type : 0)
                           }}
                           key={selected == 0 ? obj.login : obj.channelName}
                           className={`w-full h-14 ease-in-out 2xl:h-[68px]  truncate   text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 2xl:space-x-6 md:pl-5 2xl:pl-7 items-center transition-all duration-500 tracking-wide  ${
@@ -482,7 +484,7 @@ function Messages() {
                                 <PiCircleFill
                                   className={`${
                                     obj.state == 1
-                                      ? 'text-green-500 border  border-neutral-500 rounded-full '
+                                      ? 'text-green-500 border  border-neutral-500 rounded-full animate-pulse'
                                       : 'text-gray-500'
                                   } `}
                                 />
@@ -519,6 +521,9 @@ function Messages() {
                   roomSelected={roomSelected}
                   setOpenSettings={setOpenSettingModal}
                   setOpenInvite={setOpenInviteModal}
+                  channelType={roomSelectedType}
+                  iAm={iAm}
+               
                 />
               )}
             </div>
