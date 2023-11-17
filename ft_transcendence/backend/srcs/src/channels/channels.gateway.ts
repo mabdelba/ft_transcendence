@@ -5,6 +5,16 @@ import { Server, Socket, Namespace } from 'socket.io';
 @WebSocketGateway({ namespace: 'channels' })
 export class ChannelsGateway {
   constructor(private channelService: ChannelsService) {}
+  @SubscribeMessage('channels-with-conversation')
+  async getChannelsWithConversation(
+     data: { channelName: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const channels = await this.channelService.channelsWithConversation(client, data.channelName);
+    client.emit('get-channels', channels);
+    return channels;
+  }
+
   @SubscribeMessage('remove-user-from-channel')
   async removeUserFromChannel( @ConnectedSocket() client: Socket, data: { channelName: string; myLogin: string; otherLogin: string }) {
     return this.channelService.removeUserFromChannel(client, data);

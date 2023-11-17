@@ -85,7 +85,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { channelName: string },
     @ConnectedSocket() client: Socket,
   ) {
-    this.dmsGateway.getChannelsWithConversation(data, client);
+    this.channelsGateway.getChannelsWithConversation(data, client);
   }
 
   @SubscribeMessage('get-messages')
