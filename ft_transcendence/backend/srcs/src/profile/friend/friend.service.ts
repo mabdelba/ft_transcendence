@@ -25,7 +25,7 @@ export class FriendService {
     });
     const updatedFriendList = await Promise.all(
       friendList.friends.map(async (friend) => {
-        const avatarUrl = await getAvatarUrlFromLogin(friend.login, friend.avatar);
+        const avatarUrl = getAvatarUrlFromLogin(friend.login, friend.avatar);
         return { ...friend, avatarUrl };
       })
     );
@@ -50,11 +50,11 @@ export class FriendService {
     });
     const updatedFriendReqList = await Promise.all(
       friendRequestsList.recievedFriendRequestsBy.map(async (friend) => {
-        const avatarUrl = await getAvatarUrlFromLogin(friend.login, friend.avatar);
+        const avatarUrl = getAvatarUrlFromLogin(friend.login, friend.avatar);
         return { ...friend, avatarUrl };
       })
-    );
-  
+      );
+      
     return { ...friendRequestsList, friends: updatedFriendReqList };
   }
 

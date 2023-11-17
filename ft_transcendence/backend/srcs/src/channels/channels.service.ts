@@ -474,4 +474,60 @@ export class ChannelsService {
     });
     return channels;
   }
+  async channelsWithConversation(client: any, login: string) {
+    const channelsWithConversation = await this.prismaservice.channel.findMany({
+      where: {
+        OR: [
+          {
+            members: {
+              some: {
+                login: login,
+              },
+            },
+          },
+          {
+            owner: {
+              login: login,
+            },
+          },
+          {
+            admins: {
+              some: {
+                login: login,
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        messages: true,
+      },
+    });
+    if (!channelsWithConversation) return [];
+    channelsWithConversation.sort((a, b) => {
+      const getLastMessageDate = (channel) => {
+        const dates = channel.messages.map((message) => message.dateOfSending);
+        return Math.max(...dates);
+      };
+
+      const aLastMessageDate = getLastMessageDate(a);
+      const bLastMessageDate = getLastMessageDate(b);
+
+      if (aLastMessageDate > bLastMessageDate) {
+        return -1;
+      }
+      if (aLastMessageDate < bLastMessageDate) {
+        return 1;
+      }
+      return 0;
+    });
+    await Promise.all(
+      channelsWithConversation.map(async (channel) => {
+        channel['whoIam'] = await this.whoIam({ channelName: channel.name, user: login });
+        console.log('who i am ==== ', channel['whoIam']);
+        client.join(channel.name);
+      }),
+    );
+    return channelsWithConversation;
+  }
 }
