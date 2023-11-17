@@ -219,18 +219,19 @@ export class DmsService {
     this.sortUsersWithConversation(usersWithConversation);
     const blockedList = await this.blockedList(login);
     const blockedListLogins = blockedList.blockedList.map((user) => user.login);
-    const users: { login: string; state: number; avatar?: string; isBlocked?: boolean }[] = [];
+    const users: { login: string; state: number; avatar?: string; isBlocked?: boolean, avatarUrl: string }[] = [];
     usersWithConversation.forEach(async (user) => {
       users.push({
         login: user.login,
         state: user.state,
         avatar: user.avatar,
         isBlocked: blockedListLogins.includes(user.login),
+        avatarUrl: getAvatarUrlFromLogin(login, user.avatar),
       });
-      users['avatarUrl'] = getAvatarUrlFromLogin(user.login, user.avatar);
       console.log(login, 'join ', this.createRoomName(login, user.login));
       client.join(this.createRoomName(login, user.login));
     });
+    console.log('users with conversation == ', users );
     return users;
   }
 

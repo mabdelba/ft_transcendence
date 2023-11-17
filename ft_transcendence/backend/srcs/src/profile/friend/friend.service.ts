@@ -54,8 +54,8 @@ export class FriendService {
         return { ...friend, avatarUrl };
       })
       );
-      
-    return { ...friendRequestsList, friends: updatedFriendReqList };
+      console.log("this is friendRequestsList", updatedFriendReqList);
+    return { ...friendRequestsList, recievedFriendRequestsBy: updatedFriendReqList };
   }
 
   async getBlockedUserList(user: User) {
@@ -75,11 +75,11 @@ export class FriendService {
     });
     const updatedFriendBlockedList = await Promise.all(
       blockedUserList.blockedList.map(async (friend) => {
-        const avatarUrl = await getAvatarUrlFromLogin(friend.login, friend.avatar);
+        const avatarUrl = getAvatarUrlFromLogin(friend.login, friend.avatar);
         return { ...friend, avatarUrl };
       })
     );
-    return { ...blockedUserList, friends: updatedFriendBlockedList };
+    return { ...blockedUserList, blockedList: updatedFriendBlockedList };
 
   }
 
