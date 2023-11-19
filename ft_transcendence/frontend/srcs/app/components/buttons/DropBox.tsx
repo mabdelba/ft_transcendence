@@ -8,14 +8,15 @@ import {BsFillEyeFill} from 'react-icons/bs'
 import {GiGamepad} from 'react-icons/gi'
 import {FiSettings} from 'react-icons/fi'
 import {TbLogout2} from 'react-icons/tb'
-import {MdGroups2} from 'react-icons/md'
+import {MdGroups2, MdDelete} from 'react-icons/md'
 import { useRouter } from 'next/navigation'
+import { group } from 'console'
+import { channel } from 'diagnostics_channel'
 
 
 
 
-
-function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: any, setOpenInvite: any ,roomSelected : string}) {
+function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: any, setOpenInvite: any ,roomSelected : string, iAm?: string, channelType?: number}) {
   
   const router = useRouter();
   const friendMenu = [
@@ -33,8 +34,27 @@ function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: 
   const [links, setLinks] = useState(friendMenu);
   
   useEffect(()=> {
-    props.slected == 0 ? setLinks(friendMenu) : props.slected == 1 ? setLinks(GroupMenu) : setLinks([]);
-  }, [props.slected, props.roomSelected])
+    if(props.slected == 0)
+      setLinks(friendMenu);
+    else if(props.slected == 1 && props.iAm != '')
+    {
+      setLinks([]);
+      if(props.iAm == 'owner'){
+        GroupMenu[1].label = 'Delete';
+        GroupMenu[1].render = ()=> {return(<MdDelete size="20"/>)};
+      }
+      else if(props.iAm == 'member' && props.channelType != 0)
+        GroupMenu.splice(3 , 1);
+      if(props.iAm != 'owner')
+        GroupMenu.splice(0, 1);
+      // console.log('roomSelected: ', props.roomSelected);
+      // console.log("channelType: ", props.channelType);
+      // console.log("iAm: ", props.iAm);
+      // console.log("GroupMenu: ", GroupMenu);
+      setLinks(GroupMenu);
+    }
+  
+  }, [props.iAm ,props.roomSelected])
 
   return (
     <div className="">
@@ -59,6 +79,7 @@ function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: 
           <Menu.Items className="absolute right-0 mr-3 mt-2 w-60 z-10 origin-top-right divide-yoverflow-auto SmallNeonShadowBord  bg-[#36494e] text-base shadow-lg ring-1 ring-black ring-opacity-5  sm:text-sm focus:outline-none">
             <div className="px-1  ">
               {
+                links &&
                 links.map((link: any) => (
                   <Menu.Item>
                   {({ active }) => (
