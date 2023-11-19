@@ -3,34 +3,86 @@ import * as React from 'react'
 import Image from 'next/image';
 import LightMap from '../../public/lightmap.svg';
 import DarkMap from '../../public/darkmap.svg';
-import { Fragment, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import Logout from '../../public/log-out.svg';
 import Loader from '../components/shapes/loader';
+import { User, context } from '../../context/context';
+import { Socket, io } from 'socket.io-client';
+import { useRouter } from 'next/navigation';
+import { set } from 'husky';
+import { StoreID } from 'recoil';
 
 function Queue() {
     const [isOpen, setIsOpen] = useState(false);
+    const {user, setUser} = useContext(context);
+    const router = useRouter();
+    // const [map, setMap] = useState('');
 
-    const toggleModal = () => {
-        setIsOpen(!isOpen);
+    const toggleModal = (mode: string) => {
+      // setMap(mode);
+      const _user : User = user;
+      _user.map = mode;
+      setUser(_user);
+      setIsOpen(true);
+          user.socket?.emit('NewGame', {map: user.map});
+          user.socket?.on('ready', ()=>{
+          router.push('/game');
+        })
+      }
+    
+    const checkCancel = () => {
+      user.socket?.emit('CancelGame');
+      setIsOpen(false);
     }
+
+    useEffect(() => {
+      console.log('enterereererer');
+      if(!user.socket){
+          let socket: Socket = io('http://localhost:3001', {
+              auth: {
+                  token: localStorage.getItem('jwtToken'),
+              },
+          });
+
+          socket.on('connect', () => {
+              console.log('connectedff', socket.id );
+          });
+          const usersocket : User = user;
+          usersocket.socket = socket;
+          setUser(usersocket);
+
+          socket?.on('already connected', () => {
+          console.log('already connected');
+          router.push('/dashboard');
+        })
+      }
+      else
+      {
+        user.socket?.on('already connected', () => {
+          console.log('already connected');
+          router.push('/dashboard');
+      })
+    }
+    }, [user.socket]);
+
 
     return (
       <>
         <div className='flex flex-col items-center h-screen justify-center'>
           <h1 className='font-Orbitron NeonShadow text-[30px] mb-[30px]'>Choose a map</h1>
           <div className='flex content-center justify-center'>
-            <button className='' onClick={toggleModal}>
+            <button className='' onClick={()=>toggleModal('light')}>
               <Image src={LightMap} alt="LightMap" />
             </button>
-            <button className='' onClick={toggleModal}>
+            <button className='' onClick={()=>toggleModal('dark')}>
               <Image src={DarkMap} alt="DarkMap" />
             </button>
           </div>
         </div>
         {isOpen && (
           <Transition appear show={isOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-10" onClose={toggleModal}>
+            <Dialog as="div" className="relative z-10" onClose={()=>{}}>
               <div className="fixed inset-0 overflow-y-auto">
                 <div className="flex justify-center items-center bg-opacity-40 bg-[#282828] w-screen h-screen">
                   <Transition.Child
@@ -55,7 +107,7 @@ function Queue() {
 
 
 
-                      <button className='NeonShadow flex items-center justify-center NBord Boxshad h-[68px] w-[196px] text-[20px] hover:bg-white hover:text-black duration-300' onClick={toggleModal}>
+                      <button className='NeonShadow flex items-center justify-center NBord Boxshad h-[68px] w-[196px] text-[20px] hover:bg-white hover:text-black duration-300'onClick={()=>{checkCancel()}}>
                         <Image
                           src={Logout}
                           alt='Logout'

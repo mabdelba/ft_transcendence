@@ -113,11 +113,10 @@ class Game{
 
     public destroy(): void{
         Matter.Events.off(this._engine, 'beforeUpdate', ()=> {});
-        this._render.canvas.remove();
         Matter.Render.stop(this._render);
-        Matter.Engine.clear(this._engine);
         Matter.World.clear(this._world, false);
-        Matter.Render.stop(this._render);
+        Matter.Engine.clear(this._engine);
+        this._render.canvas.remove();
     }
 
     public setState(p1: Matter.Vector, p2: Matter.Vector, ball: Matter.Vector): void{

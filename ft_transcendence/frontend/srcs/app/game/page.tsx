@@ -2,20 +2,19 @@
 import * as React from 'react'
 import Game from './game';
 import Matter from 'matter-js';
-import { useState, useEffect , useRef} from 'react';
+import { useState, useEffect , useRef, useContext} from 'react';
 import { Socket, io } from 'socket.io-client';
 import { Content } from 'next/font/google';
 import Alien from '../../public/alien.svg';
 import Logout from '../../public/log-out.svg';
 import Image from 'next/image';
 import { set } from 'husky';
-import { Console } from 'console';
 import { useRouter } from 'next/navigation';
 import { data } from 'autoprefixer';
 import { emit } from 'process';
-import Popup from '../components/shapes/Popup';
 import GamePopup from '../components/shapes/GamePopup';
 import { BiHappyAlt, BiSad, BiLogOut } from 'react-icons/bi';
+import { context } from '../../context/context';
 
 let game: Game | null = null;
 
@@ -30,9 +29,10 @@ const fetchInfo = async () => {
   };
 
 const gamePage = () => {
+    const {user} = useContext(context);
     const gameDiv = useRef<HTMLDivElement>(null)
     const [{width, height}, setWindowSize] = useState({width: 0, height: 0})
-    const [gameSocket, setGameSocket] = useState<Socket | null>(null)
+    const [gameSocket, setGameSocket] = useState<any>(null)
     const [isLeft, setIsLeft] = useState(false);
     const [gameEnded, setGameEnded] = useState<string>('');
     const router = useRouter();
@@ -43,39 +43,23 @@ useEffect(() => {
             setWindowSize({width: window.innerWidth, height: window.innerHeight});
         };
         window.addEventListener('resize', handleResize);
-        const isPageReloaded = window.performance.navigation.type === 1;
 
-        if (isPageReloaded) {
-            console.log('isPageReloaded');
-            setIsLeft(true);
-            //if page is reloaded, need to check if socket disconnected in move player handler and if so, emit end game to the last socket in the connected user ids array and then remove this user from the array
+        if (!user.socket) {
+            game?.destroy();
+            router.push('/queue');
         }
-        else {
-               if (typeof window !== 'undefined' && gameSocket === null) {
-    
-               let socket: Socket = io('http://localhost:3001', {
-                   auth: {
-                       token: localStorage.getItem('jwtToken'),
-                   },
-               });
-               socket?.on('connect', () => {
-                   socket.emit('NewGame', {map: 'map1'});
-                   console.log('connectedff', socket.id );
-                   game?.setSocket(socket);
-               });
-    
-                   socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
-                       game?.setState(data.player1, data.player2, data.ball);
-               });
 
-                socket?.on('gameEnded', (data: {state: string}) => {
-                    setGameEnded(data.state);
-                })
+         user.socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
+                game?.setState(data.player1, data.player2, data.ball);
+        });
     
-               setGameSocket(socket);
-            
-            }
-        }
+        console.log('gameSocket', user.socket);
+
+         user.socket?.on('gameEnded', (data: {state: string}) => {
+             setGameEnded(data.state);
+         })
+
+        setGameSocket(user.socket);
 
         return () => {
             if (typeof window !== 'undefined') {
@@ -95,7 +79,7 @@ useEffect(() => {
         return () => {
             game?.destroy();
         }
-    }, [width, height])
+    }, [width, height, gameSocket])
 
     const [username, setUsername] = useState("Username");
     const [avatar, setAvatar] = useState(Alien);
@@ -112,7 +96,7 @@ useEffect(() => {
     const handleLeave = () => {;
         gameSocket?.emit('endGame')
         game?.destroy();
-        // router.push('/queue');
+        router.push('/queue');
     }
 
    useEffect(() => {
@@ -131,14 +115,14 @@ useEffect(() => {
         if(gameEnded !== ''){
             console.log('gameEnded', gameEnded);
             setOpenModal(true)
-            gameSocket?.off('GameState');
-            gameSocket?.off('gameEnded');
-            gameSocket?.off('left game');
-            gameSocket?.off('connect');
-            gameSocket?.off('disconnect');
-            setGameSocket(null);
-            gameSocket?.disconnect();
-            gameSocket?.close();
+            // gameSocket?.off('GameState');
+            // gameSocket?.off('gameEnded');
+            // gameSocket?.off('left game');
+            // gameSocket?.off('connect');
+            // gameSocket?.off('disconnect');
+            // setGameSocket(null);
+            // gameSocket?.disconnect();
+            // gameSocket?.close();
             game?.destroy();
         }
     }, [gameEnded])
@@ -190,7 +174,7 @@ useEffect(() => {
                       : null}
             </div>
             <div className='flex justify-center h-1/2 w-full font-Orbitron items-start'>
-            <button onClick={()=> {router.push('/queue')}}  type="button" className="NeonShadowBord flex flex-row items-center h-fit px-4 py-3 hover:bg-white hover:text-[black] outline-none transition-[300]">
+            <button onClick={()=> { game?.destroy(); router.push('/queue');}}  type="button" className="NeonShadowBord flex flex-row items-center h-fit px-4 py-3 hover:bg-white hover:text-[black] outline-none transition-[300]">
                     <BiLogOut size={40} />
                     <div className="pl-2 text-[30px]">Leave</div>
             </button>

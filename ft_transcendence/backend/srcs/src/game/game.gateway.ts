@@ -6,6 +6,7 @@ import { Socket } from "socket.io";
 import { JwtGuard } from "src/auth/guards";
 import GameModel from "./game.service";
 import { disconnect } from "process";
+import { subscribe } from "diagnostics_channel";
 
 @WebSocketGateway(3001, { cors: '*' })
 export class GameGateway {
@@ -20,8 +21,9 @@ export class GameGateway {
         const login = decoded['login'];
         if (this.ConnectedUsers.has(login)) {
             this.ConnectedUsers.get(login)?.push(socket);
+            socket.emit('connected');
             console.log('already connected', login, socket.id);
-            socket.disconnect();
+            // socket.disconnect();
         }
         else{
             this.ConnectedUsers.set(login, [socket]);
@@ -29,14 +31,14 @@ export class GameGateway {
         }
     }
 
-
-
     @SubscribeMessage('NewGame')
     handleNewGame(@ConnectedSocket() socket: Socket, @MessageBody() data: { map: string }) {
         const jwtToken = socket.handshake.auth.token;
         const decoded = jwtDecode(jwtToken);
         const login = decoded['login'];
         const index = this.RandomGames.findIndex((game) => game.map == data.map && (game.id1 !== login && game.id2 !== login));
+        const check = this.RandomGames.findIndex((game) => game.id1 == login || game.id2 == login);
+        console.log("new game created");
 
         if (index >= 0){
             console.log("index "+ index +" "+ login +" joined game");
@@ -44,7 +46,9 @@ export class GameGateway {
             game.game.setSocket2(socket);
             game.game.setID2(socket.id);
             game.id2 = login;
-        }else
+            game.game.socket1.emit('ready');
+            game.game.socket2.emit('ready');
+        }else if(check < 0)
         {
             let game: GameModel = new GameModel(socket);
             console.log( login +" created new game");
@@ -57,7 +61,7 @@ export class GameGateway {
         const index = this.RandomGames.findIndex((game) => (game.game.id1 == socket.id && game.id2 != '') || game.game.id2 == socket.id);
         if (index >= 0 && this.RandomGames[index].game.socket1.connected && this.RandomGames[index].game.socket2.connected){
             const game: GameModel = this.RandomGames[index].game;
-            console.log("start game", game.id1, game.id2, this.RandomGames.length);
+            console.log("start game", game.id1, game.id2, index);
             game.run();
         }
         
@@ -89,37 +93,52 @@ export class GameGateway {
                 game.socket1.emit('gameEnded', {state: 'lose'});
                 game.socket2.emit('gameEnded', {state: 'win'});
             }
+            this.ConnectedUsers.delete(this.RandomGames[index].id1);
+            this.ConnectedUsers.delete(this.RandomGames[index].id2);
             this.RandomGames.splice(index, 1);
             game.destroy();
         }
+    }
+    @SubscribeMessage('CancelGame')
+    handleCancelGame(@ConnectedSocket() socket: Socket) {
+        const jwtToken = socket.handshake.auth.token;
+        const decoded = jwtDecode(jwtToken);
+        const login = decoded['login'];
+        const index = this.RandomGames.findIndex((game) => game.id1 == login || game.id2 == login);
+        if(index >= 0)
+            this.RandomGames.splice(index, 1);
     }
 
     @UseGuards(JwtGuard)
      handleDisconnect(socket: Socket) {
         const jwtToken = socket.handshake.auth.token;
         const decoded = jwtDecode(jwtToken);
-        const ids = this.ConnectedUsers.get(decoded['login']);
-        if (ids?.length > 1){
-            ids.map((id) => {
-                console.log("disconnect you use many tab", id?.id);
-                id.emit('left game');
-            });
-        }
-
-        // const gameIndex = this.RandomGames.findIndex((game) => game.game.id1 == socket.id || game.game.id2 == socket.id);
-        // this.RandomGames.splice(gameIndex, 1);
-        
-        // if (gameIndex >= 0){
-        //     const game: GameModel = this.RandomGames[gameIndex].game;
-        //     if (socket.id == game.socket1.id){
-        //         console.log("here111");
-        //         game.socket2?.emit('endGame', {winner: 2});
-        //     }
-        //     else if (socket.id == game.socket2.id){
-        //         console.log("here222");
-        //         game.socket1?.emit('endGame', {winner: 1});
-        //     }
+        // const ids = this.ConnectedUsers.get(decoded['login']);
+        // if (ids?.length > 1){
+        //     ids.map((id) => {
+        //         console.log("disconnect you use many tab", id?.id);
+        //         id.emit('left game');
+        //     });
         // }
+
+        const gameIndex = this.RandomGames.findIndex((game) => game.game.id1 == socket.id || game.game.id2 == socket.id);
+        // if(gameIndex  >= 0){
+        //     this.RandomGames.splice(gameIndex, 1);
+        // }
+        
+        if (gameIndex >= 0){
+            const game: GameModel = this.RandomGames[gameIndex].game;
+            if (socket.id == game.socket1.id){
+                console.log("here111");
+                game.socket2?.emit('gameEnded', {state: 'win'});
+            }
+            else if (socket.id == game.socket2.id){
+                console.log("here222");
+                game.socket1?.emit('gameEnded', {state: 'win'});
+            }
+            game.destroy();
+            this.RandomGames.splice(gameIndex, 1);
+        }
         this.ConnectedUsers.delete(decoded['login']);
         console.log("GameGateway handleDisconnect", socket.id, decoded['login']);
     }

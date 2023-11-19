@@ -91,7 +91,7 @@ class GameModel{
     public destroy(): void{
         console.log("destroy");
         Runner.stop(this._runner);
-        World.clear(this._world, false);
+        World.clear(this._world, true);
         Engine.clear(this._engine);
     }
 
