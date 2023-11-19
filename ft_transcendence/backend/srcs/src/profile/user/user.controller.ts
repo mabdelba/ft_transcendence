@@ -29,6 +29,12 @@ export class UserController {
   }
 
   @UseGuards(JwtGuard)
+  @Get('all-users')
+  async getAllUsers(@Req() req: Request) {
+    return this.userService.getAllUsers(req.user as User);
+  }
+
+  @UseGuards(JwtGuard)
   @Post('avatar')
   async getAvatar(@Body() dto: { userLogin: string }) {
     if (dto.userLogin === null) return null;
