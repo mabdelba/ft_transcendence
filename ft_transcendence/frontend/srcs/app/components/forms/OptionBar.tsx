@@ -58,9 +58,9 @@ function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}
               <BurgButton setFlag={setShowSideBar} val={showSideBar} />
               {
                 !showSideBar &&
-                <SearchBar />
+                <SearchBar  />
               }
-              {results && results.length > 0 && <ResultElements results={results} />}
+              {/* {results && results.length > 0 && <ResultElements results={results} />} */}
               <Link 
               onMouseEnter={() => {setHoverBool(true)}}
               onMouseLeave={() => {setHoverBool(false)}}

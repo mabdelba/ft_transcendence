@@ -8,29 +8,58 @@ import MenuButton from '../buttons/menuButton';
 import Logo from '../../../public/logo.svg';
 import SearchLogo from '../../../public/searchLogo.svg';
 
-function SearchBar ({ setResults } : any)
+interface UserData {
+  id: number;
+  name: string;
+  // Add other properties as needed
+}
+
+type setResults = React.Dispatch<React.SetStateAction<any>>;
+
+function SearchBar (setResults: setResults)
 {
   const [input, setInput] = useState("");
 
-  const fetchData = (value: string) => {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then((response) => response.json())
-      .then((json) => {
-        const results = json.filter((user: any) => {
-          return (
-            value &&
-            user &&
-            user.name &&
-            user.name.toLowerCase().includes(value)
-          );
-        });
-        // setResults(results);
+  // const fetchData = (value: string) => {
+  //   fetch("https://jsonplaceholder.typicode.com/users")
+  //     .then((response) => response.json())
+  //     .then((json) => {
+  //       const results = json.filter((user: any) => {
+  //         return (
+  //           value &&
+  //           user &&
+  //           user.name &&
+  //           user.name.toLowerCase().includes(value)
+  //         );
+  //       });
+  //       // setResults(results);
+  //     });
+  // };
+
+  const fetchData = async (value: string) => {
+    try {
+      const response = await fetch("https://jsonplaceholder.typicode.com/users");
+      const json: UserData[] = await response.json();
+
+      const results = json.filter((user) => {
+        return (
+          value &&
+          user &&
+          user.name &&
+          user.name.toLowerCase().includes(value)
+        );
       });
+      // Assuming you have a state variable like setResults, you can update it here
+      setResults(results);
+    } catch (error) {
+      console.log("No apparent user:", error);
+    }
   };
 
   const handleChanges = (value: string) => {
     setInput(value);
     fetchData(value);
+    // console.log(results);
   }
 
   return (
