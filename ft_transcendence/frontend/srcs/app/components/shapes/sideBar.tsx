@@ -29,6 +29,9 @@ function SideBar({flag}: {flag: number}) {
 	function handleLogOutClick() {
 		socket.emit('offline', { token: localStorage.getItem('jwtToken') });
 		localStorage.removeItem('jwtToken');
+		const _user : User = user;
+		_user.login = undefined;
+		setUser(_user);
 		router.push('/');
 	}
   return (

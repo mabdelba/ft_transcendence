@@ -36,9 +36,13 @@ function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: 
   useEffect(()=> {
     if(props.slected == 0)
       setLinks(friendMenu);
-    else if(props.slected == 1 && props.iAm != '')
+    else if(props.slected == 1)
     {
-      setLinks([]);
+    
+      console.log('roomSelected: ', props.roomSelected);
+      console.log("channelType: ", props.channelType);
+      console.log("iAm: ", props.iAm);
+      // console.log("GroupMenu: ", GroupMenu);
       if(props.iAm == 'owner'){
         GroupMenu[1].label = 'Delete';
         GroupMenu[1].render = ()=> {return(<MdDelete size="20"/>)};
@@ -47,14 +51,10 @@ function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: 
         GroupMenu.splice(3 , 1);
       if(props.iAm != 'owner')
         GroupMenu.splice(0, 1);
-      // console.log('roomSelected: ', props.roomSelected);
-      // console.log("channelType: ", props.channelType);
-      // console.log("iAm: ", props.iAm);
-      // console.log("GroupMenu: ", GroupMenu);
       setLinks(GroupMenu);
     }
   
-  }, [props.iAm ,props.roomSelected])
+  }, [props.slected ,props.roomSelected, props.iAm])
 
   return (
     <div className="">
@@ -80,8 +80,8 @@ function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: 
             <div className="px-1  ">
               {
                 links &&
-                links.map((link: any) => (
-                  <Menu.Item>
+                links.map((link: any, index : number) => (
+                  <Menu.Item key={index}>
                   {({ active }) => (
                     <button
                       onClick={link.handleClick}

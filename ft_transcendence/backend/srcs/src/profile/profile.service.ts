@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { getAvatarFromLogin, getAvatarUrlFromLogin } from 'src/utils/get-avatar-from-login';
 import { getUserFromId, getUserFromLogin } from 'src/utils/get-user-from-id';
 
 @Injectable()
@@ -33,6 +34,8 @@ export class ProfileService {
       id: matchesPlayedByUser.id,
       me: me.login,
       other: other.login,
+      myAvatar: getAvatarUrlFromLogin(me.login, me.avatar),
+      otherAvatar: getAvatarUrlFromLogin(other.login, other.avatar),
       myScore:
         me.id == matchesPlayedByUser.player1Id
           ? matchesPlayedByUser.scoreOfPlayer1

@@ -52,6 +52,23 @@ function Friends() {
   const { data: requestListData, status } = useQuery('requestList', fetchRequestList);
   const { data: friendListData, status: status_ } = useQuery('friendList', fetchFriendList);
   const { data: blockedListData, status: status__ } = useQuery('blockedList', fetchBlockedList);
+
+  useEffect(()=> {
+    if(!user.login){
+
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+      const token = localStorage.getItem('jwtToken');
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      axios.get(apiUrl, config)
+      .then((response : any) => {
+        const _user = response.data;
+        setUser(_user);
+
+      })
+    }
+  })
   // const getImageByLogin = async (login: string): Promise<string | null> => {
   //   return new Promise<string | null>(async (resolve) => {
   //     if (login != '') {
@@ -306,7 +323,7 @@ function Friends() {
     setOpenBlock(false);
   };
   const [userId, setUserId] = useState<any>(null);
-  const [userAvatar, setUserAvatar] = useState<any>(null);
+  const [userAvatar, setUserAvatar] = useState(alien);
   const [userName, setUserName] = useState('');
   const [open, setOpen] = useState(false);
   const [openFriend, setOpenFriend] = useState(false);
@@ -383,18 +400,6 @@ function Friends() {
               />
             </div>
           </div>}
-          <ToastContainer
-            position="top-center"
-            autoClose={4000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-          />
         </main>
       </OptionBar>
       {/* request */}

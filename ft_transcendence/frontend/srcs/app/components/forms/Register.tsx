@@ -263,18 +263,6 @@ function Register(props: closeFunc) {
         </div>
         <div className="h-[10%] w-full ">
           <SimpleButton buttonType="submit" content="Register" />
-          <ToastContainer
-            position="top-center"
-            autoClose={4000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-          />
         </div>
         <div className="h-[10%] w-full flex flex-row justify-center space-x-2">
           <div className="w-1/2 h-full" onClick={handleFtClick}>

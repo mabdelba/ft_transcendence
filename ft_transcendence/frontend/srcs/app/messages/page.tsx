@@ -33,29 +33,29 @@ type ChatText = {
   text: string;
 };
 
-const getImageByLogin = async (login: string): Promise<string | null> => {
-  return new Promise<string | null>(async (resolve) => {
-    if (login != '') {
-      await axios
-        .post(
-          'http://localhost:3000/api/atari-pong/v1/user/avatar',
-          { userLogin: login },
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-            responseType: 'blob',
-          },
-        )
-        .then((response) => {
-          const imageBlob = URL.createObjectURL(response.data) as string;
-          if (imageBlob) resolve(imageBlob);
-          else resolve(alien);
-        })
-        .catch(() => {
-          // resolve(alien);
-        });
-    }
-  });
-};
+// const getImageByLogin = async (login: string): Promise<string | null> => {
+//   return new Promise<string | null>(async (resolve) => {
+//     if (login != '') {
+//       await axios
+//         .post(
+//           'http://localhost:3000/api/atari-pong/v1/user/avatar',
+//           { userLogin: login },
+//           {
+//             headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+//             responseType: 'blob',
+//           },
+//         )
+//         .then((response) => {
+//           const imageBlob = URL.createObjectURL(response.data) as string;
+//           if (imageBlob) resolve(imageBlob);
+//           else resolve(alien);
+//         })
+//         .catch(() => {
+//           // resolve(alien);
+//         });
+//     }
+//   });
+// };
 
 function Messages() {
   const [showSideBar, setShowSideBar] = useState(false);
@@ -85,14 +85,58 @@ function Messages() {
   const [iAm, setIam] = useState('');
   const [roomSelectedType, setRoomSelectedType] = useState(0);
 
+
+  useEffect(()=> {
+    if(!user.login){
+
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+      const token = localStorage.getItem('jwtToken');
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      axios.get(apiUrl, config)
+      .then((response : any) => {
+        const _user = response.data;
+        setUser(_user);
+
+      })
+    }
+  })
+
   const handleImage = (e: any) => {
     setFilename(e.target.files[0].name);
     setAvatarToUpload(e.target.files[0]);
   };
 
+
+  const handleChangeSettings = (e: any)=>{
+
+    e.preventDefault();
+    const apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/update-channel-password";
+    const token = localStorage.getItem('jwtToken');
+    const config ={
+      headers : {Authorization: `Bearer ${token}`}
+    };
+    axios.post(apiUrl, {channelName: roomSelected, password: description}, config)
+    .then(()=>{
+      const tempConv = user.groups;
+      const index = tempConv.findIndex((obj: any)=> obj.name == roomSelected)
+      if(index != -1){
+        if(roomSelectedType == 0 && description != '')
+          tempConv[index].type = 2;
+        else if(roomSelectedType == 2 && description == '')
+          tempConv[index].type = 0;
+        const _user :User =  user;
+        _user.groups = tempConv;
+        setUser(user);
+      }
+      setDescripion('');
+      toast.success('Changes saved successfully!');
+      setOpenSettingModal(false);
+    })
+  }
   useEffect(() => {
     if (selected == 1 && roomSelected != '') {
-      setIam('');
       setGroupMembers([]);
       const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/channel-members';
       axios
@@ -107,7 +151,6 @@ function Messages() {
         )
         .then(async (response: any) => {
           // console.log('for debug: ', response.data)
-          setIam(response.data.iAm);
           response.data.owner.state = 'owner';
 
           response.data.admins.forEach( async (obj: any) => {
@@ -146,7 +189,7 @@ function Messages() {
         .then((response: any) => {
           const tempGroup = [
             ...groups,
-            { name: groupName, ownerLogin: user.login, type: groupType },
+            { name: groupName, ownerLogin: user.login, type: groupType, iAm : 'owner' },
           ];
           setGroups(tempGroup);
           const _user: User = { ...user, groups: tempGroup };
@@ -194,7 +237,7 @@ function Messages() {
         senderLogin: user.login,
         receiverLogin: roomSelected,
         text: message,
-        senderAvatar: user.avatar,
+        senderAvatar: user.avatarUrl,
         state: user.state,
       });
       const _chatArea = [
@@ -245,6 +288,7 @@ function Messages() {
         }
         socket.emit('channels-with-conversation', { channelName: user.login || 'mabdelba' });
         socket.on('get-channels', (data: any) => {
+          // console.log("zidch: ", data);
           setGroups(data);
           _user.groups = data;
           setUser(_user);
@@ -272,6 +316,7 @@ function Messages() {
           } else _user.conversations = data;
           setUser(_user);
           // console.log("nchufo hadi", _user.conversations);
+          
           setConversations(_user.conversations);
         });
       } else setConversations(user.conversations);
@@ -412,14 +457,15 @@ function Messages() {
               <div className=" h-full  overflow-y-auto w-full ">
                 {showArray &&
                   showArray.map(
-                    (obj: any) =>
+                    (obj: any, index: number) =>
                       !obj.isBlocked && (
                         <button
                           onClick={() => {
                             setRoomSelected(selected == 0 ? obj.login : obj.name);
                             setRoomSelectedType(selected == 1 ? obj.type : 0)
+                            setIam(selected == 1 ? obj.whoIam : '');
                           }}
-                          key={selected == 0 ? obj.login : obj.channelName}
+                          key={obj.id || `${obj.login}${index}` || `${obj.name}${index}`}
                           className={`w-full h-14 ease-in-out 2xl:h-[68px]  truncate   text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 2xl:space-x-6 md:pl-5 2xl:pl-7 items-center transition-all duration-500 tracking-wide  ${
                             roomSelected == obj.login || roomSelected == obj.name
                               ? '   md:bg-[#EDEDED] border-[#36494e]  text-black  md:border-b-2   2xl:border-b-4   font-bold  underline-offset-8 '
@@ -496,8 +542,8 @@ function Messages() {
             <div className="  border-yellow-400 h-[60vh] w-full overflow-y-auto flex flex-col-reverse justify-end pb-4">
               <div className="h-auto  overflow-y-auto scroll-smooth" ref={messageEl}>
                 {chatArea &&
-                  chatArea.map((obj: ChatText) => (
-                    <div key={obj.id} className=" w-full h-auto">
+                  chatArea.map((obj: ChatText, index: number) => (
+                    <div key={obj.id } className=" w-full h-auto">
                       <MessageText sender={obj.sender} message={obj.text} selected={selected} />
                     </div>
                   ))}
@@ -575,7 +621,7 @@ function Messages() {
             <ul className="w-full">
               {groupMembers &&
                 groupMembers.map((member: any, index: number) => (
-                  <li key={index}>
+                  <li key={member.id  || `${member.login}${index}`}>
                     <div className="flex flex-row items-center my-[10px] justify-between">
                       <div className="flex flex-row">
                         <div className="NeonShadowBord h-[60px] w-[60px] flex items-center mr-[10px]">
@@ -596,7 +642,15 @@ function Messages() {
                           <p className="text-[12px] text-yellow-400">{member.state}</p>
                         </div>
                       </div>
-                      <div className="ml-[30px]">{((iAm == 'owner' && member.state != 'owner') || (iAm == 'admin' && member.state == 'member')) && <DropDown />}</div>
+                      <div className="ml-[30px]">{((iAm == 'owner' && member.state != 'owner') || (iAm == 'admin' && member.state == 'member')) && 
+                        <DropDown 
+                         iAm={iAm} 
+                         memberSelected={member.login}
+                         roomSelected={roomSelected} 
+                         members={groupMembers}
+                         setMembers={setGroupMembers}/>
+                         }
+                        </div>
                     </div>
                   </li>
                 ))}
@@ -618,9 +672,13 @@ function Messages() {
         </h1>
         <form className="h-[78%] flex flex-col  justify-between w-full p-2 sm:p-10 ">
           <div className="h-1/5 w-full z-10">
-            <textarea
+            <div className=' mb-2 lg:mb-4 font-Orbitron  truncate'>
+              Change Password :
+            </div>
+            <input
               onChange={(e) => setDescripion(e.target.value)}
-              placeholder="Group description"
+              placeholder={roomSelectedType == 1 ? 'Group is private' : 'Password'}
+              readOnly={roomSelectedType == 1 ? true : false}
               className="h-full min-h-[60px]
                sm:min-h-[70px] p-4 text-sm md:text-lg lg:text-xl font-Orbitron  text-white outline-none placeholder-[#484848] max-h-36 sm:max-h-44 z-10 w-full NeonShadowBord bg-[#272727]"
             />
@@ -635,7 +693,7 @@ function Messages() {
             </label>
           </div>
           <div className="h-1/5 z-0">
-            <SimpleButton content="Save" buttonType={'submit'} handleClick={() => {}} />
+            <SimpleButton content="Save" buttonType={'submit'} handleClick={handleChangeSettings} />
           </div>
         </form>
       </Popup>
@@ -656,7 +714,7 @@ function Messages() {
             <ul className="w-full">
               {friendList &&
                 friendList.map((member: any, index: number) => (
-                  <li key={index}>
+                  <li key={member.id || `${member.login}${index}`}>
                     <div className="flex flex-row items-center my-[10px] justify-between">
                       <div className="flex flex-row">
                         <div className="NeonShadowBord h-[60px] w-[60px] flex items-center mr-[10px]">
