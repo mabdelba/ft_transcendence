@@ -3,39 +3,31 @@ import React from 'react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { Disclosure } from "@headlessui/react";
-// import SearchInput from '../inputs/searchInput';
 import MenuButton from '../buttons/menuButton';
 import Logo from '../../../public/logo.svg';
 import SearchLogo from '../../../public/searchLogo.svg';
 
 interface UserData {
   id: number;
-  name: string;
-  // Add other properties as needed
+  username: string;
 }
 
-type setResults = React.Dispatch<React.SetStateAction<any>>;
+interface SearchBarProps {
+  setResults: React.Dispatch<React.SetStateAction<UserData[]>>;
+}
 
-function SearchBar (setResults: setResults)
+function SearchBar (prop : SearchBarProps)
 {
   const [input, setInput] = useState("");
-
-  // const fetchData = (value: string) => {
-  //   fetch("https://jsonplaceholder.typicode.com/users")
-  //     .then((response) => response.json())
-  //     .then((json) => {
-  //       const results = json.filter((user: any) => {
-  //         return (
-  //           value &&
-  //           user &&
-  //           user.name &&
-  //           user.name.toLowerCase().includes(value)
-  //         );
-  //       });
-  //       // setResults(results);
-  //     });
-  // };
-
+  const fetchUsers = async () => {
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+    const token = localStorage.getItem('jwtToken');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    const res = await fetch(apiUrl, config);
+    return res.json();
+  };
   const fetchData = async (value: string) => {
     try {
       const response = await fetch("https://jsonplaceholder.typicode.com/users");
@@ -45,12 +37,11 @@ function SearchBar (setResults: setResults)
         return (
           value &&
           user &&
-          user.name &&
-          user.name.toLowerCase().includes(value)
+          user.username &&
+          user.username.toLowerCase().includes(value)
         );
       });
-      // Assuming you have a state variable like setResults, you can update it here
-      setResults(results);
+      prop.setResults(results);
     } catch (error) {
       console.log("No apparent user:", error);
     }
@@ -59,15 +50,10 @@ function SearchBar (setResults: setResults)
   const handleChanges = (value: string) => {
     setInput(value);
     fetchData(value);
-    // console.log(results);
   }
 
   return (
     <Disclosure as='search' className="w-full h-full font-Orbitron ">
-      {/* <Disclosure.Button className="absolute top-4 right-4 inline-flex items-center peer justify-center rounded-md p-2 text-gray-800 hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white group">
-        Dashboard
-      </Disclosure.Button> */}
-
       <div className='flex h-full'>
         <div className='min-h-full w-full h-full'>
           <div className='flex h-[97%] w-full'>

@@ -13,7 +13,10 @@ import { context } from "../../../context/context";
 import Pdp from "../shapes/Pdp";
 import ResultElements from "../shapes/resultElements"
 
-
+interface UserData {
+  id: number;
+  username: string;
+}
 
 function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}){
 
@@ -42,7 +45,7 @@ function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}
     }, [])
     
     const [hoverBool, setHoverBool] = useState(false);
-    const [results, setResults] = useState([]);
+    const [results, setResults] = useState<UserData[]>([]);
     return(
         <main className='w-screen h-screen flex  min-h-[600px] min-w-[280px] overflow-y-hidden'>
           <div className={`h-full ${showSideBar ? '' : 'hidden'}  sm:block  w-20 xl:w-60  border-r-[3px] lineshad bg-opacity-10 bg-blue-500`}>
@@ -58,9 +61,17 @@ function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}
               <BurgButton setFlag={setShowSideBar} val={showSideBar} />
               {
                 !showSideBar &&
-                <SearchBar  />
+                <SearchBar setResults={setResults} />
               }
-              {/* {results && results.length > 0 && <ResultElements results={results} />} */}
+              {
+                results.length > 0
+                && console.log(results)
+              }
+              {/* {
+                results
+                && results.length > 0
+                && <ResultElements results={results} />
+              } */}
               <Link 
               onMouseEnter={() => {setHoverBool(true)}}
               onMouseLeave={() => {setHoverBool(false)}}
