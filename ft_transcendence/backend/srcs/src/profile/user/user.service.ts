@@ -2,11 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { get } from 'http';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { getAvatarUrlFromLogin } from 'src/utils/get-avatar-from-login';
 import { getUserFromLogin } from 'src/utils/get-user-from-id';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
+  async getAllUsers(user: User){
+    const test = await this.prisma.user.findMany({
+      select:{
+        login: true,
+      }
+    });
+    test['avatarUrl'] = getAvatarUrlFromLogin(user.login, user.avatar);
+    return test;
+  }
   async getMe(login: string) {
     return await this.prisma.user.findUnique({
       where: {
