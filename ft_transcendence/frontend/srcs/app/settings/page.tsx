@@ -45,6 +45,23 @@ function Settings() {
     
     var [Array, setArray] = useState<string[]>([]);
 
+
+    useEffect(()=> {
+        if(!user.login){
+    
+          const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+          const token = localStorage.getItem('jwtToken');
+          const config = {
+            headers: { Authorization: `Bearer ${token}` },
+          };
+          axios.get(apiUrl, config)
+          .then((response : any) => {
+            const _user = response.data;
+            setUser(_user);
+    
+          })
+        }
+      })
     const handleImage = (e: any) => {
 
         setFilename(e.target.files[0].name);
@@ -209,7 +226,7 @@ function Settings() {
                     <div className=" w-full  md:w-1/2 md:h-full h-auto  flex    flex-col ">
                         <div className="w-full h-auto  md:h-1/2  flex flex-col justify-center">
                             <div className="w-1/6 pl-2">
-                                <Pdp  color={false} flag={true} image={user.avatar} name={""} />
+                                <Pdp  color={false} flag={true} image={user.avatarUrl} name={""} />
                             </div>
                             <span className={`w-1/2 NeonShadow text-[5px] md:text-[12px]  flex font-light items-center ${selectFileError? '' : 'text-red-600 redShadow'} `}>({filename})</span>
                         </div>
@@ -231,18 +248,6 @@ function Settings() {
                 </div>
             </form>
         </main>
-        <ToastContainer
-            position="top-center"
-            autoClose={4000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-          />
     </OptionBar>
     )
 }

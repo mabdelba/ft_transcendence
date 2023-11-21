@@ -79,7 +79,7 @@ function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}
                 <span className="NeonShadow">{user.login}</span>
                 {
                   showPdp &&
-                    <Image width="50" height="50"  alt="image" src={user.avatar || alien}  className={`w-10 h-10 lineshad  ${!hoverBool ? 'border-[2px]' : 'border-lime-300 border-[4px]' }  rounded-full` }/>
+                    <Image width="50" height="50"  alt="image" src={user.avatarUrl || alien}  className={`w-10 h-10 lineshad  ${!hoverBool ? 'border-[2px]' : 'border-lime-300 border-[4px]' }  rounded-full` }/>
                 }
 
               </Link>

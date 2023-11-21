@@ -18,11 +18,13 @@ export class UserService {
     return test;
   }
   async getMe(login: string) {
-    return await this.prisma.user.findUnique({
+    const user =  await this.prisma.user.findUnique({
       where: {
         login,
       },
     });
+    user['avatarUrl'] = getAvatarUrlFromLogin(user.login, user.avatar);
+    return user;
   }
   async getRelation(user: User, userLogin: string) {
     if (user.login === userLogin) {

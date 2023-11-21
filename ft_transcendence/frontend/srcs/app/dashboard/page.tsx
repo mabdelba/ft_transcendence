@@ -28,36 +28,40 @@ const fetchDashboard = async () => {
 };
 
 function Dashboard() {
-  const { setUser: setUser__, user } = useContext(context);
+  const { setUser, user } = useContext(context);
   const router = useRouter();
   const { socket } = useContext(SocketContext);
+  const [profile, setProfile] = useState<any>({});
+  const [status, setStatus] = useState('loading');
 
-  const [myLogin, setMyLogin] = useState('');
+  // const [myLogin, setMyLogin] = useState('');
 
-  const { data, status } = useQuery('dashboard', fetchDashboard);
-
-  async function getProfile() {
-    if (data) {
-      const user_ = await axios.post(
-        'http://localhost:3000/api/atari-pong/v1/user/avatar',
-        { userLogin: data.login },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-          responseType: 'blob',
-        },
-      );
-      const imageBlob = URL.createObjectURL(user_.data) as string;
-      const user: User = data;
-      user.avatar = imageBlob;
-      if (!user.state) {
-        socket.emit('online', { token: localStorage.getItem('jwtToken') });
-        user.state = 1;
-      }
-      setUser__(user);
+  // const { data, status } = useQuery('dashboard', fetchDashboard);
+  
+  const  getProfile = () => {
+    
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+    const token = localStorage.getItem('jwtToken');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
     }
+    axios.get(apiUrl, config)
+    .then((response : any) => {
+    
+      const _user: User = response.data;
+      if (!_user.state) {
+        socket.emit('online', { token: localStorage.getItem('jwtToken') });
+        _user.state = 1;
+      }
+      setProfile(response.data);
+      setUser(_user);
+      setStatus('success');
+    })
+    .catch()
   }
 
   useEffect(() => {
+    // console.log('this is myLogin: ', user.login);
     const token = localStorage.getItem('jwtToken');
     if (!token) router.push('/');
     else {
@@ -67,23 +71,30 @@ function Dashboard() {
       if (exp < current_time) {
         localStorage.removeItem('jwtToken');
         router.push('/');
-      } else if (user.id === undefined) getProfile();
+      } 
+      else if (!user.login && socket)
+         getProfile();
+      else
+        {
+          setStatus('success');
+          setProfile(user);
+        }
     }
-  }, [status]);
+  }, [status, socket]);
 
   return (
     <OptionBar flag={0}>
-      {status == 'loading' && (
+      {(status == 'loading' || profile.login == undefined) && (
         <div className=" flex flex-col space-y-2 w-full h-[80%] items-center justify-center">
           <h1>Loading</h1>
           <div className="spinner"></div>
         </div>
       )}
       {
-		status == "success" &&
+		(status == "success" && profile.login != undefined) &&
 		<main className="h-auto w-auto md:w-full md:h-full font-Orbitron NeonShadow min-h-[480px] min-w-[280px] ">
         <div className="w-full h-[8%] pl-6 md:pl-12 font-semibold flex justify-start items-center NeonShadow text-base xl:text-3xl">
-          Hello {user.firstName}!
+          Hello {profile.firstName}!
         </div>
         <div className=" w-full md:h-[84%] h-auto flex flex-col md:flex-row justify-center items-center px-2 md:px-12 space-y-6 md:space-y-0 md:space-x-6 xl:space-x-12 ">
           <div className="md:h-full h-auto w-full md:w-[60%]  space-y-6 xl:space-y-12 flex flex-col -red-600">
@@ -92,8 +103,8 @@ function Dashboard() {
             </div>
             <div className="w-full md:h-[40%] h-40">
               <LastMatch
-                matchPlayed={user.numberOfGamesPlayed || 0}
-                login={user.login || ''}
+                matchPlayed={profile.numberOfGamesPlayed || 0}
+                login={profile.login || ''}
                 router={router}
               />
             </div>
@@ -103,7 +114,7 @@ function Dashboard() {
               <NewGame />
             </div>
             <div className="w-full md:h-[60%] h-auto">
-              <LatestAchiev login={user.login || ''} router={router} />
+              <LatestAchiev login={profile.login || ''} router={router} />
             </div>
           </div>
         </div>

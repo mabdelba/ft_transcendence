@@ -29,6 +29,23 @@ function UserProfil(props: newType) {
   const router = useRouter();
   const [numberofMatchPlayed, setNumberOfMatchPlayed] = useState(0);
 
+  useEffect(()=> {
+    if(!user.login){
+
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+      const token = localStorage.getItem('jwtToken');
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      axios.get(apiUrl, config)
+      .then((response : any) => {
+        const _user = response.data;
+        setUser(_user);
+
+      })
+    }
+  })
+
   // useEffect(() => {
   //   if (!user.state)
   //   {
@@ -123,18 +140,6 @@ function UserProfil(props: newType) {
           <div className="w-full h-[8%]"></div>
         </>
       )}
-      <ToastContainer
-        position="top-center"
-        autoClose={4000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
     </main>
      </OptionBar>
   );

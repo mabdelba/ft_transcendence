@@ -226,12 +226,12 @@ export class DmsService {
         state: user.state,
         avatar: user.avatar,
         isBlocked: blockedListLogins.includes(user.login),
-        avatarUrl: getAvatarUrlFromLogin(login, user.avatar),
+        avatarUrl: getAvatarUrlFromLogin(user.login, user.avatar),
       });
       console.log(login, 'join ', this.createRoomName(login, user.login));
       client.join(this.createRoomName(login, user.login));
     });
-    console.log('users with conversation == ', users );
+    // console.log('users with conversation == ', users );
     return users;
   }
 

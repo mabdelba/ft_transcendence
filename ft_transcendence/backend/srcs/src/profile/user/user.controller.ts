@@ -6,14 +6,16 @@ import { createReadStream } from 'fs';
 import { join } from 'path';
 import { Request, Response } from 'express';
 import { getUserFromLogin } from 'src/utils/get-user-from-id';
-import { getAvatarFromLogin } from 'src/utils/get-avatar-from-login';
+import { getAvatarFromLogin, getAvatarUrlFromLogin } from 'src/utils/get-avatar-from-login';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
   @UseGuards(JwtGuard)
   @Get('me-from-token')
   getMeFromToken(@Req() req: Request) {
-    return req.user as User;
+    const user = req.user as User;
+    user['avatarUrl'] = getAvatarUrlFromLogin(user.login, user.avatar);
+    return user;
   }
 
   @UseGuards(JwtGuard)

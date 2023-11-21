@@ -54,7 +54,7 @@ export class FriendService {
         return { ...friend, avatarUrl };
       })
       );
-      console.log("this is friendRequestsList", updatedFriendReqList);
+      // console.log("this is friendRequestsList", updatedFriendReqList);
     return { ...friendRequestsList, recievedFriendRequestsBy: updatedFriendReqList };
   }
 
