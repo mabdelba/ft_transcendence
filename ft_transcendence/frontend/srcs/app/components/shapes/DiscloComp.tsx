@@ -46,7 +46,8 @@ function DiscloComp(props: newType) {
                         <Pdp
                           name={divName.login}
                           myProfile={true}
-                          image={divName.avatar == `public/avatars/${divName.login}.jpg` ? alien : divName.avatar}
+                          // image={divName.avatar == `public/avatars/${divName.login}.jpg` ? alien : divName.avatar}
+                          image={divName.avatarUrl}
                           color={props.Color}
                           handleClick={() => {
                             props.setOpen(true);

@@ -49,7 +49,7 @@ function SimpleInput(props: InputProps) {
   };
 
   return (
-    <div onBlur={handleBlur} className="space-y-44 h-full w-full">
+    <div onBlur={handleBlur} className="space-y-44 h-full w-full min-h-[45px]">
       <div
         className={`w-full h-full  flex justify-center  items-center ${
           verror ? 'NBord' : 'NeonShadowBordRed'

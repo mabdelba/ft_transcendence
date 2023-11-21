@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { getAvatarUrlFromLogin } from 'src/utils/get-avatar-from-login';
 
 @Injectable()
 export class FriendService {
   constructor(private prisma: PrismaService) {}
+  
+
   async getFriendList(user: User) {
     const friendList = await this.prisma.user.findUnique({
       where: {
@@ -20,7 +23,14 @@ export class FriendService {
         },
       },
     });
-    return friendList;
+    const updatedFriendList = await Promise.all(
+      friendList.friends.map(async (friend) => {
+        const avatarUrl = getAvatarUrlFromLogin(friend.login, friend.avatar);
+        return { ...friend, avatarUrl };
+      })
+    );
+  
+    return { ...friendList, friends: updatedFriendList };
   }
 
   async getFriendRequestsList(user: User) {
@@ -38,7 +48,14 @@ export class FriendService {
         },
       },
     });
-    return friendRequestsList;
+    const updatedFriendReqList = await Promise.all(
+      friendRequestsList.recievedFriendRequestsBy.map(async (friend) => {
+        const avatarUrl = getAvatarUrlFromLogin(friend.login, friend.avatar);
+        return { ...friend, avatarUrl };
+      })
+      );
+      console.log("this is friendRequestsList", updatedFriendReqList);
+    return { ...friendRequestsList, recievedFriendRequestsBy: updatedFriendReqList };
   }
 
   async getBlockedUserList(user: User) {
@@ -56,7 +73,14 @@ export class FriendService {
         },
       },
     });
-    return blockedUserList;
+    const updatedFriendBlockedList = await Promise.all(
+      blockedUserList.blockedList.map(async (friend) => {
+        const avatarUrl = getAvatarUrlFromLogin(friend.login, friend.avatar);
+        return { ...friend, avatarUrl };
+      })
+    );
+    return { ...blockedUserList, blockedList: updatedFriendBlockedList };
+
   }
 
   async sendFriendRequest(user: User, recieverId: number) {

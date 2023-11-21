@@ -6,14 +6,15 @@ type Props ={
 
     sender: string;
     message: string;
+    selected : number;
 
 }
 
 function MessageText(props: Props){
 
     const {user} = useContext(context);
-    return (<div className={`h-full w-full py-1 px-5   xl:py-2 xl:px-10 flex ${props.sender == user.login ? 'justify-end border-[#1EBBFF] md:pl-5 pl-10 ' : 'justify-start border-[#FF0742] md:pr-5 pr-10'}`}>
-
+    return (<div className={`h-full w-full py-1 px-5   xl:py-2 xl:px-10 flex flex-col space-y-1 ${props.sender == user.login ? 'items-end border-[#1EBBFF] md:pl-5 pl-10 ' : 'items-start border-[#FF0742] md:pr-5 pr-10'}`}>
+        {props.selected == 1 && props.sender != user.login && <div className=" text-[8px] sm:text-xs md:text-sm xl:text-lg">{props.sender}</div>}
         <span className={`border-[2px] break-all lg:border-[3px] max-w-[28vh] sm:max-w-[50vh] lg:max-w-[67vh] ${props.sender ==user.login ? 'blueShadowBord rounded-bl-2xl' : 'rShadowBord rounded-br-2xl '}  border-inherit text-[8px] sm:text-xs md:text-sm xl:text-lg p-2  sm:p-4 `}>
            {props.message}
         </span>

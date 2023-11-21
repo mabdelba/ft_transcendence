@@ -5,17 +5,19 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Namespace, Server, Socket } from 'socket.io';
 import { JwtGuard } from 'src/auth/guards';
 import { PrismaService } from 'src/prisma/prisma.service';
 import jwtDecode from 'jwt-decode';
 import { DmsGateway } from 'src/chat/dms/dms.gateway';
-
+import { ChannelsGateway } from 'src/channels/channels.gateway';
 
 @WebSocketGateway()
 export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private prisma: PrismaService, private dmsGateway: DmsGateway) {}
+  constructor(private prisma: PrismaService, private dmsGateway: DmsGateway, private channelsGateway: ChannelsGateway) {}
   @WebSocketServer()
   io: Server;
   users = new Map();
@@ -25,26 +27,26 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.users.set(client.id, null);
   }
 
-  async handleDisconnect(client: any) { 
+  async handleDisconnect(client: any) {
     if (this.users.has(client.id) && this.users.get(client.id) != null) {
-      console.log("offline----", this.users.get(client.id));
+      console.log('offline----', this.users.get(client.id));
       await this.prisma.user.update({
-      where: {
-        login: this.users.get(client.id),
-      },
-      data: {
-        state: 0,
-      },
-    });
-    this.users.delete(client.id);
+        where: {
+          login: this.users.get(client.id),
+        },
+        data: {
+          state: 0,
+        },
+      });
+      this.users.delete(client.id);
     }
-  } 
+  }
 
   @SubscribeMessage('online')
-  async setOnline(client: Socket, message: {token: string}) {
+  async setOnline(client: Socket, message: { token: string }) {
     const jwtToken = message.token;
     const decoded = jwtDecode(jwtToken);
-    console.log("online----", decoded['login']);
+    console.log('online----', decoded['login']);
     this.users.set(client.id, decoded['login']);
     await this.prisma.user.update({
       where: {
@@ -52,14 +54,14 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
       },
       data: {
         state: 1,
-      }
-    });   
+      },
+    });
   }
-  @SubscribeMessage('offline')  
-  async setOffline(client: Socket, message: {token: string}) {
+  @SubscribeMessage('offline')
+  async setOffline(client: Socket, message: { token: string }) {
     const jwtToken = message.token;
     const decoded = jwtDecode(jwtToken);
-    console.log("offline----", decoded['login']);
+    console.log('offline----', decoded['login']);
     this.users.delete(client.id);
     await this.prisma.user.update({
       where: {
@@ -67,27 +69,68 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
       },
       data: {
         state: 0,
-      }
-    }); 
+      },
+    });
   }
-
 
   /** 
        events for direct messages namespace
   **/
   @SubscribeMessage('users-with-conversation')
-  getUsersWithConversation(client: Socket, data: {me: string, login: string}){
+  getUsersWithConversation(client: Socket, data: { me: string; login: string }) {
     this.dmsGateway.getUsersWithConversation(data, client);
+  }
+  @SubscribeMessage('channels-with-conversation')
+  async getChannelsWithConversation(
+    @MessageBody() data: { channelName: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.channelsGateway.getChannelsWithConversation(data, client);
   }
 
   @SubscribeMessage('get-messages')
-  getMessages(client: Socket, data: {isChannel: boolean, senderLogin: string, receiverLogin: string}){
+  getMessages(
+    client: Socket,
+    data: { isChannel: boolean; senderLogin: string; receiverLogin: string },
+  ) {
     this.dmsGateway.handleGetMessages(data, client);
   }
 
   @SubscribeMessage('send-message')
-  sendMessage(client: Socket, data: {isChannel: boolean, senderLogin: string, receiverLogin: string, text: string}){
-    this.dmsGateway.handleMessage(data, client);
+  sendMessage(
+    client: Socket,
+    data: { isChannel: boolean; senderLogin: string; receiverLogin: string; text: string },
+  ) {
+    this.dmsGateway.handleMessage(data, client, this.users, this.io);
+  }
+  
+  @SubscribeMessage('remove-user-from-channel')
+  removeUserFromChannel(client: Socket, data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.removeUserFromChannel(client, data);
+  }
+
+  @SubscribeMessage('mute-user-in-channel')
+  muteUserInChannel(client: Socket, data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.muteUserInChannel(client, data);
+  }
+
+  @SubscribeMessage('ban-user-in-channel')
+  banUserInChannel(client: Socket, data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.banUserInChannel(client, data);
+  }
+
+  @SubscribeMessage('unban-user-in-channel')
+  unbanUserInChannel(client: Socket, data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.unbanUserInChannel(client, data);
+  }
+
+  @SubscribeMessage('remove-admin-from-channel')
+  removeAdminFromChannel(client: Socket, data: { channelName: string; myLogin: string; otherLogin: string }) {
+    this.channelsGateway.removeAdminFromChannel(client, data);
+  }
+
+  @SubscribeMessage('remove-channel')
+  removeChannel(client: Socket, data: { channelName: string; user: string }) {
+    this.channelsGateway.removeChannel(client, data);
   }
 }
- 

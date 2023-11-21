@@ -94,7 +94,7 @@ export class AuthController {
 
   // @UseGuards(JwtGuard)
   @Post('regenerate-token')
-  async regenerateToken(@Body() dto: {id, login}) {
+  async regenerateToken(@Body() dto: { id; login }) {
     return await this.authService.getToken(dto.id, dto.login);
   }
 }

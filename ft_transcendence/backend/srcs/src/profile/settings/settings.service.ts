@@ -15,22 +15,22 @@ export class SettingsService {
         data: { login: login },
       });
       const newFileName = `${login}.jpg`; // New filename
-    const newPath = 'public/avatars/' + newFileName;
+      const newPath = 'public/avatars/' + newFileName;
 
-    // Rename the file (if needed)a
-    if (fs.existsSync(imagePath)) {
-      // Rename the file
-      fs.rename(imagePath, newPath, (error) => {
-        if (error) {
-          console.error('File rename error:', error);
-          throw new Error('File rename failed'); // Handle the error appropriately
-        } else {
-          console.log('File renamed successfully!');
-        }
-      });
-    } else {
-      console.error('Original image file not found');
-    }
+      // Rename the file (if needed)a
+      if (fs.existsSync(imagePath)) {
+        // Rename the file
+        fs.rename(imagePath, newPath, (error) => {
+          if (error) {
+            console.error('File rename error:', error);
+            throw new Error('File rename failed'); // Handle the error appropriately
+          } else {
+            console.log('File renamed successfully!');
+          }
+        });
+      } else {
+        console.error('Original image file not found');
+      }
     } catch (e) {
       throw new ForbiddenException('Login already exists');
     }
