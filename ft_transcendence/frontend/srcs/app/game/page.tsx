@@ -46,7 +46,7 @@ useEffect(() => {
 
         if (!user.socket) {
             game?.destroy();
-            router.push('/queue');
+            router.push('/dashboard');
         }
 
          user.socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
@@ -96,7 +96,7 @@ useEffect(() => {
     const handleLeave = () => {;
         gameSocket?.emit('endGame')
         game?.destroy();
-        router.push('/queue');
+        router.push('/dashboard');
     }
 
    useEffect(() => {
@@ -174,7 +174,7 @@ useEffect(() => {
                       : null}
             </div>
             <div className='flex justify-center h-1/2 w-full font-Orbitron items-start'>
-            <button onClick={()=> { game?.destroy(); router.push('/queue');}}  type="button" className="NeonShadowBord flex flex-row items-center h-fit px-4 py-3 hover:bg-white hover:text-[black] outline-none transition-[300]">
+            <button onClick={()=> { game?.destroy(); router.push('/dashboard');}}  type="button" className="NeonShadowBord flex flex-row items-center h-fit px-4 py-3 hover:bg-white hover:text-[black] outline-none transition-[300]">
                     <BiLogOut size={40} />
                     <div className="pl-2 text-[30px]">Leave</div>
             </button>

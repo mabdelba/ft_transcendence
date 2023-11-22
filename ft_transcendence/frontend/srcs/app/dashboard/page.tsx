@@ -4,7 +4,7 @@ import LastMatch from '../components/forms/LastMatch';
 import NewGame from '../components/forms/NewGame';
 import LatestAchiev from '../components/forms/LatestAchiev';
 import alien from '../../public/alien.svg';
-import { useContext, useEffect, useState } from 'react';
+import { use, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
 import { useRouter } from 'next/navigation';
@@ -16,6 +16,7 @@ import { context, SocketContext } from '../../context/context';
 import { User } from '../../context/context';
 import { useQuery } from 'react-query';
 import { log } from 'console';
+import InviteToast from '../components/shapes/invitetoast';
 
 const fetchDashboard = async () => {
   const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
@@ -49,9 +50,21 @@ function Dashboard() {
       const imageBlob = URL.createObjectURL(user_.data) as string;
       const user: User = data;
       user.avatar = imageBlob;
-      if (!user.state) {
-        socket.emit('online', { token: localStorage.getItem('jwtToken') });
+      console.log('user state ======== ', user.state)
+      if (user.state === 0 && socket) {
+        socket.emit('online', { token: localStorage.getItem('jwtToken'), test: 'dashboard' });
         user.state = 1;
+        socket.on('inviteToGame', () => {
+          console.log('inviteToGame');
+          toast(<InviteToast/>,{
+            position: "top-center",
+            autoClose: false,
+            hideProgressBar: false,
+            closeOnClick: true,
+            draggable: true,
+            theme: 'dark',
+          });
+        });
       }
       setUser__(user);
     }
@@ -70,6 +83,7 @@ function Dashboard() {
       } else if (user.id === undefined) getProfile();
     }
   }, [status]);
+
 
   return (
     <OptionBar flag={0}>

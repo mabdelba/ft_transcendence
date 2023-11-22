@@ -7,7 +7,7 @@ import { Fragment, useContext, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import Logout from '../../public/log-out.svg';
 import Loader from '../components/shapes/loader';
-import { User, context } from '../../context/context';
+import { User, context, SocketContext } from '../../context/context';
 import { Socket, io } from 'socket.io-client';
 import { useRouter } from 'next/navigation';
 import { set } from 'husky';
@@ -16,6 +16,7 @@ import { StoreID } from 'recoil';
 function Queue() {
     const [isOpen, setIsOpen] = useState(false);
     const {user, setUser} = useContext(context);
+    const { socket } = useContext(SocketContext);
     const router = useRouter();
     // const [map, setMap] = useState('');
 
@@ -25,7 +26,10 @@ function Queue() {
       _user.map = mode;
       setUser(_user);
       setIsOpen(true);
-          user.socket?.emit('NewGame', {map: user.map});
+          user.socket?.emit('NewGame', {map: user.map, type: user.gameType, opponent: 'adam'});
+          if (user.login !== 'adam'){
+            socket?.emit('notification', {login: 'adam'});
+          }
           user.socket?.on('ready', ()=>{
           router.push('/game');
         })
@@ -63,10 +67,19 @@ function Queue() {
           console.log('already connected');
           router.push('/dashboard');
       })
+      console.log(user.socket.id)
     }
     }, [user.socket]);
-
-
+  
+    useEffect(()=> {
+      if (!user.state && socket) {
+        socket.emit('online', { token: localStorage.getItem('jwtToken') });
+        const _user: User = user;
+        _user.state = 1;
+        setUser(_user);
+      }
+          
+    }, [user, socket])
     return (
       <>
         <div className='flex flex-col items-center h-screen justify-center'>

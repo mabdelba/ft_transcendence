@@ -13,6 +13,7 @@ import jwtDecode from 'jwt-decode';
 import { DmsGateway } from 'src/chat/dms/dms.gateway';
 
 
+
 @WebSocketGateway()
 export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private prisma: PrismaService, private dmsGateway: DmsGateway) {}
@@ -21,13 +22,13 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   users = new Map();
   @UseGuards(JwtGuard)
   handleConnection(client: Socket) {
-    // console.log('connected state  ', client.id);
-    this.users.set(client.id, null);
+    console.log('connected state  ', client.id);
+   this.users.set(client.id, null);
   }
-
+ 
   async handleDisconnect(client: any) { 
     if (this.users.has(client.id) && this.users.get(client.id) != null) {
-      // console.log("offline----", this.users.get(client.id));
+      console.log("offline----", this.users.get(client.id), " client id ", client.id);
       await this.prisma.user.update({
       where: {
         login: this.users.get(client.id),
@@ -37,30 +38,30 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
       },
     });
     this.users.delete(client.id);
-    }
+    } 
     // console.log("offline handler");
   }
 
   @SubscribeMessage('online')
-  async setOnline(client: Socket, message: {token: string}) {
+  async setOnline(client: Socket, message: {token: string, test: string}) {
     const jwtToken = message.token;
     const decoded = jwtDecode(jwtToken);
-    // console.log("online----", decoded['login']);
+    console.log("online----", decoded['login'], " client id ", client.id, "mnin jay ", message.test); 
     this.users.set(client.id, decoded['login']);
     await this.prisma.user.update({
       where: {
         login: decoded['login'],
       },
-      data: {
+      data: { 
         state: 1,
-      }
+      } 
     });   
-  } 
+  }  
   @SubscribeMessage('offline')  
   async setOffline(client: Socket, message: {token: string}) {
     const jwtToken = message.token;
     const decoded = jwtDecode(jwtToken); 
-    // console.log("offline----", decoded['login']);
+    console.log("offline----", decoded['login']); 
     this.users.delete(client.id);
     await this.prisma.user.update({
       where: {
@@ -72,6 +73,16 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
+ 
+  @SubscribeMessage('notification')
+  sendNotification(client: Socket, message: {login: string}) {
+    const key = [...this.users].find(([key, value]) => value === message.login)?.[0];
+  
+    if (key != null) {
+      console.log("sendnotification---- ", this.users.get(key));
+      this.io.to(key).emit('inviteToGame', {idsocket: client.id, key: key});
+    }
+  } 
 
   /** 
        events for direct messages namespace
@@ -79,7 +90,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('users-with-conversation')
   getUsersWithConversation(client: Socket, data: {me: string, login: string}){
     this.dmsGateway.getUsersWithConversation(data, client);
-  }
+  } 
 
   @SubscribeMessage('get-messages')
   getMessages(client: Socket, data: {isChannel: boolean, senderLogin: string, receiverLogin: string}){
@@ -91,4 +102,4 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.dmsGateway.handleMessage(data, client, this.users, this.io);
   }
 }
- 
+  

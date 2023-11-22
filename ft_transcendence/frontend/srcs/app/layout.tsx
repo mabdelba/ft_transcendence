@@ -9,6 +9,8 @@ import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
 import Logo from "../public/logo.svg"
 import { Provider } from 'react-redux';
 import { store } from '../redux_tool';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const inter = Inter({ subsets: ['latin'] });
@@ -34,6 +36,18 @@ export default function rootLayout({ children }: { children: React.ReactNode }) 
         <Context>
           <QueryClientProvider client={new QueryClient} >
             {children}
+            <ToastContainer
+              position="top-center"
+              autoClose={4000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="dark"
+            />
           </QueryClientProvider>
         </Context>
         </Provider>

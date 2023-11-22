@@ -66,7 +66,7 @@ function Login(props: closeFunc) {
         });
         const jwtToken = response.data.token;
         localStorage.setItem('jwtToken', jwtToken);
-        socket.emit('online', {token: jwtToken});
+        socket.emit('online', {token: jwtToken, test: 'login ooo'});
         props.rout.push('/dashboard');
       })
       .catch((error) => {

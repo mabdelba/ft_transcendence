@@ -32,6 +32,7 @@ class GameModel{
         this._createPlayers();
         this._setEvents();
     }
+    
     setForce(x: number, y: number): void{
         this.xForce = x;
         this.yForce = y;

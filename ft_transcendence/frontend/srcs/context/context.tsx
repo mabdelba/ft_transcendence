@@ -36,7 +36,7 @@ export interface User{
     conversations?: any;
     socket?: any;
     map?: string;
-
+    gameType?: string | null;
 }
 
 export const context = createContext<{user: User; setUser: Function}>({user: {conversations: []}, setUser: ()=>{}});
