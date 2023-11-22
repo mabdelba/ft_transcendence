@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ChannelsService } from './channels.service';
 import { JwtGuard } from 'src/auth/guards';
 import { User } from '@prisma/client';
@@ -43,4 +43,9 @@ export class ChannelsController {
     updateChannelPassword(@Req() req, @Body() dto: { channelName: string; password: string }) {
       return this.channelsService.updateChannelPassword((req.user as User).login, dto);
     }
+  @UseGuards(JwtGuard)
+  @Get('list-all-channels')
+  listPublicProtectedChannels(@Req() req) {
+    return this.channelsService.listPublicProtectedChannels((req.user as User).login);
+  }
 }

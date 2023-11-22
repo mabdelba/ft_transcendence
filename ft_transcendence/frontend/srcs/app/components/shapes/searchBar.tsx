@@ -6,10 +6,14 @@ import { Disclosure } from "@headlessui/react";
 import MenuButton from '../buttons/menuButton';
 import Logo from '../../../public/logo.svg';
 import SearchLogo from '../../../public/searchLogo.svg';
+import { type } from 'os';
 
 interface UserData {
+  name: string;
+  type: number;
+  isMember: boolean;
   id: number;
-  username: string;
+  login: string;
 }
 
 interface SearchBarProps {
@@ -20,7 +24,7 @@ function SearchBar (prop : SearchBarProps)
 {
   const [input, setInput] = useState("");
   const fetchUsers = async () => {
-    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/all-users';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },
@@ -28,20 +32,37 @@ function SearchBar (prop : SearchBarProps)
     const res = await fetch(apiUrl, config);
     return res.json();
   };
+
+  const fetchChannels = async () => {
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/list-all-channels';
+    const token = localStorage.getItem('jwtToken');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    const res = await fetch(apiUrl, config);
+    return res.json();
+  };
+
   const fetchData = async (value: string) => {
     try {
-      const response = await fetch("https://jsonplaceholder.typicode.com/users");
-      const json: UserData[] = await response.json();
-
-      const results = json.filter((user) => {
+      value = value.toLowerCase();
+      const [users, channels] = await Promise.all([fetchUsers(), fetchChannels()]);
+      const usersResults = users.filter((user: any) => {
         return (
           value &&
           user &&
-          user.username &&
-          user.username.toLowerCase().includes(value)
+          user.login &&
+          user.login.toLowerCase().startsWith(value)
         );
       });
-      prop.setResults(results);
+      const channelsResults = channels.filter((channel: any) => {
+        return (
+          value &&
+          channel &&
+          channel.name.toLowerCase().startsWith(value)
+        );
+      });
+      prop.setResults(usersResults.concat(channelsResults));
     } catch (error) {
       console.log("No apparent user:", error);
     }

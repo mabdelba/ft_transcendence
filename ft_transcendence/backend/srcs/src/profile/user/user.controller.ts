@@ -22,7 +22,7 @@ export class UserController {
   @Post('me')
   getMe(@Body() dto: { userLogin: string }) {
     return this.userService.getMe(dto.userLogin);
-  }
+  } 
 
   @UseGuards(JwtGuard)
   @Post('check-relation')

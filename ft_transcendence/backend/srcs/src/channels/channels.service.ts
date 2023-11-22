@@ -55,6 +55,14 @@ export class ChannelsService {
             type: 0
           }
         })
+        await this.prismaservice.channel.update({
+          where: {
+            name: dto.channelName,
+          },
+          data: {
+            password: null,
+          },
+      });
       }
     } else throw new ForbiddenException('You are not owner of this channel');
   }
@@ -486,7 +494,7 @@ export class ChannelsService {
     };
   }
 
-  async listPublicProtectedChannels() {
+  async listPublicProtectedChannels(login: string) {
     const channels = await this.prismaservice.channel.findMany({
       where: {
         OR: [
@@ -498,6 +506,17 @@ export class ChannelsService {
           },
         ],
       },
+      select: {
+        name: true,
+        type: true,
+      },
+    });
+    channels.forEach((channel) => {
+      const isMember = this.checkIfMember(channel.name, login);
+      const isOwner = this.checkIfOwner({ channelName: channel.name, user: login });
+      const isAdmin = this.checkIfAdmin({ channelName: channel.name, user: login });
+      if (isMember || isOwner || isAdmin) channel['isMember'] = true;
+      else channel['isMember'] = false;
     });
     return channels;
   }
