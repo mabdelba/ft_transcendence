@@ -17,7 +17,8 @@ interface UserData {
 }
 
 interface SearchBarProps {
-  setResults: React.Dispatch<React.SetStateAction<UserData[]>>;
+  setUsersResults: React.Dispatch<React.SetStateAction<UserData[]>>;
+  setChannelsResults: React.Dispatch<React.SetStateAction<UserData[]>>;
 }
 
 function SearchBar (prop : SearchBarProps)
@@ -62,7 +63,8 @@ function SearchBar (prop : SearchBarProps)
           channel.name.toLowerCase().startsWith(value)
         );
       });
-      prop.setResults(usersResults.concat(channelsResults));
+      prop.setUsersResults(usersResults);
+      prop.setChannelsResults(channelsResults);
     } catch (error) {
       console.log("No apparent user:", error);
     }

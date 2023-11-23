@@ -178,6 +178,7 @@ export class ChannelsService {
     const channelType = await this.checkTypeOfChannel(dto);
     const checkIfAdmin = await this.checkIfAdmin({ channelName: dto.channelName, user: login });
     const checkIfOwner = await this.checkIfOwner({ channelName: dto.channelName, user: login });
+    console.log('channel type === ', channelType)
     if (channelType == 2) {
       if (!(checkIfAdmin || checkIfOwner)) {
         throw new ForbiddenException('You are not admin or owner of this channel');
@@ -511,13 +512,15 @@ export class ChannelsService {
         type: true,
       },
     });
-    channels.forEach((channel) => {
-      const isMember = this.checkIfMember(channel.name, login);
-      const isOwner = this.checkIfOwner({ channelName: channel.name, user: login });
-      const isAdmin = this.checkIfAdmin({ channelName: channel.name, user: login });
-      if (isMember || isOwner || isAdmin) channel['isMember'] = true;
-      else channel['isMember'] = false;
-    });
+    await Promise.all(
+      channels.map(async (channel) => {
+        const isMember = await this.checkIfMember(channel.name, login);
+        const isOwner = await this.checkIfOwner({ channelName: channel.name, user: login });
+        const isAdmin = await this.checkIfAdmin({ channelName: channel.name, user: login });
+        if (isMember || isOwner || isAdmin) channel['isMember'] = true;
+        else channel['isMember'] = false;
+      }),
+    );
     return channels;
   }
   async channelsWithConversation(client: any, login: string) {

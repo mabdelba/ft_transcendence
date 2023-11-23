@@ -46,9 +46,10 @@ function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}
         window.removeEventListener('resize', handleResize);
       }
     }, [])
-    
+
     const [hoverBool, setHoverBool] = useState(false);
-    const [results, setResults] = useState<UserData[]>([]);
+    const [usersResults, setUsersResults] = useState<UserData[]>([]);
+    const [channelsResults, setChannelsResults] = useState<UserData[]>([]);
 
     return(
         <main className='w-screen h-screen flex  min-h-[600px] min-w-[280px] overflow-y-hidden'>
@@ -65,7 +66,7 @@ function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}
               <BurgButton setFlag={setShowSideBar} val={showSideBar} />
               {
                 !showSideBar &&
-                <SearchBar setResults={setResults} />
+                <SearchBar setUsersResults={setUsersResults}  setChannelsResults={setChannelsResults} />
               }
               <Link 
               onMouseEnter={() => {setHoverBool(true)}}
@@ -79,13 +80,11 @@ function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}
 
               </Link>
             </div>
-            <div className="">
-              {
-                results
-                && results.length > 0
-                && <ResultElements players={results} />
-              }
-            </div>
+            {
+              ((usersResults && usersResults.length > 0)
+              || ( channelsResults && channelsResults.length > 0 && !channelsResults.every((channel) => channel.isMember === true)))
+              && <ResultElements users={usersResults} channels={channelsResults} />
+            }
             <div className="h-[94%] w-full overflow-auto">
               {children}
             </div>
