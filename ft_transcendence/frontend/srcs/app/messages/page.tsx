@@ -33,30 +33,6 @@ type ChatText = {
   text: string;
 };
 
-// const getImageByLogin = async (login: string): Promise<string | null> => {
-//   return new Promise<string | null>(async (resolve) => {
-//     if (login != '') {
-//       await axios
-//         .post(
-//           'http://localhost:3000/api/atari-pong/v1/user/avatar',
-//           { userLogin: login },
-//           {
-//             headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-//             responseType: 'blob',
-//           },
-//         )
-//         .then((response) => {
-//           const imageBlob = URL.createObjectURL(response.data) as string;
-//           if (imageBlob) resolve(imageBlob);
-//           else resolve(alien);
-//         })
-//         .catch(() => {
-//           // resolve(alien);
-//         });
-//     }
-//   });
-// };
-
 function Messages() {
   const [showSideBar, setShowSideBar] = useState(false);
   const [selected, setSelected] = useState(0);
@@ -84,10 +60,11 @@ function Messages() {
   const [groupMembers, setGroupMembers] = useState<any>([]);
   const [iAm, setIam] = useState('');
   const [roomSelectedType, setRoomSelectedType] = useState(0);
+  const [isMuted, setIsMuted] = useState(false)
 
 
   useEffect(()=> {
-    if(!user.login){
+    if(!user.login && socket){
 
       const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
       const token = localStorage.getItem('jwtToken');
@@ -97,17 +74,22 @@ function Messages() {
       axios.get(apiUrl, config)
       .then((response : any) => {
         const _user = response.data;
+        if ( _user.state == 0) {
+          console.log('hello hello hello');
+          socket.emit('online', { token: localStorage.getItem('jwtToken') });
+          _user.state = 1;
+        }
         setUser(_user);
 
       })
     }
-  })
+  }, [socket])
 
   const handleImage = (e: any) => {
     setFilename(e.target.files[0].name);
     setAvatarToUpload(e.target.files[0]);
   };
-
+ 
 
   const handleChangeSettings = (e: any)=>{
 
@@ -189,7 +171,7 @@ function Messages() {
         .then((response: any) => {
           const tempGroup = [
             ...groups,
-            { name: groupName, ownerLogin: user.login, type: groupType, iAm : 'owner' },
+            { name: groupName, ownerLogin: user.login, type: groupType, whoIam : 'owner' },
           ];
           setGroups(tempGroup);
           const _user: User = { ...user, groups: tempGroup };
@@ -231,7 +213,7 @@ function Messages() {
   const handleSend = (e: any) => {
     e.preventDefault();
     // alert(`message to ${roomSelected} : ${message}`);
-    if (message != '') {
+    if (message != '' && roomSelected != '') {
       socket.emit('send-message', {
         isChannel: selected == 1 ? true : false,
         senderLogin: user.login,
@@ -277,16 +259,34 @@ function Messages() {
     }
   };
 
+  // useEffect(()=>{
+
+  //   if(socket && user.login && groups && roomSelected != ''){
+  //     socket.on('user-removed-from-channel', (data: any) => {
+  //       if(data.login == user.login)
+  //       {
+  //         console.log(groups);
+  //         const index = groups.findIndex((obj:any) => obj.name == data.channelName);
+  //         console.log('index: ', index);
+  //         if(index != -1)
+  //         {
+  //           if(selected ==1)
+  //             setShowArray([])
+  //           const _user : User = user;
+  //           _user.groups = undefined;
+  //           setUser(_user);
+  //           toast.warning(`You have been kicked from ${data.channelName}`)
+  //         }
+  //       }
+  //     })
+  //   }
+  // }, [socket, user.login, groups, roomSelected])
+
   const channelsWithConversation = async () => {
     if (socket) {
-      if (!user.groups) {
+      if (user.groups == undefined) {
         const _user: User = user;
-        if (!user.state) {
-          socket.emit('online', { token: localStorage.getItem('jwtToken') });
-          _user.state = 1;
-          setUser(_user);
-        }
-        socket.emit('channels-with-conversation', { channelName: user.login || 'mabdelba' });
+        socket.emit('channels-with-conversation', { channelName: user.login  });
         socket.on('get-channels', (data: any) => {
           // console.log("zidch: ", data);
           setGroups(data);
@@ -294,37 +294,93 @@ function Messages() {
           setUser(_user);
         });
       } else setGroups(user.groups);
+      socket.on('user-removed-from-channel', (data: any) => {
+        if(data.login == user.login)
+        {
+          // console.log(groups);
+          const index = groups.findIndex((obj:any) => obj.name == data.channelName);
+          // console.log('index: ', index);
+          if(index != -1)
+          {
+            if(selected ==1)
+              setShowArray([])
+            const _user : User = user;
+            _user.groups = undefined;
+            setUser(_user);
+            // toast.warning(`You have been kicked from ${data.channelName}`)
+          }
+        }
+      })
+      socket.on('user-banned-from-channel', (data: any) => {
+        if(data.login == user.login)
+        {
+          // console.log(groups);
+          const index = groups.findIndex((obj:any) => obj.name == data.channelName);
+          // console.log('index: ', index);
+          if(index != -1)
+          {
+            if(selected ==1)
+              setShowArray([])
+            const _user : User = user;
+            _user.groups = undefined;
+            setUser(_user);
+            // toast.warning(`You have been banned from ${data.channelName}`)
+          }
+        }
+      })
+      socket.on('user-muted-in-channel', (data:any)=>{
+        if(data.login == user.login){
+
+          const index = groups.findIndex((obj: any) => obj.name == data.channelName)
+          if(index != -1){
+            if(selected ==1)
+              setShowArray([])
+            const _user = user;
+            _user.groups = undefined;
+            setUser(_user)
+          }
+        }
+      })
+      return ()=> {socket.off('user-removed-from-channel')
+        socket.off('user-banned-from-channel')  
+        socket.off('user-muted-in-channel')
+    }
     }
   };
   const usersWithConversation = async () => {
     if (socket) {
       if (!user.conversations || (user.conversations.length == 1 && user.conversations.isFrd)) {
         const _user: User = { ...user };
-        if (!user.state) {
-          socket.emit('online', { token: localStorage.getItem('jwtToken') });
-          _user.state = 1;
-          setUser(_user);
-        }
+       
         socket.emit('users-with-conversation', { login: user.login || 'mabdelba' });
         socket.on('get-users', (data: any) => {
-          
-          if (user.conversations) {
+          console.log('data users,', data)
+          if (user && user.conversations && user.conversations.length > 0) {
+            const uLogin : string = user.conversations[0].login
             data.map((obj: any) => {
-              if (obj.login != _user.conversations[0].login)
-                _user.conversations = [..._user.conversations, obj];
+              if (obj.login != uLogin)
+                user.conversations = [...user.conversations, obj];
             });
-          } else _user.conversations = data;
-          setUser(_user);
+            setUser(user);
+            setConversations(user.conversations);
+            // setRoomSelected(uLogin)
+          } else{
+            _user.conversations = data;
+            setUser(_user);
+            setConversations(_user.conversations)
+          } 
+            
           // console.log("nchufo hadi", _user.conversations);
           
-          setConversations(_user.conversations);
         });
       } else setConversations(user.conversations);
+   
     }
   };
   // const [friendList, setFriendList] = useState(user.friendList);
 
   function recieveMessage(data: any) {
+    console.log('is enter: ', data)
     if (data.senderLogin == roomSelected || data.receiverLogin == roomSelected)
       setChatArea([
         ...chatArea,
@@ -332,7 +388,7 @@ function Messages() {
       ]);
     if (selected == 0) {
       // console.log('heeeereeeeeee');
-
+      
       const tempConversation = conversations;
       const indexOfElementToMove = tempConversation.findIndex(
         (obj: any) => obj.login == data.senderLogin || obj.login == data.receiverLogin,
@@ -346,15 +402,22 @@ function Messages() {
         setUser(_user);
         setConversations(tempConversation);
       } else {
-        tempConversation.unshift({
-          login: data.senderLogin,
-          avatar: data.senderAvatar,
-          state: data.state,
-        });
+        // tempConversation.splice(indexOfElementToMove, 1);
+        tempConversation.unshift({login: data.senderLogin, avatar: 'avatar', avatarUrl: data.senderAvatar, state: 1});
         const _user: User = { ...user };
         _user.conversations = tempConversation;
         setUser(_user);
         setConversations(tempConversation);
+        // tempConversation.unshift({
+        //   login: data.senderLogin,
+        //   avatar: data.senderAvatar,
+        //   state: data.state,
+        // });
+        
+        // const _user: User = { ...user };
+        // _user.conversations = undefined;
+        // setUser(_user);
+        // setConversations([]);
       }
     } else if (selected == 1) {
       const tempGroup = groups;
@@ -383,7 +446,7 @@ function Messages() {
   useEffect(() => {
     if (socket && roomSelected != '') {
       socket.emit('get-messages', {
-        senderLogin: user.login || 'mabdelba',
+        senderLogin: user.login ,
         receiverLogin: roomSelected,
         isChannel: selected == 1 ? true : false,
       });
@@ -394,14 +457,22 @@ function Messages() {
   }, [roomSelected, socket]);
 
   useEffect(() => {
-    selected == 0
-      ? (setShowArray(conversations),
-        setRoomSelected(conversations.length == 0 ? '' : conversations[0].login))
-      : selected == 1
-      ? (setShowArray(groups), setRoomSelected(groups.length == 0 ? '' : groups[0].name))
-      : setShowArray([]);
-    if (selected == 0) usersWithConversation();
-    else if (selected == 1) channelsWithConversation();
+    if (selected == 0){
+      setRoomSelected('');
+      usersWithConversation()
+      setShowArray(conversations)
+      setChatArea([]);
+    } 
+    else if (selected == 1){
+      
+      setRoomSelected('');
+      channelsWithConversation();
+      setShowArray(groups);
+      setChatArea([]);
+
+    }
+    else
+      setShowArray([]);
   }, [selected, user.state, user.conversations, conversations, user.groups, groups]);
 
   useEffect(() => {
@@ -411,8 +482,10 @@ function Messages() {
     }
   }, [chatArea]);
 
+
   const handleAddToGroup  = ( login: string) => {
 
+    setOpenInviteModal(false);
     const apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/add-user-to-channel";
     const config =   {
       headers: {
@@ -464,6 +537,7 @@ function Messages() {
                             setRoomSelected(selected == 0 ? obj.login : obj.name);
                             setRoomSelectedType(selected == 1 ? obj.type : 0)
                             setIam(selected == 1 ? obj.whoIam : '');
+                            setIsMuted(selected == 1 ? obj.isMuted : false)
                           }}
                           key={obj.id || `${obj.login}${index}` || `${obj.name}${index}`}
                           className={`w-full h-14 ease-in-out 2xl:h-[68px]  truncate   text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 2xl:space-x-6 md:pl-5 2xl:pl-7 items-center transition-all duration-500 tracking-wide  ${
@@ -549,8 +623,11 @@ function Messages() {
                   ))}
               </div>
             </div>
-            <div className="h-16  2xl:h-20  border-t-[3px] lineshad">
-              <SendMessage SetValue={setMessage} handleClick={handleSend} value={message} />
+            <div className={`h-16  2xl:h-20  ${roomSelected != '' ? 'border-t-[3px] lineshad' :  ''}  `}>
+              {
+                (roomSelected != '' && !isMuted) &&
+                  <SendMessage SetValue={setMessage} handleClick={handleSend} value={message} />
+              }
             </div>
           </div>
         </div>
@@ -648,7 +725,8 @@ function Messages() {
                          memberSelected={member.login}
                          roomSelected={roomSelected} 
                          members={groupMembers}
-                         setMembers={setGroupMembers}/>
+                         setMembers={setGroupMembers}
+                         setOpenModal={setOpenMembersModal}/>
                          }
                         </div>
                     </div>

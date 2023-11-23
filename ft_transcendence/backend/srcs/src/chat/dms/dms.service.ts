@@ -90,6 +90,7 @@ export class DmsService {
       }
     }
     console.log('room name == ', roomName);
+     
     client.to(roomName).emit('receive-message', data);
   }
 
@@ -187,6 +188,7 @@ export class DmsService {
       },
       include: {
         blockedList: true,
+        blockedBy: true
       },
     });
     return blockedList;
@@ -219,13 +221,15 @@ export class DmsService {
     this.sortUsersWithConversation(usersWithConversation);
     const blockedList = await this.blockedList(login);
     const blockedListLogins = blockedList.blockedList.map((user) => user.login);
+    const blockedByLogins = blockedList.blockedBy.map((user)=> user.login);
+    const allBlocked = [...blockedByLogins , ...blockedListLogins]
     const users: { login: string; state: number; avatar?: string; isBlocked?: boolean, avatarUrl: string }[] = [];
     usersWithConversation.forEach(async (user) => {
       users.push({
         login: user.login,
         state: user.state,
         avatar: user.avatar,
-        isBlocked: blockedListLogins.includes(user.login),
+        isBlocked: allBlocked.includes(user.login),
         avatarUrl: getAvatarUrlFromLogin(user.login, user.avatar),
       });
       console.log(login, 'join ', this.createRoomName(login, user.login));
@@ -246,12 +250,22 @@ export class DmsService {
   }
   // Check if user is in room before join it
 
-  async getMessages(data: any, io: any, client: Socket) {
+  // otherUserJoinRoom(roomName:string, data: any, users: any, io: any){
+  //   console.log("rani hna ", data.receiverLogin, "users ", users);
+ 
+  //   if (users.has(data.receiverLogin))
+  //   {
+  //     console.log("hahuwa n3amssi ", data.receiverLogin , "dkhel lina l ", roomName);
+  //     io.to(users.get(data.receiverLogin)).join(roomName);
+  //   } 
+  // } 
+  async getMessages(data: any, io: any, client: Socket, users: any) {
     // this.checkIfInRoomAndJoin(senderLogin, receiverLogin, io, client);
     const roomName = data.isChannel
       ? data.receiverLogin
       : this.createRoomName(data.senderLogin, data.receiverLogin);
     client.join(roomName);
+    // this.otherUserJoinRoom(roomName, data, users, io);
     console.log(`User ${data.senderLogin} joined room ${roomName}`);
     const messages = await this.getConversation(
       data.senderLogin,
