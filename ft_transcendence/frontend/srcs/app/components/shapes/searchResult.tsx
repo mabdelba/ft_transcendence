@@ -49,7 +49,7 @@ function SearchResult(props: SearchBarProps)
     })
     setJoinPublic(false);
   }
-  let channelPass: any = 123;
+  let channelPass: any = "1234";
 
   const joinProtectedChannel = async (name: string) => {
     const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/add-user-to-channel';
@@ -57,7 +57,7 @@ function SearchResult(props: SearchBarProps)
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
-    axios.post(apiUrl, {channelName: name, user: user.login, password: channelPass}, config)
+    axios.post(apiUrl, {channelName: name, password: channelPass}, config)
     .then(()=> {
       toast.success(`You joined ${name}!`)
     }

@@ -127,18 +127,24 @@ export class ChannelsService {
     dto: { channelName: string; type: number; password?: string },
   ) {
     if (dto.type == 0) dto.password = null;
-    await this.prismaservice.channel.create({
-      data: {
-        name: dto.channelName,
-        password: dto.password,
-        type: dto.type,
-        owner: {
-          connect: {
-            login: login,
+    try{
+
+      await this.prismaservice.channel.create({
+        data: {
+          name: dto.channelName,
+          password: dto.password,
+          type: dto.type,
+          owner: {
+            connect: {
+              login: login,
+            },
           },
         },
-      },
-    });
+      });
+    }
+    catch (e){
+      throw new ForbiddenException('Channel with this name already exists');
+    }
   }
 
   async checkTypeOfChannel(dto: { channelName: string }) {
@@ -173,23 +179,26 @@ export class ChannelsService {
 
   async addNewUserToChannel(
     login: string,
-    dto: { channelName: string; user: string; password?: string },
+    dto: { channelName: string; user?: string; password?: string },
   ) {
     const channelType = await this.checkTypeOfChannel(dto);
+    const pass = await this.getChannelPassword(dto);
+    let userToAdd = dto.user;
     const checkIfAdmin = await this.checkIfAdmin({ channelName: dto.channelName, user: login });
     const checkIfOwner = await this.checkIfOwner({ channelName: dto.channelName, user: login });
-    console.log('channel type === ', channelType)
-    if (channelType == 2) {
-      if (!(checkIfAdmin || checkIfOwner)) {
-        throw new ForbiddenException('You are not admin or owner of this channel');
-      }
-    } else if (channelType == 1) {
-      if (!(checkIfAdmin || checkIfOwner))
-      {
-        if(!dto.password)
-          throw new ForbiddenException('This is a protected channel so it need a password');
-        if ((await this.getChannelPassword(dto)) != dto.password)
+    console.log("dto.user ===== ", dto.user);
+    if (!dto.user){
+      if (channelType == 2) {
+        if (pass != dto.password)
           throw new ForbiddenException('Wrong password');
+      userToAdd = login;
+    }
+  }
+    else{
+      if (channelType == 2 || channelType == 1) {
+        if (!(checkIfAdmin || checkIfOwner)) {
+          throw new ForbiddenException('You are not admin or owner of this channel');
+        }
       }
     }
     const isBanned = await this.getBannedUsers(dto.channelName);
@@ -202,7 +211,7 @@ export class ChannelsService {
       data: {
         members: {
           connect: {
-            login: dto.user,
+            login: userToAdd,
           },
         },
       },
