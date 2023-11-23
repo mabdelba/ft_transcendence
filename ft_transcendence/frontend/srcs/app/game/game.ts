@@ -1,4 +1,4 @@
-import Matter, { Body, Events } from "matter-js";
+import Matter, { Body, Events, World} from "matter-js";
 import { Socket } from "socket.io-client";
 
 class Game{
@@ -117,6 +117,14 @@ class Game{
         Matter.World.clear(this._world, false);
         Matter.Engine.clear(this._engine);
         this._render.canvas.remove();
+    }
+//last update
+    public spawnBall(): void{
+        if(this.ball){
+            Matter.World.remove(this._world, this.ball);
+            this.ball = Matter.Bodies.circle(this.width / 2, this.height / 2, 10 * this.scale, {isStatic: true});
+            Matter.World.add(this._world, this.ball);
+        }
     }
 
     public setState(p1: Matter.Vector, p2: Matter.Vector, ball: Matter.Vector): void{

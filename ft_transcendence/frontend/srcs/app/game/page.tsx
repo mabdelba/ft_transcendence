@@ -15,6 +15,7 @@ import { emit } from 'process';
 import GamePopup from '../components/shapes/GamePopup';
 import { BiHappyAlt, BiSad, BiLogOut } from 'react-icons/bi';
 import { context } from '../../context/context';
+import { start } from 'repl';
 
 let game: Game | null = null;
 
@@ -37,6 +38,9 @@ const gamePage = () => {
     const [gameEnded, setGameEnded] = useState<string>('');
     const router = useRouter();
     const [openModal, setOpenModal] = useState(false);
+    const [startState, setStartState] = useState(true);
+    const [player1Score, setPlayer1Score] = useState<number>(0);
+    const [player2Score, setPlayer2Score] = useState<number>(0);
 
 useEffect(() => {
         const handleResize = () => {
@@ -58,6 +62,13 @@ useEffect(() => {
          user.socket?.on('gameEnded', (data: {state: string}) => {
              setGameEnded(data.state);
          })
+        user.socket?.on('Score', (data: {player1: number, player2: number}) => {
+            setPlayer1Score(data.player1);
+            setPlayer2Score(data.player2);
+        })
+        user.socket?.on('startBotton', () => {
+            setStartState(false);
+        })
 
         setGameSocket(user.socket);
 
@@ -127,6 +138,8 @@ useEffect(() => {
         }
     }, [gameEnded])
 
+    // const [startState, setStartState] = useState(true);
+
     return (
         <><div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
             <div className='flex flex-row items-center w-[100%] justify-evenly'>
@@ -148,15 +161,16 @@ useEffect(() => {
                 </div>
             </div>
             <div className='text-[40px]'>
-                0 - 0
+                {player1Score} - {player2Score}
             </div>
-            <button
+            {startState && <button
                 type='button'
                 onClick={() => {
                     console.log(gameSocket);
+                    setStartState(false);
                     gameSocket?.emit('StartGame', { map: 'map1' });
                 } }
-                className='z-10 h-10 w-52 border'>Start Game</button>
+                className='z-10 h-10 w-52 border'>Start Game</button>}
             <div className='w-[100%] h-[80%] flex justify-center items-center' ref={gameDiv}>
             </div>
 
