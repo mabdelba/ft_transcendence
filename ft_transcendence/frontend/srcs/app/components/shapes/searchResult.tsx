@@ -49,7 +49,12 @@ function SearchResult(props: SearchBarProps)
     })
     setJoinPublic(false);
   }
-  let channelPass: any = "1234";
+
+  const [channelPass, setChannelPass] = useState<string>("");
+
+  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChannelPass(event.target.value);
+  };
 
   const joinProtectedChannel = async (name: string) => {
     const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/add-user-to-channel';
@@ -106,20 +111,6 @@ function SearchResult(props: SearchBarProps)
             }
           </div>
         }
-        {/* {
-          props.result
-          && props.type === true
-          && props.isMember === false
-          && <div>
-            {
-              props.type === true
-              &&  <button className='hover:text-[#BEF264] flex flex-row items-center' onClick={openLoginModal}>
-                    <IoMdAdd />
-                    Join
-                  </button>
-            }
-          </div>
-        } */}
       </div>
       <Transition appear show={JoinPopUp} as={Fragment}>
         <Dialog as="div" className="relative z-20 font-Orbitron" onClose={closeLoginModal}>
@@ -149,9 +140,15 @@ function SearchResult(props: SearchBarProps)
                 <Dialog.Panel className="px-6 py-1 flex flex-col justify-center min-w-[200px] w-full md:w-2/3  lg:w-1/3  bg-black NeonShadowBord">
                   {/* <JoinPopUp handler={closeLoginModal} rout={router} /> */}
                   <div className='m-5'>Type the channel's password</div>
-                  <input type="password" placeholder='Password' className="w-full h-14 bg-[#272727] neonBord pl-[20px] mb-5 text-white outline-none placeholder-[rgba(255, 255, 255, 0.50);] text-sm transition-all duration-500" />
+                  <input
+                    value={channelPass}
+                    onChange={handlePasswordChange}
+                    type="password"
+                    placeholder='Password'
+                    className="w-full h-14 bg-[#272727] neonBord pl-[20px] mb-5 text-white outline-none placeholder-[rgba(255, 255, 255, 0.50);] text-sm transition-all duration-500"
+                  />
                   <div className="flex flex-row justify-center">
-                    <button className="mt-2 mb-2 py-3 px-5 mb-5 NeonShadowBord hover:text-[#BEF264] flex flex-row items-center" onClick={closeLoginModal}>
+                    <button className="mt-2 py-3 px-5 mb-5 NeonShadowBord hover:text-[#BEF264] flex flex-row items-center" onClick={closeLoginModal}>
                       Join
                     </button>
                   </div>

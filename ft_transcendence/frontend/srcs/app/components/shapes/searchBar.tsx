@@ -75,6 +75,16 @@ function SearchBar (prop : SearchBarProps)
     fetchData(value);
   }
 
+  const fetchAll = async () => {
+    try {
+      const [users, channels] = await Promise.all([fetchUsers(), fetchChannels()]);
+      prop.setUsersResults(users);
+      prop.setChannelsResults(channels);
+    } catch (error) {
+      console.log("No apparent user:", error);
+    }
+  }
+
   return (
     <Disclosure as='search' className="w-full h-full font-Orbitron ">
       <div className='flex h-full'>
@@ -82,6 +92,7 @@ function SearchBar (prop : SearchBarProps)
           <div className='flex h-[97%] w-full'>
             <Image className='' src={SearchLogo} alt="logo" />
             <div className='w-[100%]'>
+              {fetchAll}
               <input
               placeholder='Search ...'
               className="pl-2  md:text-lg lg:text-xl h-full w-full bg-transparent text-white outline-none placeholder-[rgba(255, 255, 255, 0.50);] text-sm focus:bg-opacity-5 transition-all duration-500"
