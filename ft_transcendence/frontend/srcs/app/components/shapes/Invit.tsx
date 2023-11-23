@@ -38,9 +38,9 @@ function Invit(props: newType) {
     if(indexOfElementToMove == -1)
     {
       if(conversation)
-        conversation.unshift({login: props.login, avatar: props.avatar});
+        conversation.unshift({login: props.login,avatar: 'avatar', avatarUrl: props.avatar});
       else
-        conversation = [{login: props.login, avatar: props.avatar}]
+        conversation = [{login: props.login, avatar: 'avatar', avatarUrl: props.avatar}]
     }
     else
     {

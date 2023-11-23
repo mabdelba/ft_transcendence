@@ -93,7 +93,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client: Socket,
     data: { isChannel: boolean; senderLogin: string; receiverLogin: string },
   ) {
-    this.dmsGateway.handleGetMessages(data, client);
+    this.dmsGateway.handleGetMessages(data, client, this.users);
   }
 
   @SubscribeMessage('send-message')

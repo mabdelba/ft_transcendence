@@ -1,6 +1,6 @@
 'use client'
 import { Menu, Transition } from '@headlessui/react'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useContext, useEffect, useRef, useState } from 'react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
 import { AiOutlinePlus } from 'react-icons/ai'
 import { ImBlocked } from 'react-icons/im'
@@ -9,13 +9,19 @@ import {GiBootKick} from 'react-icons/gi'
 import { StoreID } from 'recoil'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { SocketContext, context } from '../../../context/context'
+import { userAgent } from 'next/server'
 
 
-function MyDropDown(props : {iAm: string, memberSelected : string, roomSelected: string, members : any, setMembers : any}) {
+function MyDropDown(props : {iAm: string, memberSelected : string, roomSelected: string, members : any, setMembers : any, setOpenModal: any}) {
   
   
+  const {socket} = useContext(SocketContext)
+  const {user} = useContext(context);
+
   const setAsAdmin = () =>{
 
+    props.setOpenModal(false);
     const apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/add-admin-to-channel";
     const token = localStorage.getItem('jwtToken');
     const config = {
@@ -37,10 +43,49 @@ function MyDropDown(props : {iAm: string, memberSelected : string, roomSelected:
       toast.warning(error.response.data.message);
     })
   }
+
+  const handleKick = () => {
+
+    props.setOpenModal(false); 
+    try{
+      socket.emit('remove-user-from-channel', {channelName: props.roomSelected, myLogin: user.login , otherLogin : props.memberSelected});
+      const tempMembers = props.members
+      const index = tempMembers.findIndex((obj:any)=> obj.login == props.memberSelected)
+      if(index != -1){
+        tempMembers.splice(index, 1);
+        props.setMembers(tempMembers);
+      }
+      toast.success(`You have kicked ${props.memberSelected} from ${props.roomSelected}`)
+
+    }
+    catch{
+      toast.error('Error');
+    }
+  }
+
+  const handleBan = ()=> {
+
+    props.setOpenModal(false)
+    socket.emit('ban-user-in-channel', {channelName: props.roomSelected, myLogin: user.login , otherLogin : props.memberSelected});
+    const tempMembers = props.members
+    const index = tempMembers.findIndex((obj:any)=> obj.login == props.memberSelected)
+    if(index != -1){
+      tempMembers.splice(index, 1);
+      props.setMembers(tempMembers);
+    }
+    toast.success(`You have banned ${props.memberSelected} from ${props.roomSelected}`)
+  }
+
+  const handleMute = ()=> {
+
+    props.setOpenModal(false);
+    socket.emit('mute-user-in-channel', {channelName: props.roomSelected, myLogin: user.login , otherLogin : props.memberSelected})
+    toast.success(`You have muted ${props.memberSelected} from ${props.roomSelected}`)
+  }
   const link = [
-    { href: ()=>{}, label: 'Ban' , render: () => {return(<ImBlocked size="20"/>)}},
-    { href: ()=>{}, label: 'Mute' ,render: () => {return(<BsFillVolumeMuteFill size="20"/>)}},
-    { href: ()=>{}, label: 'Kick' ,render: () => {return(<GiBootKick size="20"/>)} },
+    { href: handleBan, label: 'Ban' , render: () => {return(<ImBlocked size="20"/>)}},
+    { href: handleMute, label: 'Mute' ,render: () => {return(<BsFillVolumeMuteFill size="20"/>)}},
+    { href: handleKick , label: 'Kick' ,render: () => {return(<GiBootKick size="20"/>)} },
     { href: setAsAdmin, label: 'Set as admin' ,render: () => {return(<AiOutlinePlus size="20"/>)} },
   ]
 

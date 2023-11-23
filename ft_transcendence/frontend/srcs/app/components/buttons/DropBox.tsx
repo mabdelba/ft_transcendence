@@ -10,8 +10,7 @@ import {FiSettings} from 'react-icons/fi'
 import {TbLogout2} from 'react-icons/tb'
 import {MdGroups2, MdDelete} from 'react-icons/md'
 import { useRouter } from 'next/navigation'
-import { group } from 'console'
-import { channel } from 'diagnostics_channel'
+
 
 
 
@@ -36,12 +35,12 @@ function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: 
   useEffect(()=> {
     if(props.slected == 0)
       setLinks(friendMenu);
-    else if(props.slected == 1)
+    else if(props.slected == 1 && props.iAm != '')
     {
     
-      console.log('roomSelected: ', props.roomSelected);
-      console.log("channelType: ", props.channelType);
-      console.log("iAm: ", props.iAm);
+      // console.log('roomSelected: ', props.roomSelected);
+      // console.log("channelType: ", props.channelType);
+      // console.log("iAm: ", props.iAm);
       // console.log("GroupMenu: ", GroupMenu);
       if(props.iAm == 'owner'){
         GroupMenu[1].label = 'Delete';
@@ -53,6 +52,8 @@ function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: 
         GroupMenu.splice(0, 1);
       setLinks(GroupMenu);
     }
+    else
+      setLinks([]);
   
   }, [props.slected ,props.roomSelected, props.iAm])
 

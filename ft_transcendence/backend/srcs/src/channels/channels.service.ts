@@ -185,7 +185,7 @@ export class ChannelsService {
     }
     const isBanned = await this.getBannedUsers(dto.channelName);
     if (isBanned.find((ban) => ban.login == dto.user))
-      throw new ForbiddenException('You are banned from this channel');
+      throw new ForbiddenException('This user is banned from this channel');
     await this.prismaservice.channel.update({
       where: { 
         name: dto.channelName,
@@ -213,13 +213,59 @@ export class ChannelsService {
     return false;
   }
   /// use in channel gateway
-  async removeUserFromChannel(client: any, dto: { channelName: string; myLogin: string; otherLogin: string }) {
+  async removeUserFromChannel(client: any, dto: { channelName: string; myLogin: string; otherLogin?: string }) {
     const isAdmin = await this.checkIfAdmin({ channelName: dto.channelName, user: dto.myLogin });
     const isOwner = await this.checkIfOwner({ channelName: dto.channelName, user: dto.myLogin });
     const isOtherAdmin = await this.checkIfAdmin({
       channelName: dto.channelName,
       user: dto.otherLogin,
     });
+    if (!dto.otherLogin)
+    {
+      if (isOwner)
+        return await this.removeChannel(client, {channelName: dto.channelName, user: dto.myLogin});
+      else if (isAdmin){
+        await this.prismaservice.channel.update({
+          where: {
+            name: dto.channelName,
+          },
+          data: {
+            admins: {
+              disconnect: {
+                login: dto.otherLogin,
+              },
+            },
+          },
+        });
+      }
+      else {
+        await this.prismaservice.channel.update({
+          where: {
+            name: dto.channelName,
+          },
+          data: {
+            members: {
+              disconnect: {
+                login: dto.otherLogin,
+              },
+            },
+          },
+        });
+      }
+      await this.prismaservice.userMutedInChannel.deleteMany({
+        where: {
+          AND: [
+            {
+              userLogin: dto.myLogin
+            },
+            {
+              channelName: dto.channelName
+            },
+          ]
+        }
+      })
+    }
+  else {
     const isOtherMember = await this.checkIfMember(dto.channelName, dto.otherLogin);
     if (isOtherAdmin) {
       if (isOwner) {
@@ -264,8 +310,21 @@ export class ChannelsService {
           },
         });
       } else throw new ForbiddenException('You are not admin or owner of this channel');
+  }
     }
-    client.to(dto.channelName).emit('user-removed-from-channel', dto.otherLogin);
+    await this.prismaservice.userMutedInChannel.deleteMany({
+      where: {
+        AND: [
+          {
+            userLogin: dto.otherLogin
+          },
+          {
+            channelName: dto.channelName
+          },
+        ]
+      }
+    })
+    client.to(dto.channelName).emit('user-removed-from-channel', {login: dto.otherLogin, channelName: dto.channelName});
   }
 
   //use in channel gateway
@@ -289,7 +348,7 @@ export class ChannelsService {
         },
       });
     } else throw new ForbiddenException('You are not admin or owner of this channel');
-    client.to(dto.channelName).emit('user-muted-in-channel', dto.otherLogin);
+    client.to(dto.channelName).emit('user-muted-in-channel',  {login: dto.otherLogin, channelName: dto.channelName});
   }
 
   //use in channel gateway
@@ -320,7 +379,7 @@ export class ChannelsService {
         },
       });
     } else throw new ForbiddenException('You are not admin or owner of this channel');
-    client.to(dto.channelName).emit('user-banned-from-channel', dto.otherLogin);
+    client.to(dto.channelName).emit('user-banned-from-channel',  {login: dto.otherLogin, channelName: dto.channelName});
   }
 
   // use in channel gateway
@@ -342,7 +401,7 @@ export class ChannelsService {
         },
       });
     } else throw new ForbiddenException('You are not admin or owner of this channel');
-    client.to(dto.channelName).emit('user-unbanned-from-channel', dto.otherLogin);
+    client.to(dto.channelName).emit('user-unbanned-from-channel',  {login: dto.otherLogin, channelName: dto.channelName});
   }
 
   // use in channel gateway
@@ -391,7 +450,7 @@ export class ChannelsService {
         },
       });
     } else throw new ForbiddenException('You are not owner of this channel');
-    client.to(dto.channelName).emit('admin-removed-from-channel', dto.otherLogin);
+    client.to(dto.channelName).emit('admin-removed-from-channel',  {login: dto.otherLogin, channelName: dto.channelName});
   }
 
   // use in channel gateway
@@ -404,7 +463,7 @@ export class ChannelsService {
         },
       });
     } else throw new ForbiddenException('You are not owner of this channel');
-    client.to(dto.channelName).emit('channel-removed', dto.channelName);
+    client.to(dto.channelName).emit('channel-removed',  {channelName: dto.channelName});
   }
 
   async checkIfUserMuted(dto: { channelName: string; user: string }) {
@@ -551,7 +610,9 @@ export class ChannelsService {
     await Promise.all(
       channelsWithConversation.map(async (channel) => {
         channel['whoIam'] = await this.whoIam({ channelName: channel.name, user: login });
-        console.log('who i am ==== ', channel['whoIam']);
+        channel['isMuted'] = await this.checkIfUserMuted({channelName: channel.name, user: login});
+        console.log("is muted ===== ", channel['isMuted']);
+        // console.log('who i am ==== ', channel['whoIam']);
         client.join(channel.name);
       }),
     );

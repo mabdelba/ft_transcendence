@@ -16,7 +16,7 @@ export class ChannelsGateway {
   }
 
   @SubscribeMessage('remove-user-from-channel')
-  async removeUserFromChannel( @ConnectedSocket() client: Socket, data: { channelName: string; myLogin: string; otherLogin: string }) {
+  async removeUserFromChannel( @ConnectedSocket() client: Socket, data: { channelName: string; myLogin: string; otherLogin?: string }) {
     return this.channelService.removeUserFromChannel(client, data);
   }
 
