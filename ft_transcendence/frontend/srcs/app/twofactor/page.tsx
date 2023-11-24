@@ -64,8 +64,25 @@ function TwoFactor() {
     event.preventDefault();
     setChange(true);
   };
+
+  const i = document.getElementById('keyStroke');
+
+  i && i.addEventListener('keydown', function(e) {
+    if (['+', '-', 'e', '.'].includes(e.key)) {
+      e.preventDefault();
+    }
+  })
+
+  const inputRefs = Array.from({ length: 6 }, () => useRef(null));
+
+  const handleInput = (index, value) => {
+    if (value.length === 1 && index < inputRefs.length - 1) {
+      inputRefs[index + 1].current.focus();
+    }
+  };
+
   return (
-    <main className="flex justify-center items-center w-full h-screen">
+    <main className="flex justify-center items-center w-fit h-screen m-auto">
       <div className="flex flex-col bg-black NeonShadowBord">
         <div className="flex justify-end items-start w-full">
           <Link href="/">
@@ -87,14 +104,17 @@ function TwoFactor() {
               <div className="h-[70px] w-[54px] mx-4">
                 <input
                   placeholder='_'
-                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[40px] text-center neonBord'
+                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[39px] text-center neonBord'
                   maxLength={1}
+                  type="number"
+                  id="keyStroke"
+                  key={index}
                 />
               </div>
               <div className="h-[70px] w-[54px] mx-4">
                 <input
                   placeholder='_'
-                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[40px] text-center neonBord'
+                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[39px] text-center neonBord'
                   maxLength={1}
                 />
               </div>
@@ -110,30 +130,30 @@ function TwoFactor() {
               <div className="h-[70px] w-[54px] mx-4">
                 <input
                   placeholder='_'
-                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[40px] text-center neonBord'
+                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[39px] text-center neonBord'
                   maxLength={1}
                 />
               </div>
               <div className="h-[70px] w-[54px] mx-4">
                 <input
                   placeholder='_'
-                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[40px] text-center neonBord'
+                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[39px] text-center neonBord'
                   maxLength={1}
                 />
               </div>
               <div className="h-[70px] w-[54px] mx-4">
                 <input
                   placeholder='_'
-                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[40px] text-center neonBord'
+                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[39px] text-center neonBord'
                   maxLength={1}
                 />
               </div>
             </div>
           </div>
-          <div className="flex items-end justify-center mt-16 mb-32 w-full px-10">
-            <div className="w-full text-[39px]">
+          <div className="flex justify-center mt-16 mb-32 mx-[40px] w-[568px] h-[70px]">
+            <div className="text-[39px] w-full h-full">
               <button
-                className='font-Orbitron text-[39px] text-center SmallNeonShadowBord w-full NeonShadow m-3'
+                className='font-Orbitron text-[39px] text-center SmallNeonShadowBord NeonShadow w-full h-full'
               >
                 Continue
               </button>
