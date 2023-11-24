@@ -223,9 +223,10 @@ export class DmsService {
     const blockedListLogins = blockedList.blockedList.map((user) => user.login);
     const blockedByLogins = blockedList.blockedBy.map((user)=> user.login);
     const allBlocked = [...blockedByLogins , ...blockedListLogins]
-    const users: { login: string; state: number; avatar?: string; isBlocked?: boolean, avatarUrl: string }[] = [];
+    const users: {id: number; login: string; state: number; avatar?: string; isBlocked?: boolean, avatarUrl: string }[] = [];
     usersWithConversation.forEach(async (user) => {
       users.push({
+        id: user.id,
         login: user.login,
         state: user.state,
         avatar: user.avatar,

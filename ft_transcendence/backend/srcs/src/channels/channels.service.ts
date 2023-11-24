@@ -250,7 +250,7 @@ export class ChannelsService {
           data: {
             admins: {
               disconnect: {
-                login: dto.otherLogin,
+                login: dto.myLogin,
               },
             },
           },
@@ -264,7 +264,7 @@ export class ChannelsService {
           data: {
             members: {
               disconnect: {
-                login: dto.otherLogin,
+                login: dto.myLogin,
               },
             },
           },
