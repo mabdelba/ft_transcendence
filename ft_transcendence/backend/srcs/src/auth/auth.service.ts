@@ -43,10 +43,14 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
+    let user;
+    try {
+    user = await this.prisma.user.findUnique({
       where: { login: dto.login, password: { not: null } },
     });
-    if (!user) throw new ForbiddenException('User not found');
+  } catch (e) {
+    throw new ForbiddenException('User not found');
+  }
     const isPasswordValid = await argon.verify(user.password, dto.password);
     if (!isPasswordValid) throw new ForbiddenException('Wrong password');
     return {

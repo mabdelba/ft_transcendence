@@ -49,10 +49,10 @@ function Dashboard() {
     .then((response : any) => {
     
       const _user: User = response.data;
-      if (!_user.state) {
+      // if (!_user.state) {
         socket.emit('online', { token: localStorage.getItem('jwtToken') });
         _user.state = 1;
-      }
+      // }
       setProfile(response.data);
       setUser(_user);
       setStatus('success');

@@ -4,6 +4,8 @@ import jwtDecode from 'jwt-decode';
 import { Socket } from 'socket.io';
 import { getAvatarFromLogin, getAvatarUrlFromLogin } from 'src/utils/get-avatar-from-login';
 import { channel } from 'diagnostics_channel';
+import { use } from 'passport';
+import { all } from 'axios';
 
 @Injectable()
 export class DmsService {
@@ -66,6 +68,48 @@ export class DmsService {
           },
         },
       });
+      const allSocketsInRoom = await io.in(roomName).fetchSockets();
+      await Promise.all(
+        allSocketsInRoom.map(async (socket) => {
+          if (socket.id !== client.id){
+          const checkIfBlocked = await this.prisma.user.findMany({
+            where: {
+              AND: [ 
+                {
+                  login: users.get(socket.id),
+                },
+                {
+                  OR: [
+                    {
+                      blockedList: {
+                        some: {
+                          login: data.senderLogin,
+                        },
+                      },
+                    },
+                    {
+                      blockedBy: {
+                        some: {
+                          login: data.senderLogin,
+                        },
+                      },
+                    }, 
+                  ],
+                } 
+              ],
+            },
+            include: {
+              blockedList: true,
+              blockedBy: true
+            },
+          });
+          if (!checkIfBlocked || checkIfBlocked.length === 0) {
+            socket.emit('receive-message', data);
+            console.log('send message to ', users.get(socket.id));
+          }
+        }
+        }),
+      ); 
     } else {
       await this.prisma.message.create({
         data: {
@@ -88,10 +132,8 @@ export class DmsService {
 
         console.log(data.receiverLogin, ' join this room === ', roomName);
       }
+      client.to(roomName).emit('receive-message', data);
     }
-    console.log('room name == ', roomName);
-     
-    client.to(roomName).emit('receive-message', data);
   }
 
   async checkUsers(senderLogin: string, receiverLogin: string) {
@@ -275,10 +317,13 @@ export class DmsService {
     );
     const blockedList = await this.blockedList(data.senderLogin);
     const messagesWithoutBlocked = [];
+    const blockedListLogins = blockedList.blockedList.map((user) => user.login);
+    const blockedByLogins = blockedList.blockedBy.map((user)=> user.login);
+    const allBlocked = [...blockedByLogins , ...blockedListLogins]
     messages.forEach((message) => {
       // if (message.sender === data.senderLogin)
       // {
-      if (!blockedList.blockedList.map((user) => user.login).includes(message.sender))
+      if (!allBlocked.includes(message.sender))
         messagesWithoutBlocked.push(message);
       // }
       // else if (message.reciever === data.senderLogin)

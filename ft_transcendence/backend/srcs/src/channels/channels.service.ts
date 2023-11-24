@@ -107,7 +107,7 @@ export class ChannelsService {
     });
     if (channel.admins.find((admin) => admin.login == dto.user)) return true;
     return false;
-  }
+  } 
 
   async checkIfOwner(dto: { channelName: string; user: string }) {
     const channel = await this.prismaservice.channel.findUnique({
@@ -238,6 +238,7 @@ export class ChannelsService {
       channelName: dto.channelName,
       user: dto.otherLogin,
     });
+    const userToRemove = dto.otherLogin ? dto.otherLogin : dto.myLogin;
     if (!dto.otherLogin)
     {
       if (isOwner)
@@ -342,7 +343,7 @@ export class ChannelsService {
         ]
       }
     })
-    client.to(dto.channelName).emit('user-removed-from-channel', {login: dto.otherLogin, channelName: dto.channelName});
+    client.to(dto.channelName).emit('user-removed-from-channel', {login: userToRemove, channelName: dto.channelName});
   }
 
   //use in channel gateway
@@ -475,6 +476,16 @@ export class ChannelsService {
   async removeChannel(client: any, dto: { channelName: string; user: string }) {
     const isOwner = await this.checkIfOwner(dto);
     if (isOwner) {
+      await this.prismaservice.userMutedInChannel.deleteMany({
+        where: {
+          channelName: dto.channelName,
+        },
+      });
+      await this.prismaservice.message.deleteMany({
+        where: {
+          recieverchannel: dto.channelName,
+        },
+      });
       await this.prismaservice.channel.delete({
         where: {
           name: dto.channelName,
@@ -495,7 +506,7 @@ export class ChannelsService {
         },
       },
     });
-    if (channel) return true;
+    if (channel) return true; 
     return false;
   }
 
@@ -642,8 +653,6 @@ export class ChannelsService {
       channelsWithConversation.map(async (channel) => {
         channel['whoIam'] = await this.whoIam({ channelName: channel.name, user: login });
         channel['isMuted'] = await this.checkIfUserMuted({channelName: channel.name, user: login});
-        console.log("is muted ===== ", channel['isMuted']);
-        // console.log('who i am ==== ', channel['whoIam']);
         client.join(channel.name);
       }),
     );
