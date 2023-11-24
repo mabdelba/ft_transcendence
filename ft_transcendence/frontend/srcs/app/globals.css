@@ -209,7 +209,7 @@ body {
 }
 
 .SmallNeonShadowBord{
-  border: 2px solid #FFFFFF;
+  border: 3px solid #FFFFFF;
   box-shadow: 0px 0px 10px 0px #FFFFFF;
 
   box-shadow: 0px -4px 25px 0px rgba(255, 255, 255, 0.50), 0px 0px 24px 0px #FFF inset;
@@ -217,7 +217,7 @@ body {
 
 .neonBord{
   /* border: 2px solid #FFFFFF; */
-  border: 2px solid #FFFFFF;
+  border: 3px solid #FFFFFF;
   box-shadow: 0px 0px 10px 0px #FFFFFF;
 
   /* box-shadow: 0px 0px 18px 0px #FFFFFFBF inset; */
@@ -311,3 +311,19 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: lightgray;
 }
+
+@layer utilities {
+  @variants responsive {
+    /* Hide scrollbar for Chrome, Safari, and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+
+    /* Hide scrollbar for IE, Edge, and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+    }
+  }
+} 
