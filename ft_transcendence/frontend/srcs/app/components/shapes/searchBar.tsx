@@ -2,6 +2,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { useState } from 'react';
+import { useEffect } from 'react';
 import { Disclosure } from "@headlessui/react";
 import MenuButton from '../buttons/menuButton';
 import Logo from '../../../public/logo.svg';
@@ -19,11 +20,14 @@ interface UserData {
 interface SearchBarProps {
   setUsersResults: React.Dispatch<React.SetStateAction<UserData[]>>;
   setChannelsResults: React.Dispatch<React.SetStateAction<UserData[]>>;
+  setShowResults: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 function SearchBar (prop : SearchBarProps)
 {
   const [input, setInput] = useState("");
+  const [users, setUsers] = useState([]);
+  const [channels, setChannels] = useState([]);
   const fetchUsers = async () => {
     const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/all-users';
     const token = localStorage.getItem('jwtToken');
@@ -47,7 +51,6 @@ function SearchBar (prop : SearchBarProps)
   const fetchData = async (value: string) => {
     try {
       value = value.toLowerCase();
-      const [users, channels] = await Promise.all([fetchUsers(), fetchChannels()]);
       const usersResults = users.filter((user: any) => {
         return (
           value &&
@@ -70,19 +73,27 @@ function SearchBar (prop : SearchBarProps)
     }
   };
 
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        const data = await  Promise.all([fetchUsers(), fetchChannels()]);
+        setUsers(data[0]);
+        setChannels(data[1]);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchAllData();
+
+    return () => {
+      console.log('Component unmounted, cleanup can be performed here');
+    };
+  }, []);
+
   const handleChanges = (value: string) => {
     setInput(value);
     fetchData(value);
-  }
-
-  const fetchAll = async () => {
-    try {
-      const [users, channels] = await Promise.all([fetchUsers(), fetchChannels()]);
-      prop.setUsersResults(users);
-      prop.setChannelsResults(channels);
-    } catch (error) {
-      console.log("No apparent user:", error);
-    }
   }
 
   return (
@@ -92,13 +103,14 @@ function SearchBar (prop : SearchBarProps)
           <div className='flex h-[97%] w-full'>
             <Image className='' src={SearchLogo} alt="logo" />
             <div className='w-[100%]'>
-              {fetchAll}
               <input
               placeholder='Search ...'
               className="pl-2  md:text-lg lg:text-xl h-full w-full bg-transparent text-white outline-none placeholder-[rgba(255, 255, 255, 0.50);] text-sm focus:bg-opacity-5 transition-all duration-500"
               type="text"
               value={input}
               onChange={(e) => handleChanges(e.target.value)}
+              onFocus={() => prop.setShowResults(true)}
+              onBlur={() => prop.setShowResults(false)}
               />
             </div>
           </div>

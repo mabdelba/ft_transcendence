@@ -26,11 +26,8 @@ function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}
     const [showSideBar, setShowSideBar] = useState(false);
     const [showPdp, setShowPdp] = useState(true);
     const {user} = useContext(context);
-    // const [avatar, setAvatar] = useState(alien);
+    const [showResults, setShowResults] = useState(false);
 
-    // useEffect(() =>{
-    //   setAvatar(user.avatar);
-    // });
     useEffect(() => {
       const handleResize = () => {
         if (window.innerWidth >= 640)
@@ -66,7 +63,7 @@ function OptionBar( {children, flag}: {children : React.ReactNode, flag: number}
               <BurgButton setFlag={setShowSideBar} val={showSideBar} />
               {
                 !showSideBar &&
-                <SearchBar setUsersResults={setUsersResults}  setChannelsResults={setChannelsResults} />
+                <SearchBar setUsersResults={setUsersResults}  setChannelsResults={setChannelsResults} setShowResults={setShowResults} />
               }
               <Link 
               onMouseEnter={() => {setHoverBool(true)}}

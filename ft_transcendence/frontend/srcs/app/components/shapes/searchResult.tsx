@@ -19,7 +19,7 @@ type SearchBarProps = {
 function SearchResult(props: SearchBarProps)
 {
   const [JoinPopUp, setJoinPopUp] = useState(false);
-  const [Joinpublic, setJoinPublic] = useState(true);
+  // const [Joinpublic, setJoinPublic] = useState(true);
   const {user} = useContext(context)
 
   const closeLoginModal = () => {
@@ -47,7 +47,7 @@ function SearchResult(props: SearchBarProps)
       
       toast.error(error.response.data.message);
     })
-    setJoinPublic(false);
+    // setJoinPublic(false);
   }
 
   const [channelPass, setChannelPass] = useState<string>("");
@@ -71,15 +71,21 @@ function SearchResult(props: SearchBarProps)
       
       toast.error(error.response.data.message);
     })
-    setJoinPublic(false);
+    // setJoinPublic(false);
   }
+
+  const handleDivClick = (user: string) => {
+    console.log(user);
+    window.location.href = 'http://localhost:4000/profil/' + user;
+  };
+
   return (
     <>
       <div className="flex flex-row justify-between m-1 hover:bg-black p-2 pl-[60px] pr-[25px]">
         {
           props.result
           && props.type === false
-          && <div onClick={(e) => alert(`You selected ${props.result}!`)}>{props.result}</div>
+          && <div onClick={() => handleDivClick(props.result)}>{props.result}</div>
         }
         {
           props.result
@@ -95,7 +101,7 @@ function SearchResult(props: SearchBarProps)
             {
               props.type === true
               && props.channelType === 0
-              && Joinpublic === true
+              // && Joinpublic === true
               &&  <button className='hover:text-[#BEF264] flex flex-row items-center' onClick={()=>joinChannel(props.result)}>
                     <IoMdAdd />
                     Join
@@ -138,7 +144,6 @@ function SearchResult(props: SearchBarProps)
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="px-6 py-1 flex flex-col justify-center min-w-[200px] w-full md:w-2/3  lg:w-1/3  bg-black NeonShadowBord">
-                  {/* <JoinPopUp handler={closeLoginModal} rout={router} /> */}
                   <div className='m-5'>Type the channel's password</div>
                   <input
                     value={channelPass}
