@@ -5,6 +5,7 @@ import close from '../../public/close.svg';
 import SimpleButton from '../components/buttons/simpleButton';
 import SimpleInput from '../components/inputs/simpleInput';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 function TwoFactor() {
   const [fir, setFir] = useState(0);
@@ -16,29 +17,6 @@ function TwoFactor() {
   const [change, setChange] = useState(false);
   const [error, setError] = useState(true);
   const CodeObj = { fir, sec, thi, forth, fiv, six };
-
-  const handlSubmit = (event: any) => {
-    event.preventDefault();
-    if (!change) return;
-    if (
-      change &&
-      (CodeObj.fir < 0 ||
-        CodeObj.fir > 9 ||
-        CodeObj.sec < 0 ||
-        CodeObj.sec > 9 ||
-        CodeObj.thi < 0 ||
-        CodeObj.thi > 9 ||
-        CodeObj.forth < 0 ||
-        CodeObj.forth > 9 ||
-        CodeObj.fiv < 0 ||
-        CodeObj.fiv > 9 ||
-        CodeObj.six < 0 ||
-        CodeObj.six > 9)
-    )
-      return setError(false);
-    else setError(true);
-    console.log(CodeObj);
-  };
 
   const handleBlur = () => {
     if (!change) return;
@@ -65,19 +43,17 @@ function TwoFactor() {
     setChange(true);
   };
 
-  const i = document.getElementById('keyStroke');
+  let [result, setResult] = useState('');
 
-  i && i.addEventListener('keydown', function(e) {
-    if (['+', '-', 'e', '.'].includes(e.key)) {
-      e.preventDefault();
+  const handleSubmit = (event: any) => {
+    if (result.length !== 6) {
+      event.preventDefault();
+      toast.error('The code must be 6 digits long.');
+      return;
     }
-  })
-
-  const inputRefs = Array.from({ length: 6 }, () => useRef(null));
-
-  const handleInput = (index, value) => {
-    if (value.length === 1 && index < inputRefs.length - 1) {
-      inputRefs[index + 1].current.focus();
+    else {
+      
+      console.log(result);
     }
   };
 
@@ -90,7 +66,7 @@ function TwoFactor() {
           </Link>
         </div>
         <form
-          onSubmit={handlSubmit}
+          onSubmit={handleSubmit}
           onChange={checkChange}
           className="flex flex-col items-center"
         >
@@ -101,59 +77,20 @@ function TwoFactor() {
           </div>
           <div onBlur={handleBlur} className="flex flex-row">
             <div className="flex flex-row  items-center mx-6">
-              <div className="h-[70px] w-[54px] mx-4">
                 <input
-                  placeholder='_'
-                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[39px] text-center neonBord'
-                  maxLength={1}
-                  type="number"
-                  id="keyStroke"
-                  key={index}
-                />
-              </div>
-              <div className="h-[70px] w-[54px] mx-4">
-                <input
-                  placeholder='_'
-                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[39px] text-center neonBord'
-                  maxLength={1}
-                />
-              </div>
-              <div className="h-[70px] w-[54px] mx-4">
-                <input
-                  placeholder='_'
-                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[39px] text-center neonBord'
-                  maxLength={1}
-                />
-              </div>
-            </div>
-            <div className="flex flex-row  items-center mx-6">
-              <div className="h-[70px] w-[54px] mx-4">
-                <input
-                  placeholder='_'
-                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[39px] text-center neonBord'
-                  maxLength={1}
-                />
-              </div>
-              <div className="h-[70px] w-[54px] mx-4">
-                <input
-                  placeholder='_'
-                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[39px] text-center neonBord'
-                  maxLength={1}
-                />
-              </div>
-              <div className="h-[70px] w-[54px] mx-4">
-                <input
-                  placeholder='_'
-                  className='bg-[#282828] h-[70px] w-[54px] text-white font-Orbitron text-[39px] text-center neonBord'
-                  maxLength={1}
-                />
-              </div>
+                  placeholder='___ ___'
+                  className='h-[70px] w-[calc(54px*5)] mx-4 bg-[#282828] text-white font-Orbitron text-[39px] text-center neonBord'
+                  type="text"
+                  maxLength={6}
+                  onChange={(e) => setResult(e.target.value)}
+                  />
             </div>
           </div>
           <div className="flex justify-center mt-16 mb-32 mx-[40px] w-[568px] h-[70px]">
             <div className="text-[39px] w-full h-full">
               <button
                 className='font-Orbitron text-[39px] text-center SmallNeonShadowBord NeonShadow w-full h-full'
+                type="submit"
               >
                 Continue
               </button>

@@ -14,6 +14,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from "next/navigation";
 import { context, SocketContext, User } from "../../context/context";
+import { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { set } from "husky";
 
 
 
@@ -191,6 +194,23 @@ function Settings() {
         router.push('/dashboard');
     }
 
+    const [isChecked, setIsChecked] = useState(false);
+    const [showPupUp, setshowPupUp] = useState(false);
+
+    const handleChecked = () => {
+        setIsChecked(!isChecked);
+        setshowPupUp(!showPupUp);
+    }
+
+    const closeLoginModal = () => {
+        setshowPupUp(false);
+    };
+
+    const openLoginModal = () => {
+        setshowPupUp(true);
+    };
+
+
     return (
     <OptionBar flag={5} >
         <main className="w-full h-full   flex flex-col items-center  font-Orbitron min-h-[550px]  min-w-[280px] pb-2 ">
@@ -222,8 +242,8 @@ function Settings() {
                     </div>
 
                 </div>
-                <div className="w-full h-auto md:h-[42%]    mt-8 md:mt-0 px-4 md:px-8  xl:px-16   ">
-                    <div className=" w-full  md:w-1/2 md:h-full h-auto  flex    flex-col ">
+                <div className="w-full h-auto md:h-[42%]    mt-8 md:mt-0 px-4 md:px-8  xl:px-16 flex flex-row justify-between  ">
+                    <div className=" w-[98%]  md:w-[49%] md:h-full h-auto  flex    flex-col ">
                         <div className="w-full h-auto  md:h-1/2  flex flex-col justify-center">
                             <div className="w-1/6 pl-2">
                                 <Pdp  color={false} flag={true} image={user.avatarUrl} name={""} />
@@ -242,11 +262,58 @@ function Settings() {
                 
                         </div>
                     </div>
+                    <div className=" w-[98%]  md:w-[49%] md:h-full h-auto  flex    flex-col items-center mt-24">
+                        <div className="w-full flex flex-row justify-evenly">
+                            <div>Two factor authentication</div>
+                            <label className="switch">
+                                <input type="checkbox" checked={isChecked} onChange={handleChecked} />
+                                <span className="slider"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div className="w-2/3 md:w-1/3 h-12 md:h-[9%] my-4 md:my-0">
                     <SimpleButton buttonType={"submit"} content="Save" />
                 </div>
             </form>
+            <Transition appear show={showPupUp} as={Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={closeLoginModal}>
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 bg-black bg-opacity-25" />
+                </Transition.Child>
+
+                <div className="fixed inset-0 overflow-y-auto">
+                    <div className="flex justify-center items-center bg-opacity-40 backdrop-blur bg-[#282828] w-screen h-screen">
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0 scale-95"
+                        enterTo="opacity-100 scale-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100 scale-100"
+                        leaveTo="opacity-0 scale-95"
+                    >
+                        <Dialog.Panel className="flex flex-col justify-center bg-black NeonShadowBord">
+                            <div className="font-Orbitron">
+                                <div className="text-[39px]">Scan the Qr bellow:</div>
+                                <div className="m-5">
+                                    <Image src={Upload} alt="upload" className="w-[100px] h-[100px] m-auto" />
+                                </div>
+                            </div>
+                        </Dialog.Panel>
+                    </Transition.Child>
+                    </div>
+                </div>
+                </Dialog>
+            </Transition>
         </main>
     </OptionBar>
     )
