@@ -31,7 +31,7 @@ const fetchInfo = async () => {
 
 const gamePage = () => {
     const {user} = useContext(context);
-    const gameDiv = useRef<HTMLDivElement>(null)
+    const gameDiv = useRef<HTMLDivElement>(null);
     const [{width, height}, setWindowSize] = useState({width: 0, height: 0})
     const [gameSocket, setGameSocket] = useState<any>(null)
     const [isLeft, setIsLeft] = useState(false);
@@ -54,7 +54,9 @@ useEffect(() => {
         }
 
          user.socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
+                console.log('player1', data.player1,'player2' ,data.player2)
                 game?.setState(data.player1, data.player2, data.ball);
+                console.log("gamePlayer1", game?.player1?.position, "gamePlayer2", game?.player2?.position);
         });
     
         console.log('gameSocket', user.socket);
@@ -67,7 +69,7 @@ useEffect(() => {
             setPlayer2Score(data.player2);
         })
         user.socket?.on('startBotton', () => {
-            setStartState(false);
+            setStartState(true);
         })
 
         setGameSocket(user.socket);
@@ -81,10 +83,9 @@ useEffect(() => {
 
 useEffect(() => {
         if (gameDiv.current){
-            console.log('gameDiv.current');
-            game = new Game(gameDiv.current);
+            game = new Game(gameDiv.current, user.map!);
             if (gameSocket)
-                game.setSocket(gameSocket)
+                game.setSocket(gameSocket) 
             game.start(); 
         }
         return () => {
@@ -150,7 +151,9 @@ useEffect(() => {
                     <div className="blueShadow text-[20px] text-[#00B2FF] m-2 hidden md:block">{username}</div>
                 </div>
                 <button onClick={handleLeave} type="button" className="NeonShadowBord flex flex-row items-center h-fit px-4 py-3 hover:bg-white hover:text-[black] transition-[300]">
-                    <Image src={Logout} className='h-[20px]' alt="logout" />
+                    {/* <Image src={Logout} className='h-[20px]' alt="logout" />
+                     */}
+                      <BiLogOut size={30} />
                     <div className="hidden md:block pl-2 text-[15px]">Leave</div>
                 </button>
                 <div className="flex flex-row items-center m-2">
@@ -168,7 +171,7 @@ useEffect(() => {
                 onClick={() => {
                     console.log(gameSocket);
                     setStartState(false);
-                    gameSocket?.emit('StartGame', { map: 'map1' });
+                    gameSocket?.emit('StartGame', {map: user.map});
                 } }
                 className='z-10 h-10 w-52 border'>Start Game</button>}
             <div className='w-[100%] h-[80%] flex justify-center items-center' ref={gameDiv}>

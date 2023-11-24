@@ -1,4 +1,5 @@
 import Matter, { Body, Events, World} from "matter-js";
+import { render } from "react-dom";
 import { Socket } from "socket.io-client";
 
 class Game{
@@ -6,8 +7,10 @@ class Game{
     private _world: Matter.World;
     private _render: Matter.Render;
     private _element: HTMLElement;
+
     width: number;
     height: number;
+    map: string = '';
     walls: Matter.Body[] = [];
     ball: Matter.Body | null = null;
     player1: Matter.Body | null = null;
@@ -17,9 +20,10 @@ class Game{
     mouseConstraint: Matter.MouseConstraint | null = null;
     socket: Socket | null = null;
 
-    constructor(element: HTMLElement){
+    constructor(element: HTMLElement, map : string){
         console.log("Game constructor");
         this._element = element;
+        this.map = map;
         [this.width, this.height] = this._calculateDimensions();
         this._engine = Matter.Engine.create({gravity: {x: 0, y: 0}});
         this._world = this._engine.world;
@@ -30,21 +34,22 @@ class Game{
                 width: this.width,
                 height: this.height,
                 wireframes: false,
-                background: '#ffffff'
+                background: map == 'black' ? '#000000' : '#ffffff'
             }
         });
         this._calculateScale();
+        this._setMouse();
         this._createWalls();
         this._createBall();
-        this._createPlayers();
-        this._setMouse();
         this._setEvents();
+        this._createPlayers();
     }
 
     private _setEvents(): void{
         Events.on(this._engine, 'beforeUpdate', () => {
-            if (this.mouse && this.mouse?.position.x != this.player1?.position.x){
-                this.socket?.emit('MovePlayer', {x: this._map(this.mouse?.position.x, 0, this.width, 0, 600)});
+            if (this.mouse){
+                if(this.mouse.position.x < this.width - 50 * this.scale && this.mouse.position.x > 50 * this.scale)
+                    this.socket?.emit('MovePlayer', {x: this._map(this.mouse.position.x, 0, this.width, 0, 600)});
             }
         });
     }
@@ -61,18 +66,18 @@ class Game{
     }
 
     private _createPlayers(): void{
-        this.player1 = Matter.Bodies.rectangle(this.width / 2, this.height - this._map(50, 0, 800, 0, this.height), this._map(100, 0, 600, 0, this.width), this._map(10, 0, 800, 0, this.height), {isStatic: true});
-        this.player2 = Matter.Bodies.rectangle(this.width / 2, this._map(50, 0, 800, 0, this.height), this._map(100, 0, 600, 0, this.width), this._map(10, 0, 800, 0, this.height), {isStatic: true})
+        this.player1 = Matter.Bodies.rectangle(this.width / 2, this.height - this._map(50, 0, 800, 0, this.height), this._map(100, 0, 600, 0, this.width), this._map(10, 0, 800, 0, this.height),{render: {fillStyle: this.map == 'black'? '#ffffff' : '#000000'}, isStatic: true});
+        this.player2 = Matter.Bodies.rectangle(this.width / 2, this._map(50, 0, 800, 0, this.height), this._map(100, 0, 600, 0, this.width), this._map(10, 0, 800, 0, this.height),{render: {fillStyle: this.map == 'black'? '#ffffff' : '#000000'}, isStatic: true})
         Matter.World.add(this._world, [this.player1, this.player2]);
     }
 
     private _createBall(): void{
-        this.ball = Matter.Bodies.circle(this.width / 2, this.height / 2, 10 * this.scale, {isStatic: true});
+        this.ball = Matter.Bodies.circle(this.width / 2, this.height / 2, 10 * this.scale, {render: {fillStyle: this.map == 'black'? '#ffffff' : '#000000'}, isStatic: true});
         Matter.World.add(this._world, this.ball);
     }
 
     private _map(value: number, x1: number, y1: number, x2: number, y2: number): number{
-        return (value - x1) * (y2 - x2) / (y1 - x1) + x2;
+        return ((value - x1) * (y2 - x2)) / ((y1 - x1) + x2);
     }
 
     private _createWalls(): void{
@@ -90,13 +95,13 @@ class Game{
         let height: number = 0;
         if (this._element.clientWidth > this._element.clientHeight){
             height = this._element.clientHeight;
-            width = height * 3 / 4;
+            width = height * (3 / 4);
         }else{
             width = this._element.clientWidth;
-            height = width * 4 / 3;
+            height = width * (4 / 3);
             if (height > this._element.clientHeight){
                 height = this._element.clientHeight;
-                width = height * 3 / 4;
+                width = height * (3 / 4);
             }
         }
         return [width, height];
@@ -113,16 +118,16 @@ class Game{
 
     public destroy(): void{
         Matter.Events.off(this._engine, 'beforeUpdate', ()=> {});
-        Matter.Render.stop(this._render);
-        Matter.World.clear(this._world, false);
-        Matter.Engine.clear(this._engine);
         this._render.canvas.remove();
+        Matter.Render.stop(this._render);
+        Matter.World.clear(this._world, true);
+        Matter.Engine.clear(this._engine);
     }
 //last update
     public spawnBall(): void{
         if(this.ball){
             Matter.World.remove(this._world, this.ball);
-            this.ball = Matter.Bodies.circle(this.width / 2, this.height / 2, 10 * this.scale, {isStatic: true});
+            this.ball = Matter.Bodies.circle(this.width / 2, this.height / 2, 10 * this.scale, {render: {fillStyle: this.map == 'black'? '#ffffff' : '#000000'}, isStatic: true});
             Matter.World.add(this._world, this.ball);
         }
     }

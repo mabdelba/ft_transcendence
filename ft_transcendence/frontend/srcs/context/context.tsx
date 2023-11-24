@@ -35,7 +35,7 @@ export interface User{
     messagesSocket?: any;
     conversations?: any;
     socket?: any;
-    map?: string;
+    map?: string | null;
     gameType?: string | null;
 }
 

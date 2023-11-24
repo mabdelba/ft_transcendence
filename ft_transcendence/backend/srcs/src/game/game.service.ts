@@ -19,7 +19,7 @@ class GameModel{
     socket1: Socket | null = null;
     socket2: Socket | null = null;
 
-    // this id is the id of the user in the database, not the socket id.
+    // this id is the id of the user in database, not the socket id.
     id1: string | null = null;
     id2: string | null = null;
 
@@ -30,11 +30,12 @@ class GameModel{
         this._runner = Runner.create();
         this._engine = Engine.create({gravity: {x: 0, y: 0}});
         this._world = this._engine.world;
+        this.setForce(1.40, 1.40)
         this._createWalls();
         this._createBall();
         this._createPlayers();
-        this._setEvents();
         Runner.run(this._runner, this._engine);
+        this._setEvents();
     }
     
     setForce(x: number, y: number): void{
@@ -53,7 +54,7 @@ class GameModel{
     }
 
     private _createBall(): void{
-        this.ball = Bodies.circle(this.width / 2, this.height / 2, 10, {mass: 60, restitution: 1, force: {x: 1.34, y: 1.34}, friction: 0, frictionAir: 0, frictionStatic: 0, inertia: Infinity, label: "ball"});
+        this.ball = Bodies.circle(this.width / 2, this.height / 2, 10, {mass: 60, restitution: 1, force: {x: this.xForce, y: this.yForce}, friction: 0, frictionAir: 0, frictionStatic: 0, inertia: Infinity, label: "ball"});
         // World.add(this._world, this.ball);
     }
 
@@ -65,6 +66,7 @@ class GameModel{
 
     private _setEvents(): void{
         Events.on(this._engine, 'beforeUpdate', () => {
+            console.log('player1',this.player1.position, 'player2',this.player2.position)
             this.socket1.emit('GameState', {ball: this.ball?.position, player1: this.player1.position, player2: this.player2.position});
             this.socket2?.emit('GameState', {ball: this._reverseVector(this.ball?.position), player1: this._reverseVector(this.player1.position), player2: this._reverseVector(this.player2.position)});
         });
@@ -75,29 +77,29 @@ class GameModel{
                if ((pair.bodyA.label == "ball" && pair.bodyB.label == "topWall") || (pair.bodyB.label == "ball" && pair.bodyA.label == "topWall"))
                {//need to check whois scored
                    World.remove(this._world, this.ball);
-                    this.ball.position.x = this.width / 2;
-                    this.ball.position.y = this.height / 2;
+                    Body.setPosition(this.ball, {x: this.width / 2, y: this.height / 2});
                     this.player2Score++;
                     this.socket1?.emit('Score', {player1: this.player1Score, player2: this.player2Score});
                     this.socket2?.emit('Score', {player2: this.player2Score, player1: this.player1Score});
                     this.socket1?.emit('startBotton');
+                    if(this.player2Score == 10)
+                        this.socket1?.emit('endGame');
+                    //need to setup this event to show the start button
                     this.gameStarted = false;
                 }
                 else if ((pair.bodyA.label == "ball" && pair.bodyB.label == "bottomWall") || (pair.bodyB.label == "ball" && pair.bodyA.label == "bottomWall"))
                 {
-                    this.ball.position.x = this.width / 2;
-                    this.ball.position.y = this.height / 2;
+                    Body.setPosition(this.ball, {x: this.width / 2, y: this.height / 2});
                     World.remove(this._world, this.ball);
                     this.player1Score++;
                     this.socket1?.emit('startBotton');
                     this.socket1?.emit('Score', {player1: this.player1Score, player2: this.player2Score});
-                    this.socket2?.emit('Score', {player2: this.player2Score, player1: this.player1Score});
+                    this.socket2?.emit('Score', {player2: this.player2Score, player1: this.player1Score}); 
+                    if(this.player1Score == 10)
+                        this.socket2?.emit('endGame');
                     this.gameStarted = false;
                 }
-                if(this.player1Score == 10)
-                    this.socket2?.emit('endGame');
-                else if(this.player2Score == 10)
-                    this.socket1?.emit('endGame');
+
             }
 
         });
@@ -135,6 +137,7 @@ class GameModel{
 //destroy this function when the game ends
     public destroy(): void{
         console.log("destroy");
+        Events.off(this._engine, 'beforeUpdate', ()=> {});
         Runner.stop(this._runner);
         World.clear(this._world, true);
         Engine.clear(this._engine);

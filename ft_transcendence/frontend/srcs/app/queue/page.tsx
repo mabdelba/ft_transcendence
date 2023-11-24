@@ -85,10 +85,10 @@ function Queue() {
         <div className='flex flex-col items-center h-screen justify-center'>
           <h1 className='font-Orbitron NeonShadow text-[30px] mb-[30px]'>Choose a map</h1>
           <div className='flex content-center justify-center'>
-            <button className='' onClick={()=>toggleModal('light')}>
+            <button className='' onClick={()=>toggleModal('white')}>
               <Image src={LightMap} alt="LightMap" />
             </button>
-            <button className='' onClick={()=>toggleModal('dark')}>
+            <button className='' onClick={()=>toggleModal('black')}>
               <Image src={DarkMap} alt="DarkMap" />
             </button>
           </div>
