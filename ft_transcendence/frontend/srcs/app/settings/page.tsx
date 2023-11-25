@@ -204,11 +204,33 @@ function Settings() {
 
     }
 
+    const [qr, setQr] = useState(Upload);
+
+    const fetchQrCode = async () => {
+        const token = localStorage.getItem('jwtToken');
+        const config = {
+            headers: { Authorization: `Bearer ${token}` },
+        };
+        const url = "http://localhost:3000/api/atari-pong/v1/two-factor-auth/qrcode";
+        await axios.get(url, config)
+        .then((response) => {
+            setQr(response.data);
+        })
+        .catch((error) => {
+            console.log("error: ", error);
+        })
+    }
+
+    const [result, setResult] = useState("");
     const [isChecked, setIsChecked] = useState(user.twoFaActive);
     const [showPupUp, setshowPupUp] = useState(false);
 
     const handleChecked = () => {
-        setIsChecked(!isChecked);
+        if(!isChecked)
+        {
+            setIsChecked(false);
+            fetchQrCode();
+        }
         setshowPupUp(!showPupUp);
     }    
 
@@ -219,8 +241,17 @@ function Settings() {
     const openLoginModal = () => {
         setshowPupUp(true);
     };    
-    
 
+    const handleQrSubmit = (event: any) => {
+        if (result.length !== 6) {
+          event.preventDefault();
+          toast.error('The code must be 6 digits long.');
+          return;
+        }
+        else {
+          console.log(result);
+        }
+      };
 
     return (
     <OptionBar flag={5} >
@@ -318,13 +349,26 @@ function Settings() {
                                 <div className="text-[24px] mx-8 mb-5 text-center">Scan the Qr bellow:</div>
                                 <div className="m-5">
                                     {/* get the qr picture */}
-                                    <Image src={Upload} alt="upload" className="w-[100px] h-[100px] m-auto" />
+                                    <Image src={qr} alt="upload" className=" m-auto" width={200} height={200} />
+                                    <div className="flex flex-row">
+                                        <div className="flex flex-row  items-center mx-6 py-5">
+                                            <input
+                                            placeholder='___ ___'
+                                            className='h-[70px] w-[calc(54px*5)] mx-4 bg-[#282828] text-white font-Orbitron text-[39px] text-center neonBord'
+                                            type="text"
+                                            maxLength={6}
+                                            onChange={(e) => setResult(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
                                     <div className="text-center m-3">
                                         <button
                                             className="NeonShadowBord px-[30px] py-[10px] text-[24px]"
                                             // change the state of onclick
-                                            onClick={closeLoginModal}
-                                        > submit</button>
+                                            onClick={handleQrSubmit}
+                                        >
+                                            submit
+                                        </button>
                                     </div>
                                 </div>
                             </div>
