@@ -46,7 +46,7 @@ class Game{
     }
 
     private _setEvents(): void{
-        Events.on(this._engine, 'beforeUpdate', () => {
+        Events.on(this.mouseConstraint, "mousemove", () => {
             if (this.mouse){
                 if(this.mouse.position.x < this.width - 50 * this.scale && this.mouse.position.x > 50 * this.scale)
                     this.socket?.emit('MovePlayer', {x: this._map(this.mouse.position.x, 0, this.width, 0, 600)});
@@ -56,7 +56,15 @@ class Game{
 
     private _setMouse(): void{
         this.mouse = Matter.Mouse.create(this._render.canvas);
-        this.mouseConstraint = Matter.MouseConstraint.create(this._engine, {mouse: this.mouse});
+        this.mouseConstraint = Matter.MouseConstraint.create(this._engine, {
+            mouse: this.mouse,
+            constraint: {
+                stiffness: 0.1,
+                render: {
+                    visible: false
+                }
+            }
+          });
     }
 
     private _calculateScale(): void{
@@ -66,8 +74,8 @@ class Game{
     }
 
     private _createPlayers(): void{
-        this.player1 = Matter.Bodies.rectangle(this.width / 2, this.height - this._map(50, 0, 800, 0, this.height), this._map(100, 0, 600, 0, this.width), this._map(10, 0, 800, 0, this.height),{render: {fillStyle: this.map == 'black'? '#ffffff' : '#000000'}, isStatic: true});
-        this.player2 = Matter.Bodies.rectangle(this.width / 2, this._map(50, 0, 800, 0, this.height), this._map(100, 0, 600, 0, this.width), this._map(10, 0, 800, 0, this.height),{render: {fillStyle: this.map == 'black'? '#ffffff' : '#000000'}, isStatic: true})
+        this.player1 = Matter.Bodies.rectangle(this.width / 2, this.height - this._map(50, 0, 800, 0, this.height), this._map(100, 0, 600, 0, this.width), this._map(10, 0, 800, 0, this.height),{render: {fillStyle: '#00B2FF'}, isStatic: true});
+        this.player2 = Matter.Bodies.rectangle(this.width / 2, this._map(50, 0, 800, 0, this.height), this._map(100, 0, 600, 0, this.width), this._map(10, 0, 800, 0, this.height),{render: {fillStyle: '#FF0742'}, isStatic: true})
         Matter.World.add(this._world, [this.player1, this.player2]);
     }
 
@@ -82,10 +90,10 @@ class Game{
 
     private _createWalls(): void{
         this.walls = [
-            Matter.Bodies.rectangle(this.width / 2, 0, this.width, this._map(10, 0, 800, 0, this.height), {isStatic: true}),
-            Matter.Bodies.rectangle(this.width / 2, this.height, this.width, this._map(10, 0, 800, 0, this.height), {isStatic: true}),
-            Matter.Bodies.rectangle(0, this.height / 2, this._map(10, 0, 600, 0, this.width), this.height, {isStatic: true}),
-            Matter.Bodies.rectangle(this.width, this.height / 2, this._map(10, 0, 600, 0, this.width), this.height, {isStatic: true})
+            Matter.Bodies.rectangle(this.width / 2, 0, this.width, this._map(10, 0, 800, 0, this.height),{render: {fillStyle: this.map == 'black'? '#ffffff' : '#000000'}, isStatic: true}),
+            Matter.Bodies.rectangle(this.width / 2, this.height, this.width, this._map(10, 0, 800, 0, this.height),{render: {fillStyle: this.map == 'black'? '#ffffff' : '#000000'}, isStatic: true}),
+            Matter.Bodies.rectangle(0, this.height / 2, this._map(10, 0, 600, 0, this.width), this.height,{render: {fillStyle: this.map == 'black'? '#ffffff' : '#000000'}, isStatic: true}),
+            Matter.Bodies.rectangle(this.width, this.height / 2, this._map(10, 0, 600, 0, this.width), this.height,{render: {fillStyle: this.map == 'black'? '#ffffff' : '#000000'}, isStatic: true})
         ];
         Matter.World.add(this._world, this.walls);
     }

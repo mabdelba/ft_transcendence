@@ -54,9 +54,7 @@ useEffect(() => {
         }
 
          user.socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
-                console.log('player1', data.player1,'player2' ,data.player2)
                 game?.setState(data.player1, data.player2, data.ball);
-                console.log("gamePlayer1", game?.player1?.position, "gamePlayer2", game?.player2?.position);
         });
     
         console.log('gameSocket', user.socket);
@@ -64,6 +62,9 @@ useEffect(() => {
          user.socket?.on('gameEnded', (data: {state: string}) => {
              setGameEnded(data.state);
          })
+        user.socket?.on('gameOver' , () => {
+            user.socket?.emit('endGame');
+        })
         user.socket?.on('Score', (data: {player1: number, player2: number}) => {
             setPlayer1Score(data.player1);
             setPlayer2Score(data.player2);

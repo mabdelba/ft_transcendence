@@ -66,7 +66,6 @@ class GameModel{
 
     private _setEvents(): void{
         Events.on(this._engine, 'beforeUpdate', () => {
-            console.log('player1',this.player1.position, 'player2',this.player2.position)
             this.socket1.emit('GameState', {ball: this.ball?.position, player1: this.player1.position, player2: this.player2.position});
             this.socket2?.emit('GameState', {ball: this._reverseVector(this.ball?.position), player1: this._reverseVector(this.player1.position), player2: this._reverseVector(this.player2.position)});
         });
@@ -78,26 +77,25 @@ class GameModel{
                {//need to check whois scored
                    World.remove(this._world, this.ball);
                     Body.setPosition(this.ball, {x: this.width / 2, y: this.height / 2});
-                    this.player2Score++;
-                    this.socket1?.emit('Score', {player1: this.player1Score, player2: this.player2Score});
-                    this.socket2?.emit('Score', {player2: this.player2Score, player1: this.player1Score});
-                    this.socket1?.emit('startBotton');
-                    if(this.player2Score == 10)
-                        this.socket1?.emit('endGame');
-                    //need to setup this event to show the start button
-                    this.gameStarted = false;
-                }
-                else if ((pair.bodyA.label == "ball" && pair.bodyB.label == "bottomWall") || (pair.bodyB.label == "ball" && pair.bodyA.label == "bottomWall"))
-                {
-                    Body.setPosition(this.ball, {x: this.width / 2, y: this.height / 2});
-                    World.remove(this._world, this.ball);
                     this.player1Score++;
                     this.socket1?.emit('startBotton');
                     this.socket1?.emit('Score', {player1: this.player1Score, player2: this.player2Score});
-                    this.socket2?.emit('Score', {player2: this.player2Score, player1: this.player1Score}); 
+                    this.socket2?.emit('Score', {player1: this.player2Score, player2: this.player1Score});
                     if(this.player1Score == 10)
-                        this.socket2?.emit('endGame');
-                    this.gameStarted = false;
+                        this.socket2?.emit('gameOver');
+                    this.gameStarted = !this.gameStarted;
+                }
+                else if ((pair.bodyA.label == "ball" && pair.bodyB.label == "bottomWall") || (pair.bodyB.label == "ball" && pair.bodyA.label == "bottomWall"))
+                {
+                    World.remove(this._world, this.ball);
+                    Body.setPosition(this.ball, {x: this.width / 2, y: this.height / 2});
+                    this.player2Score++;
+                    this.socket1?.emit('startBotton');
+                    this.socket1?.emit('Score', {player1: this.player1Score, player2: this.player2Score});
+                    this.socket2?.emit('Score', {player1: this.player2Score, player2: this.player1Score}); 
+                    if(this.player2Score == 10)
+                        this.socket1?.emit('gameOver');
+                    this.gameStarted = !this.gameStarted;
                 }
 
             }
@@ -127,7 +125,7 @@ class GameModel{
     //     console.log("run");
         
     // }
-    public spawnBall(): void{
+    public runGame(): void{
         if(!this.gameStarted){
             this.gameStarted = !this.gameStarted;
             this._createBall();

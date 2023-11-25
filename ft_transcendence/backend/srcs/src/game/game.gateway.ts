@@ -84,15 +84,11 @@ export class GameGateway {
         const privateIndex = this.privateGame.findIndex((game) => (game.game.id1 == socket.id && game.id2 != '') || game.game.id2 == socket.id);
         if (index >= 0 && this.RandomGames[index].game.socket1.connected && this.RandomGames[index].game.socket2.connected){
             const game: GameModel = this.RandomGames[index].game;
-            console.log("start game", game.id1, game.id2, index);
-            // game.run();
-            game.spawnBall();
+            game.runGame();
         }
         else if(privateIndex >= 0 && this.privateGame[privateIndex].game.socket1.connected && this.privateGame[privateIndex].game.socket2.connected){
             const game: GameModel = this.privateGame[privateIndex].game;
-            console.log("start private game", game.id1, game.id2, privateIndex);
-            // game.run();
-            game.spawnBall();
+            game.runGame();
         }
     }
 
@@ -117,6 +113,7 @@ export class GameGateway {
     handleEndGame(@ConnectedSocket() socket: Socket) {
         const index = this.RandomGames.findIndex((game) => (game.game.id1 == socket.id || game.game.id2 == socket.id));
         const privateIndex = this.privateGame.findIndex((game) => (game.game.id1 == socket.id || game.game.id2 == socket.id));
+        console.log("end game");
         if (index >= 0){
             const game: GameModel = this.RandomGames[index].game;
             if (socket.id == game.socket2.id){
