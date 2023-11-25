@@ -8,7 +8,7 @@ import QuaranteDeux from '../../../public/42.svg';
 import blackQuarante from '../../../public/black42.svg';
 import seePassword from '../../../public/seePassword.svg';
 import hidePass from '../../../public/hidepass.svg';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import React from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -64,6 +64,19 @@ function Login(props: closeFunc) {
       .catch((error) => {
         toast.error('Incorrect username or password!')})   ;
   };
+
+  useEffect(()=> {
+
+    const keyDownHandler = (e: any)=> {
+      // console.log('user pressed: ', e.key);
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        handleSubmit
+      }
+    }
+    document.addEventListener('keydown', keyDownHandler);
+    return ()=> document.removeEventListener('keydown', keyDownHandler)
+  }, [])
 
   const handleFtClick = (event: any) => {
     event.preventDefault();
@@ -146,7 +159,7 @@ function Login(props: closeFunc) {
               isVerif={false}
             />
           </div>
-          <div className="h-[30%] w-full ">
+          <div  className="h-[30%] w-full ">
             <SimpleInput
               SetValue={setPassword}
               holder="Password"
@@ -163,9 +176,9 @@ function Login(props: closeFunc) {
         </div>
         <div className="px-2 w-full h-[57.15%] space-y-10">
           <div className="h-[25%] w-full ">
-            <SimpleButton content="Log-in" buttonType="submit" />
+            <SimpleButton  content="Log-in" buttonType="submit" />
           </div>
-          <div className="h-[25%] w-full flex flex-row justify-center space-x-10">
+          <div  className="h-[25%] w-full flex flex-row justify-center space-x-10">
               <SimpleButton icon={QuaranteDeux} icon2={blackQuarante} buttonType="button" handleClick={handleFtClick} />
             {/* <div className="w-[50%] h-full">
               <SimpleButton icon={google} icon2={google} buttonType="button" />
