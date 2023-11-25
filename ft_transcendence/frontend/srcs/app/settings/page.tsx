@@ -195,29 +195,7 @@ function Settings() {
         router.push('/dashboard');
     }
 
-        const fetchUser = async () => {
-            const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
-            const token = localStorage.getItem('jwtToken');
-            const config = {
-            headers: { Authorization: `Bearer ${token}` },
-            };
-            const res = await fetch(apiUrl, config);
-            return res.json();
-        };
-        
-        let r: Promise<object> = fetchUser();
-
-        try {
-            r.then((response: any) => {
-                console.log("response: ", response);
-            }
-        }
-        catch (error) {
-            console.log("error: ", error);
-        }
-        // console.log("r: ", r.twoFaActive);
-
-    const [isChecked, setIsChecked] = useState(false);
+    const [isChecked, setIsChecked] = useState(user.twoFaActive);
     const [showPupUp, setshowPupUp] = useState(false);
 
     const handleChecked = () => {
