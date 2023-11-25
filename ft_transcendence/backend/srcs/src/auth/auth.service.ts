@@ -134,7 +134,7 @@ export class AuthService {
           token: await this.getToken(user.id, user.login),
         };
     } catch (e) {
-      throw e;
+      throw new ForbiddenException('User not found');
     }
   }
 

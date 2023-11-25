@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -8,6 +8,7 @@ export class TasksService {
 
   @Cron('0 0 * * * *')
   async checkUnmutedUsersInChannel() {
+    try{
     await this.prisma.userMutedInChannel.deleteMany({
       where: {
         dateEnd: {
@@ -15,5 +16,8 @@ export class TasksService {
         },
       },
     });
+  } catch (e) {
+    throw new ForbiddenException('User not found');
+  }
   }
 }

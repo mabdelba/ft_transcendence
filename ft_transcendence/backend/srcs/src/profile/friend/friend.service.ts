@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { getAvatarUrlFromLogin } from 'src/utils/get-avatar-from-login';
@@ -9,6 +9,7 @@ export class FriendService {
   
 
   async getFriendList(user: User) {
+    try{
     const friendList = await this.prisma.user.findUnique({
       where: {
         id: user.id,
@@ -31,9 +32,13 @@ export class FriendService {
     );
   
     return { ...friendList, friends: updatedFriendList };
+    } catch (e) {
+      throw new ForbiddenException('User not found');
+    }
   }
 
   async getFriendRequestsList(user: User) {
+    try{
     const friendRequestsList = await this.prisma.user.findUnique({
       where: {
         id: user.id,
@@ -56,9 +61,13 @@ export class FriendService {
       );
       // console.log("this is friendRequestsList", updatedFriendReqList);
     return { ...friendRequestsList, recievedFriendRequestsBy: updatedFriendReqList };
+    } catch (e) {
+      throw new ForbiddenException('User not found');
+    }
   }
 
   async getBlockedUserList(user: User) {
+    try{
     const blockedUserList = await this.prisma.user.findUnique({
       where: {
         id: user.id,
@@ -80,159 +89,168 @@ export class FriendService {
       })
     );
     return { ...blockedUserList, blockedList: updatedFriendBlockedList };
-
+    } catch (e) {
+      throw new ForbiddenException('User not found');
+    }
   }
 
   async sendFriendRequest(user: User, recieverId: number) {
-    const alreadyFriendsCheck = await this.prisma.user.findUnique({
-      where: {
-        id: user.id,
-      },
-      include: {
-        friends: {
-          where: {
-            id: recieverId,
+    try{
+      const alreadyFriendsCheck = await this.prisma.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          friends: {
+            where: {
+              id: recieverId,
+            },
           },
         },
-      },
-    });
-    const friendReqSendedCheck = await this.prisma.user.findUnique({
-      where: {
-        id: user.id,
-      },
-      include: {
-        sendFriendRequestsTo: {
-          where: {
-            id: recieverId,
+      });
+      const friendReqSendedCheck = await this.prisma.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          sendFriendRequestsTo: {
+            where: {
+              id: recieverId,
+            },
           },
         },
-      },
-    });
-    const friendReqRecievedCheck = await this.prisma.user.findUnique({
-      where: {
-        id: user.id,
-      },
-      include: {
-        recievedFriendRequestsBy: {
-          where: {
-            id: recieverId,
+      });
+      const friendReqRecievedCheck = await this.prisma.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          recievedFriendRequestsBy: {
+            where: {
+              id: recieverId,
+            },
           },
         },
-      },
-    });
-    if (!friendReqSendedCheck || !friendReqRecievedCheck) {
-      return {
-        status: 404,
-        message: 'User not found',
-      };
-    } else if (
-      friendReqSendedCheck.sendFriendRequestsTo.length > 0 ||
-      friendReqRecievedCheck.recievedFriendRequestsBy.length > 0
-    ) {
-      return {
-        status: 400,
-        message: 'Friend request already sent or recieved',
-      };
-    } else if (recieverId === user.id) {
-      return {
-        status: 400,
-        message: 'You cannot add yourself',
-      };
-    } else if (alreadyFriendsCheck.friends.length > 0) {
-      return {
-        status: 400,
-        message: 'You are already friends',
-      };
-    }
-    await this.prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        sendFriendRequestsTo: {
-          connect: {
-            id: recieverId,
-          },
-        },
-      },
-    });
-    return {
-      status: 200,
-      message: 'Friend request sended',
-    };
-  }
-  async acceptFriendRequest(user: User, senderId: number) {
-    const friendReqRecievedCheck = await this.prisma.user.findUnique({
-      where: {
-        id: user.id,
-      },
-      include: {
-        recievedFriendRequestsBy: {
-          where: {
-            id: senderId,
-          },
-        },
-      },
-    });
-    if (!friendReqRecievedCheck) {
-      return {
-        status: 404,
-        message: 'User not found',
-      };
-    } else if (friendReqRecievedCheck.recievedFriendRequestsBy.length === 0) {
-      return {
-        status: 400,
-        message: 'Friend request not found',
-      };
-    } else if (senderId === user.id) {
-      return {
-        status: 400,
-        message: 'You cannot add yourself',
-      };
-    }
-    await this.prisma.$transaction([
-      this.prisma.user.update({
+      });
+      if (!friendReqSendedCheck || !friendReqRecievedCheck) {
+        return {
+          status: 404,
+          message: 'User not found',
+        };
+      } else if (
+        friendReqSendedCheck.sendFriendRequestsTo.length > 0 ||
+        friendReqRecievedCheck.recievedFriendRequestsBy.length > 0
+      ) {
+        return {
+          status: 400,
+          message: 'Friend request already sent or recieved',
+        };
+      } else if (recieverId === user.id) {
+        return {
+          status: 400,
+          message: 'You cannot add yourself',
+        };
+      } else if (alreadyFriendsCheck.friends.length > 0) {
+        return {
+          status: 400,
+          message: 'You are already friends',
+        };
+      }
+      await this.prisma.user.update({
         where: {
           id: user.id,
         },
         data: {
           sendFriendRequestsTo: {
-            disconnect: {
-              id: senderId,
-            },
-          },
-          recievedFriendRequestsBy: {
-            disconnect: {
-              id: senderId,
-            },
-          },
-          friends: {
             connect: {
-              id: senderId,
+              id: recieverId,
             },
           },
         },
-      }),
-      this.prisma.user.update({
+      });
+      return {
+        status: 200,
+        message: 'Friend request sended',
+      };
+    } catch (e) {
+      throw new ForbiddenException('User not found');
+    }
+  }
+  async acceptFriendRequest(user: User, senderId: number) {
+      try{const friendReqRecievedCheck = await this.prisma.user.findUnique({
         where: {
-          id: senderId,
+          id: user.id,
         },
-        data: {
-          friends: {
-            connect: {
-              id: user.id,
+        include: {
+          recievedFriendRequestsBy: {
+            where: {
+              id: senderId,
             },
           },
         },
-      }),
-    ]);
-    return {
-      status: 200,
-      message: 'Friend request accepted',
-    };
+      });
+      if (!friendReqRecievedCheck) {
+        return {
+          status: 404,
+          message: 'User not found',
+        };
+      } else if (friendReqRecievedCheck.recievedFriendRequestsBy.length === 0) {
+        return {
+          status: 400,
+          message: 'Friend request not found',
+        };
+      } else if (senderId === user.id) {
+        return {
+          status: 400,
+          message: 'You cannot add yourself',
+        };
+      }
+      await this.prisma.$transaction([
+        this.prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            sendFriendRequestsTo: {
+              disconnect: {
+                id: senderId,
+              },
+            },
+            recievedFriendRequestsBy: {
+              disconnect: {
+                id: senderId,
+              },
+            },
+            friends: {
+              connect: {
+                id: senderId,
+              },
+            },
+          },
+        }),
+        this.prisma.user.update({
+          where: {
+            id: senderId,
+          },
+          data: {
+            friends: {
+              connect: {
+                id: user.id,
+              },
+            },
+          },
+        }),
+      ]);
+      return {
+        status: 200,
+        message: 'Friend request accepted',
+      };} catch (e) {
+        throw new ForbiddenException('User not found');
+      }
   }
   async rejectFriendRequest(user: User, senderId: number) {
-    const friendReqRecievedCheck = await this.prisma.user.findUnique({
+    try
+    {const friendReqRecievedCheck = await this.prisma.user.findUnique({
       where: {
         id: user.id,
       },
@@ -285,9 +303,12 @@ export class FriendService {
     return {
       status: 200,
       message: 'Friend request rejected',
-    };
+    };} catch (e) {
+      throw new ForbiddenException('User not found');
+    }
   }
   async removeFriend(user: User, friendId: number) {
+    try{
     const alreadyFriendsCheck = await this.prisma.user.findUnique({
       where: {
         id: user.id,
@@ -341,8 +362,12 @@ export class FriendService {
       status: 200,
       message: 'Friend removed',
     };
+  } catch (e) {
+    throw new ForbiddenException('User not found');
+  }
   }
   async blockUser(user: User, userId: number) {
+    try{
     const alreadyBlockedCheck = await this.prisma.user.findUnique({
       where: {
         id: user.id,
@@ -403,8 +428,12 @@ export class FriendService {
       status: 200,
       message: 'User blocked',
     };
+  } catch (e) {
+    throw new ForbiddenException('User not found');
+  }
   }
   async unblockUser(user: User, userId: number) {
+    try{
     const alreadyBlockedCheck = await this.prisma.user.findUnique({
       where: {
         id: user.id,
@@ -458,5 +487,8 @@ export class FriendService {
       status: 200,
       message: 'User unblocked',
     };
+  } catch (e) {
+    throw new ForbiddenException('User not found');
+  }
   }
 }
