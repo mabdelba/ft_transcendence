@@ -334,6 +334,7 @@ body {
 }
 
 .slider {
+  min-width: 60px;
   position: absolute;
   cursor: pointer;
   top: 0;

@@ -17,6 +17,7 @@ import { context, SocketContext, User } from "../../context/context";
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { set } from "husky";
+import Close from "../../public/close.svg";
 
 
 
@@ -194,21 +195,44 @@ function Settings() {
         router.push('/dashboard');
     }
 
+        const fetchUser = async () => {
+            const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+            const token = localStorage.getItem('jwtToken');
+            const config = {
+            headers: { Authorization: `Bearer ${token}` },
+            };
+            const res = await fetch(apiUrl, config);
+            return res.json();
+        };
+        
+        let r: Promise<object> = fetchUser();
+
+        try {
+            r.then((response: any) => {
+                console.log("response: ", response);
+            }
+        }
+        catch (error) {
+            console.log("error: ", error);
+        }
+        // console.log("r: ", r.twoFaActive);
+
     const [isChecked, setIsChecked] = useState(false);
     const [showPupUp, setshowPupUp] = useState(false);
 
     const handleChecked = () => {
         setIsChecked(!isChecked);
         setshowPupUp(!showPupUp);
-    }
+    }    
 
     const closeLoginModal = () => {
         setshowPupUp(false);
-    };
+    };    
 
     const openLoginModal = () => {
         setshowPupUp(true);
-    };
+    };    
+    
 
 
     return (
@@ -242,7 +266,7 @@ function Settings() {
                     </div>
 
                 </div>
-                <div className="w-full h-auto md:h-[42%]    mt-8 md:mt-0 px-4 md:px-8  xl:px-16 flex flex-row justify-between  ">
+                <div className="w-full h-auto md:h-[42%]    mt-8 md:mt-0 px-4 md:px-8  xl:px-16 flex  flex-col md:flex-row justify-between  ">
                     <div className=" w-[98%]  md:w-[49%] md:h-full h-auto  flex    flex-col ">
                         <div className="w-full h-auto  md:h-1/2  flex flex-col justify-center">
                             <div className="w-1/6 pl-2">
@@ -262,10 +286,10 @@ function Settings() {
                 
                         </div>
                     </div>
-                    <div className=" w-[98%]  md:w-[49%] md:h-full h-auto  flex    flex-col items-center mt-24">
+                    <div className=" w-[98%]  md:w-[49%] md:h-full h-auto  flex flex-col items-center mt-24 mb-8">
                         <div className="w-full flex flex-row justify-evenly">
                             <div>Two factor authentication</div>
-                            <label className="switch">
+                            <label className="switch mr-3">
                                 <input type="checkbox" checked={isChecked} onChange={handleChecked} />
                                 <span className="slider"></span>
                             </label>
@@ -303,9 +327,18 @@ function Settings() {
                     >
                         <Dialog.Panel className="flex flex-col justify-center bg-black NeonShadowBord">
                             <div className="font-Orbitron">
-                                <div className="text-[39px]">Scan the Qr bellow:</div>
+                                <div className="flex justify-end"><Image className="cursor-pointer" src={Close} alt="close" onClick={closeLoginModal} /></div>
+                                <div className="text-[24px] mx-8 mb-5 text-center">Scan the Qr bellow:</div>
                                 <div className="m-5">
+                                    {/* get the qr picture */}
                                     <Image src={Upload} alt="upload" className="w-[100px] h-[100px] m-auto" />
+                                    <div className="text-center m-3">
+                                        <button
+                                            className="NeonShadowBord px-[30px] py-[10px] text-[24px]"
+                                            // change the state of onclick
+                                            onClick={closeLoginModal}
+                                        > submit</button>
+                                    </div>
                                 </div>
                             </div>
                         </Dialog.Panel>
