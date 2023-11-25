@@ -43,6 +43,7 @@ function Login(props: closeFunc) {
         draggable: true,
         progress: undefined,
         theme: 'dark',
+        
       });
       return;
     }
@@ -51,6 +52,7 @@ function Login(props: closeFunc) {
     const password = Data.password;
 
     const logData = { login, password };
+    console.log("haaaa za: ", logData)
     const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/login';
     axios
       .post(apiUrl, logData)
@@ -67,16 +69,18 @@ function Login(props: closeFunc) {
 
   useEffect(()=> {
 
+    console.log('hello')
+
     const keyDownHandler = (e: any)=> {
       // console.log('user pressed: ', e.key);
       if(e.key === 'Enter'){
         e.preventDefault();
-        handleSubmit
+        handleSubmit(e);
       }
     }
     document.addEventListener('keydown', keyDownHandler);
-    return ()=> document.removeEventListener('keydown', keyDownHandler)
-  }, [])
+    return () => document.removeEventListener('keydown', keyDownHandler)
+  })
 
   const handleFtClick = (event: any) => {
     event.preventDefault();
@@ -159,7 +163,7 @@ function Login(props: closeFunc) {
               isVerif={false}
             />
           </div>
-          <div  className="h-[30%] w-full ">
+          <div className="h-[30%] w-full ">
             <SimpleInput
               SetValue={setPassword}
               holder="Password"
@@ -176,7 +180,7 @@ function Login(props: closeFunc) {
         </div>
         <div className="px-2 w-full h-[57.15%] space-y-10">
           <div className="h-[25%] w-full ">
-            <SimpleButton  content="Log-in" buttonType="submit" />
+            <SimpleButton content="Log-in" buttonType="submit" />
           </div>
           <div  className="h-[25%] w-full flex flex-row justify-center space-x-10">
               <SimpleButton icon={QuaranteDeux} icon2={blackQuarante} buttonType="button" handleClick={handleFtClick} />
