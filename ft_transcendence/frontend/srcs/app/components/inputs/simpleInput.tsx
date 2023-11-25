@@ -1,6 +1,7 @@
 'use client';
 import { use, useState, MouseEvent } from 'react';
 import Image from 'next/image';
+import { toast } from 'react-toastify';
 
 type InputProps = {
   holder: string;

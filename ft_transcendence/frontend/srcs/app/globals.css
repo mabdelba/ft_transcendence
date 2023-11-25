@@ -285,7 +285,7 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 8px;
   border: 0.5px solid #FFF;
   
   margin: 50px;

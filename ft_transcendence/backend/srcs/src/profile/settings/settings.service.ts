@@ -46,27 +46,43 @@ export class SettingsService {
     }
   }
   async updateFirstname(user: User, firstname: string) {
+    try{
     await this.prisma.user.update({
       where: { id: user.id },
       data: { firstName: firstname },
     });
+  } catch (e) {
+    throw new ForbiddenException('User not found');
+  }
   }
   async updateLastname(user: User, lastname: string) {
+    try{
     await this.prisma.user.update({
       where: { id: user.id },
       data: { lastName: lastname },
     });
+  } catch (e) {
+    throw new ForbiddenException('User not found');
+  }
   }
   async enable2fa(user: User) {
+    try{
     await this.prisma.user.update({
       where: { id: user.id },
       data: { twoFaActive: true },
     });
+  } catch (e) {
+    throw new ForbiddenException('User not found');
+  }
   }
   async disable2fa(user: User) {
+    try{
     await this.prisma.user.update({
       where: { id: user.id },
       data: { twoFaActive: false },
     });
+  } catch (e) {
+    new ForbiddenException('User not found');
+  }
   }
 }

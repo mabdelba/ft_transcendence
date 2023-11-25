@@ -29,6 +29,19 @@ function UserProfil(props: newType) {
   const router = useRouter();
   const [numberofMatchPlayed, setNumberOfMatchPlayed] = useState(0);
 
+  useEffect( ()=> {
+
+    const url = 'http://localhost:3000/api/atari-pong/v1/user/me';
+    const token = localStorage.getItem('jwtToken');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+     axios.post(url, {userLogin: props.params.login}, config)
+    .catch((err)=>  {
+      router.push('/dashboard');
+    })
+    
+  })
   useEffect(()=> {
     if(!user.login){
 

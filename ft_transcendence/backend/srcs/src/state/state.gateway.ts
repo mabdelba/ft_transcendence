@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { ForbiddenException, UseGuards } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -30,6 +30,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleDisconnect(client: any) {
     if (this.users.has(client.id) && this.users.get(client.id) != null) {
       console.log('offline----', this.users.get(client.id));
+      try{
       await this.prisma.user.update({
         where: {
           login: this.users.get(client.id),
@@ -39,6 +40,9 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
         },
       });
       this.users.delete(client.id);
+    } catch (e) {
+      throw new ForbiddenException('User not found');
+    }
     }
   }
 
@@ -48,6 +52,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const decoded = jwtDecode(jwtToken);
     console.log('online----', decoded['login']);
     this.users.set(client.id, decoded['login']);
+    try{
     await this.prisma.user.update({
       where: {
         login: decoded['login'],
@@ -56,23 +61,31 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
         state: 1,
       },
     });
+  } catch (e) {
+    throw new ForbiddenException('User not found');
+  }
   }
   @SubscribeMessage('offline')
-  async setOffline(client: Socket, message: { token: string }) {
+  async setOffline(client: Socket, message: { token: string, login?: string }) {
     const jwtToken = message.token;
     const decoded = jwtDecode(jwtToken);
     console.log('offline----', decoded['login']);
     this.users.delete(client.id);
+    const log = message.login ? message.login : decoded['login'];
+    try{ 
     await this.prisma.user.update({
       where: {
-        login: decoded['login'],
+        login: log,
       },
       data: {
         state: 0,
       },
-    });
+    }); 
+  } catch (e) {
+    throw new ForbiddenException('User not found');
   }
-
+  }
+ 
   /** 
        events for direct messages namespace
   **/

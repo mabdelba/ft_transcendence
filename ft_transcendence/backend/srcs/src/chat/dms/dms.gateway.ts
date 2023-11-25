@@ -40,7 +40,7 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!this.dmsService.checkUsers(data.senderLogin, data.receiverLogin)) return;
     await this.dmsService.sendAndSaveMessage(client, data, ios, users);
   }
- 
+  
   @SubscribeMessage('users-with-conversation')
   async getUsersWithConversation(
     @MessageBody() data: { login: string },
@@ -56,7 +56,7 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { isChannel: boolean; senderLogin: string; receiverLogin: string },
     @ConnectedSocket() client: Socket,
     users:any
-  ) {
+  ) { 
     if (!this.dmsService.checkUsers(data.senderLogin, data.receiverLogin)) return;
     const messages = await this.dmsService.getMessages(data, this.io, client, users);
     client.emit('get-messages', messages);
@@ -64,5 +64,5 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   // channels part
-  
-}
+
+} 

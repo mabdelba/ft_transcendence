@@ -42,14 +42,14 @@ function Profil(props: profileProp) {
 				headers: { Authorization: `Bearer ${token}` },
 			};
 			try {
-				const user_ = await axios.post(url, { userLogin: props.login }, config);
+				const user_ = await axios.post(url, { userLogin: props.login }, config)
 				setProfile(user_.data);
 				{
 					props.setNumberOfMatch && props.setNumberOfMatch(user_.data.numberOfGamesPlayed);
 				}
 				setUserAvatar(user_.data.avatarUrl)
 			} catch (err) {
-				// console.log(err);
+				props.router('/dashboard')
 			}
 		}
 	}

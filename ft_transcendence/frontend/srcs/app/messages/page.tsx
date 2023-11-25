@@ -61,6 +61,7 @@ function Messages() {
   const [iAm, setIam] = useState('');
   const [roomSelectedType, setRoomSelectedType] = useState(0);
   const [isMuted, setIsMuted] = useState(false)
+  const [userId, setUserId] = useState(0);
 
 
   useEffect(()=> {
@@ -74,11 +75,11 @@ function Messages() {
       axios.get(apiUrl, config)
       .then((response : any) => {
         const _user = response.data;
-        if ( _user.state == 0) {
-          console.log('hello hello hello');
+        // if ( _user.state == 0) {
+          // console.log('hello hello hello');
           socket.emit('online', { token: localStorage.getItem('jwtToken') });
           _user.state = 1;
-        }
+        // }
         setUser(_user);
 
       })
@@ -177,7 +178,9 @@ function Messages() {
           const _user: User = { ...user, groups: tempGroup };
           setUser(_user);
         })
-        .catch();
+        .catch((error) => {
+          toast.error('Error to create this channel');
+        });
       setError(false);
       setOpenModal(false);
     } else setError(true);
@@ -288,7 +291,7 @@ function Messages() {
         const _user: User = user;
         socket.emit('channels-with-conversation', { channelName: user.login  });
         socket.on('get-channels', (data: any) => {
-          // console.log("zidch: ", data);
+          // console.log("zidch:================================================= ", data);
           setGroups(data);
           _user.groups = data;
           setUser(_user);
@@ -341,9 +344,19 @@ function Messages() {
           }
         }
       })
+      socket.on('channel-removed', (data:any)=> {
+        const index = groups.findIndex((obj: any) => obj.name == data.channelName)
+        if(index != -1){
+          setShowArray([])
+          const _user = user;
+          _user.groups = undefined;
+          setUser(_user)
+        }
+      })
       return ()=> {socket.off('user-removed-from-channel')
         socket.off('user-banned-from-channel')  
         socket.off('user-muted-in-channel')
+        socket.off('channel-removed')
     }
     }
   };
@@ -351,24 +364,25 @@ function Messages() {
     if (socket) {
       if (!user.conversations || (user.conversations.length == 1 && user.conversations.isFrd)) {
         const _user: User = { ...user };
-       
-        socket.emit('users-with-conversation', { login: user.login || 'mabdelba' });
-        socket.on('get-users', (data: any) => {
-          console.log('data users,', data)
-          if (user && user.conversations && user.conversations.length > 0) {
-            const uLogin : string = user.conversations[0].login
-            data.map((obj: any) => {
-              if (obj.login != uLogin)
-                user.conversations = [...user.conversations, obj];
-            });
-            setUser(user);
-            setConversations(user.conversations);
-            // setRoomSelected(uLogin)
-          } else{
-            _user.conversations = data;
-            setUser(_user);
-            setConversations(_user.conversations)
-          } 
+       console.log('fles message: ', user.conversations);
+       socket.emit('users-with-conversation', { login: user.login || 'mabdelba' });
+       socket.on('get-users', (data: any) => {
+         console.log('data users,', data)
+         if (user && user.conversations && user.conversations.length == 1) {
+           const uLogin : string = user.conversations[0].login
+           data.map((obj: any) => {
+             if (obj.login != uLogin)
+             user.conversations = [...user.conversations, obj];
+          });
+          setUser(user);
+          setConversations(user.conversations);
+          // setRoomSelected(uLogin)
+        } else if(!user.conversations || user.conversations.length == 0){
+          _user.conversations = data;
+          setUser(_user);
+          setConversations(_user.conversations)
+        } 
+        console.log('fles message wra : ', user.conversations);
             
           // console.log("nchufo hadi", _user.conversations);
           
@@ -438,6 +452,7 @@ function Messages() {
 
   useEffect(() => {
     if (socket) {
+
       socket.on('receive-message', recieveMessage);
       return () => socket.off('receive-message');
     }
@@ -538,6 +553,7 @@ function Messages() {
                             setRoomSelectedType(selected == 1 ? obj.type : 0)
                             setIam(selected == 1 ? obj.whoIam : '');
                             setIsMuted(selected == 1 ? obj.isMuted : false)
+                            setUserId(obj.id)
                           }}
                           key={obj.id || `${obj.login}${index}` || `${obj.name}${index}`}
                           className={`w-full h-14 ease-in-out 2xl:h-[68px]  truncate   text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 2xl:space-x-6 md:pl-5 2xl:pl-7 items-center transition-all duration-500 tracking-wide  ${
@@ -603,13 +619,15 @@ function Messages() {
               {roomSelected != '' && (
                 <MyMenu
                   slected={selected}
+                  setShowArray={setShowArray}
                   setOpenMembers={setOpenMembersModal}
                   roomSelected={roomSelected}
                   setOpenSettings={setOpenSettingModal}
                   setOpenInvite={setOpenInviteModal}
                   channelType={roomSelectedType}
                   iAm={iAm}
-               
+                  setRoomSelected={setRoomSelected}
+                  userId={userId}
                 />
               )}
             </div>
