@@ -14,6 +14,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from "next/navigation";
 import { context, SocketContext, User } from "../../context/context";
+import { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { set } from "husky";
+import Close from "../../public/close.svg";
 
 
 
@@ -200,6 +204,55 @@ function Settings() {
 
     }
 
+    const [qr, setQr] = useState(Upload);
+
+    const fetchQrCode = async () => {
+        const token = localStorage.getItem('jwtToken');
+        const config = {
+            headers: { Authorization: `Bearer ${token}` },
+        };
+        const url = "http://localhost:3000/api/atari-pong/v1/two-factor-auth/qrcode";
+        await axios.get(url, config)
+        .then((response) => {
+            setQr(response.data);
+        })
+        .catch((error) => {
+            console.log("error: ", error);
+        })
+    }
+
+    const [result, setResult] = useState("");
+    const [isChecked, setIsChecked] = useState(user.twoFaActive);
+    const [showPupUp, setshowPupUp] = useState(false);
+
+    const handleChecked = () => {
+        if(!isChecked)
+        {
+            setIsChecked(false);
+            fetchQrCode();
+        }
+        setshowPupUp(!showPupUp);
+    }    
+
+    const closeLoginModal = () => {
+        setshowPupUp(false);
+    };    
+
+    const openLoginModal = () => {
+        setshowPupUp(true);
+    };    
+
+    const handleQrSubmit = (event: any) => {
+        if (result.length !== 6) {
+          event.preventDefault();
+          toast.error('The code must be 6 digits long.');
+          return;
+        }
+        else {
+          console.log(result);
+        }
+      };
+
     return (
     <OptionBar flag={5} >
         <main className="w-full h-full   flex flex-col items-center  font-Orbitron min-h-[550px]  min-w-[280px] pb-2 ">
@@ -231,8 +284,8 @@ function Settings() {
                     </div>
 
                 </div>
-                <div className="w-full h-auto md:h-[42%]    mt-8 md:mt-0 px-4 md:px-8  xl:px-16   ">
-                    <div className=" w-full  md:w-1/2 md:h-full h-auto  flex    flex-col ">
+                <div className="w-full h-auto md:h-[42%]    mt-8 md:mt-0 px-4 md:px-8  xl:px-16 flex  flex-col md:flex-row justify-between  ">
+                    <div className=" w-[98%]  md:w-[49%] md:h-full h-auto  flex    flex-col ">
                         <div className="w-full h-auto  md:h-1/2  flex flex-col justify-center">
                             <div className="w-1/6 pl-2">
                                 <Pdp  color={false} flag={true} image={avatarUrl} name={""} />
@@ -251,11 +304,80 @@ function Settings() {
                 
                         </div>
                     </div>
+                    <div className=" w-[98%]  md:w-[49%] md:h-full h-auto  flex flex-col items-center mt-24 mb-8">
+                        <div className="w-full flex flex-row justify-evenly">
+                            <div>Two factor authentication</div>
+                            <label className="switch mr-3">
+                                <input type="checkbox" checked={isChecked} onChange={handleChecked} />
+                                <span className="slider"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div className="w-2/3 md:w-1/3 h-12 md:h-[9%] my-4 md:my-0">
                     <SimpleButton buttonType={"submit"} content="Save" />
                 </div>
             </form>
+            <Transition appear show={showPupUp} as={Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={closeLoginModal}>
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 bg-black bg-opacity-25" />
+                </Transition.Child>
+
+                <div className="fixed inset-0 overflow-y-auto">
+                    <div className="flex justify-center items-center bg-opacity-40 backdrop-blur bg-[#282828] w-screen h-screen">
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0 scale-95"
+                        enterTo="opacity-100 scale-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100 scale-100"
+                        leaveTo="opacity-0 scale-95"
+                    >
+                        <Dialog.Panel className="flex flex-col justify-center bg-black NeonShadowBord">
+                            <div className="font-Orbitron">
+                                <div className="flex justify-end"><Image className="cursor-pointer" src={Close} alt="close" onClick={closeLoginModal} /></div>
+                                <div className="text-[24px] mx-8 mb-5 text-center">Scan the Qr bellow:</div>
+                                <div className="m-5">
+                                    {/* get the qr picture */}
+                                    <Image src={qr} alt="upload" className=" m-auto" width={200} height={200} />
+                                    <div className="flex flex-row">
+                                        <div className="flex flex-row  items-center mx-6 py-5">
+                                            <input
+                                            placeholder='___ ___'
+                                            className='h-[70px] w-[calc(54px*5)] mx-4 bg-[#282828] text-white font-Orbitron text-[39px] text-center neonBord'
+                                            type="text"
+                                            maxLength={6}
+                                            onChange={(e) => setResult(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="text-center m-3">
+                                        <button
+                                            className="NeonShadowBord px-[30px] py-[10px] text-[24px]"
+                                            // change the state of onclick
+                                            onClick={handleQrSubmit}
+                                        >
+                                            submit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </Dialog.Panel>
+                    </Transition.Child>
+                    </div>
+                </div>
+                </Dialog>
+            </Transition>
         </main>
     </OptionBar>
     )
