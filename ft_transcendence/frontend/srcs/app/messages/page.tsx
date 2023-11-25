@@ -291,7 +291,7 @@ function Messages() {
         const _user: User = user;
         socket.emit('channels-with-conversation', { channelName: user.login  });
         socket.on('get-channels', (data: any) => {
-          // console.log("zidch: ", data);
+          // console.log("zidch:================================================= ", data);
           setGroups(data);
           _user.groups = data;
           setUser(_user);
@@ -344,9 +344,19 @@ function Messages() {
           }
         }
       })
+      socket.on('channel-removed', (data:any)=> {
+        const index = groups.findIndex((obj: any) => obj.name == data.channelName)
+        if(index != -1){
+          setShowArray([])
+          const _user = user;
+          _user.groups = undefined;
+          setUser(_user)
+        }
+      })
       return ()=> {socket.off('user-removed-from-channel')
         socket.off('user-banned-from-channel')  
         socket.off('user-muted-in-channel')
+        socket.off('channel-removed')
     }
     }
   };
@@ -442,6 +452,7 @@ function Messages() {
 
   useEffect(() => {
     if (socket) {
+
       socket.on('receive-message', recieveMessage);
       return () => socket.off('receive-message');
     }

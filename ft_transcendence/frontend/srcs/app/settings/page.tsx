@@ -98,7 +98,7 @@ function Settings() {
     }
 
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: any) => {
 
         e.preventDefault();
         if ((!nameError || !lastnameError || !emailError || !usernameError )) {
@@ -112,58 +112,92 @@ function Settings() {
         {
             if(name != Array[0]){
                 const url = "http://localhost:3000/api/atari-pong/v1/settings/update-firstname";
-                axios.put(url, {firstname: name}, config).catch((error)=> {
-                    console.log("errorrrrr", error);
+                await axios.put(url, {firstname: name}, config)
+                .then(()=> {
+                    const _user : User = user;
+                    _user.login = undefined;
+                    setUser(_user);
+                    // router.push('/dashboard');
                 })
-            }
+                .catch((error)=> {
+                    console.log("errorrrrr", error);
+                    toast.error(error.response.data.message);
+                })
+            } 
             if(Lastname != Array[1]){
                 const url = "http://localhost:3000/api/atari-pong/v1/settings/update-lastname";
-                axios.put(url, {lastname: Lastname}, config).catch((error)=> {
-                    console.log("errorrrrr", error);
+                await axios.put(url, {lastname: Lastname}, config)
+                .then(()=> {
+                    const _user : User = user;
+                    _user.login = undefined;
+                    setUser(_user);
+                    // router.push('/dashboard');
                 })
-            }
-            if(username != Array[2]){
-                const url = "http://localhost:3000/api/atari-pong/v1/settings/update-login";
-                axios.put(url, {login: username}, config).then((response) => {
-                    axios.post("http://localhost:3000/api/atari-pong/v1/auth/regenerate-token", {id:Id, login: username}, config).then((response)=> {
-                        // console.log("response: ", response.data);
-                    localStorage.setItem('jwtToken', response.data);
-                });
-                }).catch((error)=> {
+                .catch((error)=> {
                     console.log("errorrrrr", error);
-                })
+                    toast.error(error.response.data.message);
                 
+                })
             }
             if(email != Array[3]){
                 const url = "http://localhost:3000/api/atari-pong/v1/settings/update-email";
-                axios.put(url, {email: email}, config).catch((error)=> {
-                    console.log("errorrrrr", error);
+                await axios.put(url, {email: email}, config)
+                .then(()=> {
+                    const _user : User = user;
+                    _user.login = undefined;
+                    setUser(_user);
+                    // router.push('/dashboard');
+                    
                 })
+                .catch((error)=> {
+                    console.log("errorrrrr", error);
+                    toast.error(error.response.data.message);
+                })
+            }
+            {   
+                if(!avatarToUpload)
+                    setSelectFileError(false);
+                else{
+    
+                    const url = "http://localhost:3000/api/atari-pong/v1/auth/upload-avatar";
+                    const formData = new FormData();
+                    formData.append('avatar', avatarToUpload);
+                    await axios.post(url, formData ,config).then((response)=>{
+                        
+                        const _user : User = user;
+                        _user.avatarUrl = avatarUrl;
+                        setUser(_user);
+                        // router.push('/dashboard');
+                    })
+                    .catch((error) => {
+                        console.log("error image: ", error);
+                        toast.error(error.response.data.message);
+                    })
+                }
+            }
+            if(username != Array[2]){
+                const url = "http://localhost:3000/api/atari-pong/v1/settings/update-login";
+               await axios.put(url, {login: username}, config).then(() => {
+                    // axios.post("http://localhost:3000/api/atari-pong/v1/auth/regenerate-token", {id:Id, login: username}, config).then((response)=> {
+                        // console.log("response: ", response.data);
+                        socket.emit('offline', { token: localStorage.getItem('jwtToken'), login: username });
+                        localStorage.removeItem('jwtToken');
+                        const _user : User = user;
+                        _user.login = undefined;
+                        setUser(_user);
+
+                    router.push('/');
+                // });
+                }).catch((error)=> {
+                    console.log("errorrrrr", error);
+                    toast.error(error.response.data.message);
+                })
+                
             }
         
         }
 
-        {   
-            if(!avatarToUpload)
-                setSelectFileError(false);
-            else{
 
-                const url = "http://localhost:3000/api/atari-pong/v1/auth/upload-avatar";
-                const formData = new FormData();
-                formData.append('avatar', avatarToUpload);
-                axios.post(url, formData ,config).then((response)=>{
-             
-                })
-                .catch((error) => {
-                    console.log("error image: ", error);
-                })
-            }
-        }
-        toast.success('Changes saved successfully!');
-        const _user : User = user;
-        _user.login = undefined;
-        setUser(_user);
-        router.push('/dashboard');
     }
 
     return (
@@ -193,7 +227,7 @@ function Settings() {
                     </div>
                     <div className="h-1/2 min-h-[42px]  NeonShadow" >
                         <div className="mb-1 lg:mb-4">Email:</div>
-                        <SimpleInput holder={'Email'} type1={"text"} SetValue={setEmail} val={email} setError={setEmailError} flag={true} regex={EmRegex}  isVerif={false} />
+                        <SimpleInput holder={'Email'} type1={"text"} SetValue={setEmail} val={email} setError={setEmailError} flag={true} regex={EmRegex}  isVerif={false} readonly={true} />
                     </div>
 
                 </div>

@@ -106,13 +106,13 @@ export class AuthService {
     }
     try {
       let user = await this.prisma.user.findUnique({
-        where: { login: req.login, password: { not: null } },
+        where: { email: req.email, password: { not: null } },
       });
       if (user) {
         throw new ForbiddenException('User already exists');
       }
       user = await this.prisma.user.findUnique({
-        where: { login: req.login },
+        where: { email: req.email },
       });
       if (!user) {
         const newUser = await this.prisma.user.create({

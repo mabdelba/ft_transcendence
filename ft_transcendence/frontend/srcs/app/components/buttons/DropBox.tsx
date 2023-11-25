@@ -83,6 +83,28 @@ function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: 
         // console.log('error ', error);
       })
   };
+
+  const removeChannel = ()=> {
+
+    if(socket){
+      socket.emit('remove-channel', {channelName: props.roomSelected, user: user.login})
+      const _user : User = user;
+      // console.log('props.roomSelectd: ', props.roomSelected)
+      const index = _user.groups.findIndex((obj:any) => obj.name == props.roomSelected);
+      // console.log('index ', index); 
+      if(index != -1){
+        // props.setShowArray([]);
+        props.setRoomSelected('');
+        const tempGroup = _user.groups
+        tempGroup.splice(index, 1);
+        toast.warning(`You have deleted  ${props.roomSelected}`)
+        _user.groups = tempGroup
+        setUser(_user)
+      }
+    }
+  }
+
+
   const router = useRouter();
   const friendMenu = [
     { handleClick: ()=>{  props.roomSelected != '' && router.push(`/profil/${props.roomSelected}`)}, label: 'View profile' , render: () => {return(<BsFillEyeFill size="20"/>)}},
@@ -111,6 +133,7 @@ function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: 
       if(props.iAm == 'owner'){
         GroupMenu[1].label = 'Delete';
         GroupMenu[1].render = ()=> {return(<MdDelete size="20"/>)};
+        GroupMenu[1].handleClick = removeChannel;
       }
       else if(props.iAm == 'member' && props.channelType != 0)
         GroupMenu.splice(3 , 1);

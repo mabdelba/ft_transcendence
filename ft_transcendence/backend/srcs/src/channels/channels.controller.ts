@@ -20,7 +20,7 @@ export class ChannelsController {
  
   @UseGuards(JwtGuard)
   @Post('add-admin-to-channel')
-  addAdminToChannel(@Req() req, @Body() dto: { channelName: string; user: string }) {
+  addAdminToChannel(@Req() req, @Body() dto: { channelName: string; user: string }) { 
     return this.channelsService.addAdminToChannel((req.user as User).login, dto);
   }
   @UseGuards(JwtGuard) 
@@ -49,3 +49,4 @@ export class ChannelsController {
     return this.channelsService.listPublicProtectedChannels((req.user as User).login);
   }
 }
+

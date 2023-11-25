@@ -66,25 +66,26 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
   }
   @SubscribeMessage('offline')
-  async setOffline(client: Socket, message: { token: string }) {
+  async setOffline(client: Socket, message: { token: string, login?: string }) {
     const jwtToken = message.token;
     const decoded = jwtDecode(jwtToken);
     console.log('offline----', decoded['login']);
     this.users.delete(client.id);
-    try{
+    const log = message.login ? message.login : decoded['login'];
+    try{ 
     await this.prisma.user.update({
       where: {
-        login: decoded['login'],
+        login: log,
       },
       data: {
         state: 0,
       },
-    });
+    }); 
   } catch (e) {
     throw new ForbiddenException('User not found');
   }
   }
-
+ 
   /** 
        events for direct messages namespace
   **/
