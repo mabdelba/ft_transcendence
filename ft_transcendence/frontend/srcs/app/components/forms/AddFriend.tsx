@@ -19,7 +19,7 @@ function AddFriend(props: newType) {
   const [userId, setUserId] = useState<any>(null);
 
   const requestSended = () => {
-    const url = 'http://localhost:3000/api/atari-pong/v1/friend/getuserbylogin';
+    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/getuserbylogin';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },
@@ -52,7 +52,7 @@ function AddFriend(props: newType) {
   }, [props.state]);
 
   const handleAdd = () => {
-    const url = 'http://localhost:3000/api/atari-pong/v1/friend/send-friend-request';
+    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/send-friend-request';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },
@@ -69,7 +69,7 @@ function AddFriend(props: newType) {
   };
 
   const handleDelete = () => {
-    const url = 'http://localhost:3000/api/atari-pong/v1/friend/reject-friend-request';
+    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/reject-friend-request';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },
@@ -95,7 +95,7 @@ function AddFriend(props: newType) {
     props.setState(0);
   };
   const handleAccept = () => {
-    const url = 'http://localhost:3000/api/atari-pong/v1/friend/accept-friend-request';
+    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/accept-friend-request';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },
@@ -133,7 +133,7 @@ function AddFriend(props: newType) {
   });
 
   const getUserData = async () => {
-    const url = 'http://localhost:3000/api/atari-pong/v1/user/me';
+    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },

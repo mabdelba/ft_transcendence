@@ -21,7 +21,7 @@ function LastMatch(props: newType) {
   async function getMatch() {
     if((!props.myProfile && !user.matchData) || props.myProfile){
       
-      const lastMatchUrl = 'http://localhost:3000/api/atari-pong/v1/profile/last-match-played';
+      const lastMatchUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/profile/last-match-played';
       const token = localStorage.getItem('jwtToken');
       const config = {
         headers: { Authorization: `Bearer ${token}` },
@@ -30,7 +30,7 @@ function LastMatch(props: newType) {
         const res = await axios.post(lastMatchUrl, { userLogin: props.login }, config);
        
           const user__ = await axios.post(
-            'http://localhost:3000/api/atari-pong/v1/user/avatar',
+            'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/avatar',
             { userLogin: res.data.other },
             {
               headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },

@@ -11,7 +11,7 @@ import { User, context, SocketContext } from '../../context/context';
 import { useQuery } from 'react-query';
 
 const fetchHistory = async () => {
-  const res = await fetch('http://localhost:3000/api/atari-pong/v1/history', {
+  const res = await fetch('http://e3r8p14.1337.ma:3000/api/atari-pong/v1/history', {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
     },
@@ -27,6 +27,25 @@ function History() {
 
   const { data, status } = useQuery('history', fetchHistory);
 
+
+  useEffect(()=> {
+    if(!user.login){
+
+      const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+      const token = localStorage.getItem('jwtToken');
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      axios.get(apiUrl, config)
+      .then((response : any) => {
+        const _user = response.data;
+        setUser(_user);
+
+      })
+    }
+  })
+
+  
   async function getMatches() {
     if (data) {
 		// var i = 0;
@@ -72,7 +91,7 @@ function History() {
       if (login != '') {
         await axios
           .post(
-            'http://localhost:3000/api/atari-pong/v1/user/avatar',
+            'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/avatar',
             { userLogin: login },
             {
               headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
@@ -121,7 +140,7 @@ function History() {
                   <div key={obj.id} className="w-full  p-2 md:p-9 flex flex-row  ">
                     <div className="h-full w-[10%] md:w-[18%] "></div>
                     <div className="w-[15%] h-[67%] flex flex-col justify-start items-end">
-                      <Pdp name={obj.me} color={true} router={router} image={user.avatar} />
+                      <Pdp name={obj.me} color={true} router={router} image={user.avatarUrl} />
                     </div>
                     <div className="w-[50%] md:w-[34%]  NeonShadow text-sm lg:text-3xl flex flex-col justify-around items-center">
                       <div>

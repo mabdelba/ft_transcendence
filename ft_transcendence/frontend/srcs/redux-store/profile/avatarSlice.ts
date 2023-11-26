@@ -5,7 +5,7 @@ export interface AvatarState {
   url: string;
 }
 
-const avatarUrl = 'http://localhost:3000/api/atari-pong/v1/user/avatar';
+const avatarUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/avatar';
 
 const initialState: AvatarState = {
   url: '',

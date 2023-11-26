@@ -7,29 +7,38 @@ import { JwtGuard } from "src/auth/guards";
 import GameModel from "./game.service";
 import { disconnect } from "process";
 import { subscribe } from "diagnostics_channel";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @WebSocketGateway(3001, { cors: '*' }) 
 export class GameGateway {
-    ConnectedUsers: Map<string, Socket[]> = new Map<string, Socket[]>();
+    ConnectedUsers: Map<string, string[]> = new Map<string, string[]>();
     RandomGames: { game: GameModel, id1: string, id2: string, map: string }[] = [];
     privateGame: { game: GameModel, id1: string, id2: string}[] = [];
-    constructor() {}
+    constructor(private prisma: PrismaService) {}
  
     @UseGuards(JwtGuard)
-    handleConnection(socket: Socket) {
+    async handleConnection(socket: Socket) {
         const jwtToken = socket.handshake.auth.token;
         const decoded = jwtDecode(jwtToken);
         const login = decoded['login'];
         if (this.ConnectedUsers.has(login)) {
-            this.ConnectedUsers.get(login)?.push(socket);
+            this.ConnectedUsers.get(login)?.push(socket.id);
             socket.emit('already connected');
             // console.log('geteway',socket.id)
             console.log('already connected', login, socket.id);
             // socket.disconnect();
         }
         else{
-            this.ConnectedUsers.set(login, [socket]);
+            this.ConnectedUsers.set(login, [socket.id]);
             console.log('connected', login, socket.id);
+            await this.prisma.user.update({
+                where: {
+                  login: login,
+                },
+                data: {
+                  state: 2,
+                },
+              });
         }
     }
 
@@ -158,9 +167,10 @@ export class GameGateway {
     }
 
     @UseGuards(JwtGuard)
-     handleDisconnect(socket: Socket) {
+     async handleDisconnect(socket: Socket) {
         const jwtToken = socket.handshake.auth.token;
         const decoded = jwtDecode(jwtToken);
+        const login = decoded['login'];
 
         const gameIndex = this.RandomGames.findIndex((game) => game.game.id1 == socket.id || game.game.id2 == socket.id);
         const privateIndex = this.privateGame.findIndex((game) => game.game.id1 == socket.id || game.game.id2 == socket.id);
@@ -187,7 +197,21 @@ export class GameGateway {
             pGame.destroy();
             this.privateGame.splice(privateIndex, 1);
         }
-        this.ConnectedUsers.delete(decoded['login']);
-        console.log("GameGateway handleDisconnect", socket.id, decoded['login']);
+        const ids = this.ConnectedUsers.get(login);
+        if(ids?.length > 1)
+            ids.splice(ids.indexOf(socket.id), 1);
+        else{
+            this.ConnectedUsers.delete(login);
+        
+            await this.prisma.user.update({
+                where: {
+                  login: login,
+                },
+                data: {
+                  state: 1,
+                },
+            });
+            console.log("GameGateway handleDisconnect", socket.id, login, );
+        }
     }
 }

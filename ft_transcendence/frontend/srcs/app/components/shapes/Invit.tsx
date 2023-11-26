@@ -37,10 +37,12 @@ function Invit(props: newType) {
       indexOfElementToMove = conversation.findIndex((obj: any) => obj.login == props.login);
     if(indexOfElementToMove == -1)
     {
-      if(conversation)
-        conversation.unshift({login: props.login, avatar: props.avatar});
-      else
-        conversation = [{login: props.login, avatar: props.avatar}]
+      console.log('zga nchouf', conversation)
+      if(conversation )
+        conversation.unshift({login: props.login,avatar: 'avatar', avatarUrl: props.avatar});
+      else if(!conversation || conversation.length < 1)
+        conversation = [{login: props.login, avatar: 'avatar', avatarUrl: props.avatar}]
+      console.log('mora; ' , conversation)
     }
     else
     {

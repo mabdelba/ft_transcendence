@@ -20,7 +20,7 @@ import { start } from 'repl';
 let game: Game | null = null;
 
 const fetchInfo = async () => {
-    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+    const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },

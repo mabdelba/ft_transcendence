@@ -14,6 +14,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from "next/navigation";
 import { context, SocketContext, User } from "../../context/context";
+import { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { set } from "husky";
+import Close from "../../public/close.svg";
 
 
 
@@ -26,17 +30,17 @@ function Settings() {
     const router = useRouter();
 
     const [selectFileError, setSelectFileError] = useState(true);
-    const [name, setName] = useState('');
+    const [name, setName] = useState<any>('');
     const [nameError, setNameError] = useState(true);
 
-    const [Id, setId] = useState(0);
-    const [Lastname, setLastName] = useState('');
+    const [Id, setId] = useState<number | undefined>(0);
+    const [Lastname, setLastName] = useState<any>('');
     const [lastnameError, setlastNameError] = useState(true);
 
-    const [username, setUsername] = useState('');
+    const [username, setUsername] = useState<any>('');
     const [usernameError, setUsernameError] = useState(true);
 
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState<any>('');
     const [emailError, setEmailError] = useState(true);
 
     const [filename, setFilename] = useState('*No file selected');
@@ -44,68 +48,65 @@ function Settings() {
     let [counter, setCounter] = useState(0);
     
     var [Array, setArray] = useState<string[]>([]);
-
-    const handleImage = (e: any) => {
-
-        setFilename(e.target.files[0].name);
-        setAvatarToUpload(e.target.files[0]);
-        setSelectFileError(true);
-        console.log(e.target.files[0]);
-    }
+    
     const {user, setUser} = useContext(context);
     const { socket } = useContext(SocketContext);
 
-    const getData = () => {
+    const [avatarUrl, setAvatarUrl] = useState<any>('')
 
-        const url = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
-        const token = localStorage.getItem('jwtToken');
-        const config = {
-          headers: { Authorization: `Bearer ${token}` },
-        };
-        setId(user.id || 0);
-        setName(user.firstName || '');
-        setLastName(user.lastName || '');
-        setUsername(user.login || 'empty');
-        setEmail(user.email || '');
-        const Temp = [user.firstName || '', user.lastName || '', user.login || '', user.email || ''];
-        setArray(Temp);
-
-
-        // axios.get(url, config).then((response)=> {
-        // })
-        // .catch((error) => {
-
-        //     console.log("Error from server haha: ", error);
-        // })
-    }
     useEffect(()=> {
-
-        getData();
-        if (!user.state && socket) {
-			socket.emit('online', { token: localStorage.getItem('jwtToken') });
-			const _user: User = user;
-			_user.state = 1;
-			setUser(_user);
-		}
+        if(socket){
+            if(!user.login ){
         
-    }, [counter])
+              const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+              const token = localStorage.getItem('jwtToken');
+              const config = {
+                headers: { Authorization: `Bearer ${token}` },
+              };
+              axios.get(apiUrl, config)
+              .then((response : any) => {
+                const _user = response.data;
+                socket.emit('online', { token: localStorage.getItem('jwtToken') });
+                _user.state = 1;
+                setId(_user.id);setName(_user.firstName);setLastName(_user.lastName);setUsername(_user.login);setEmail(_user.email);setAvatarUrl(_user.avatarUrl)
+                setUser(_user);
+
+              })
+            }
+            else{
+                setId(user.id);setName(user.firstName);setLastName(user.lastName);setUsername(user.login);setEmail(user.email);setAvatarUrl(user.avatarUrl)
+            }
+            const Temp = [user.firstName || '', user.lastName || '', user.login || '', user.email || ''];
+            setArray(Temp)
+        }
+    }, [socket])
+
+    const handleImage = (e: any) => {
+
+        const selectedFile = e.target.files[0]
+        setFilename(e.target.files[0].name);
+        setAvatarToUpload(e.target.files[0]);
+        setSelectFileError(true);
+        if(selectedFile){
+            const reader = new FileReader();
+            reader.readAsDataURL(selectedFile)
+            reader.onload = function (e : any) {
+                // Update the avatarUrl state
+                setAvatarUrl(e.target.result );
+              };
+            setAvatarUrl(e.target.result)
+
+        }
+        // setAvatarUrl(e.target.files[0] as string);
+        console.log(e.target.files[0]);
+    }
 
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: any) => {
 
         e.preventDefault();
-        setCounter(counter++);
         if ((!nameError || !lastnameError || !emailError || !usernameError )) {
-            toast.error('Please fill out all fields with compatible format!', {
-              position: 'top-center',
-              autoClose: 2500,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: 'dark',
-            });
+            toast.error('Please fill out all fields with compatible format!');
             return;
           }
           const token = localStorage.getItem('jwtToken');
@@ -114,65 +115,143 @@ function Settings() {
           };
         {
             if(name != Array[0]){
-                const url = "http://localhost:3000/api/atari-pong/v1/settings/update-firstname";
-                axios.put(url, {firstname: name}, config).catch((error)=> {
-                    console.log("errorrrrr", error);
+                const url = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/settings/update-firstname";
+                await axios.put(url, {firstname: name}, config)
+                .then(()=> {
+                    const _user : User = user;
+                    _user.login = undefined;
+                    setUser(_user);
+                    // router.push('/dashboard');
                 })
-            }
+                .catch((error)=> {
+                    console.log("errorrrrr", error);
+                    toast.error(error.response.data.message);
+                })
+            } 
             if(Lastname != Array[1]){
-                const url = "http://localhost:3000/api/atari-pong/v1/settings/update-lastname";
-                axios.put(url, {lastname: Lastname}, config).catch((error)=> {
-                    console.log("errorrrrr", error);
+                const url = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/settings/update-lastname";
+                await axios.put(url, {lastname: Lastname}, config)
+                .then(()=> {
+                    const _user : User = user;
+                    _user.login = undefined;
+                    setUser(_user);
+                    // router.push('/dashboard');
                 })
-            }
-            if(username != Array[2]){
-                const url = "http://localhost:3000/api/atari-pong/v1/settings/update-login";
-                axios.put(url, {login: username}, config).then((response) => {
-                    axios.post("http://localhost:3000/api/atari-pong/v1/auth/regenerate-token", {id:Id, login: username}, config).then((response)=> {
-                        // console.log("response: ", response.data);
-                    localStorage.setItem('jwtToken', response.data);
-                });
-                }).catch((error)=> {
+                .catch((error)=> {
                     console.log("errorrrrr", error);
-                })
+                    toast.error(error.response.data.message);
                 
+                })
             }
             if(email != Array[3]){
-                const url = "http://localhost:3000/api/atari-pong/v1/settings/update-email";
-                axios.put(url, {email: email}, config).catch((error)=> {
-                    console.log("errorrrrr", error);
+                const url = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/settings/update-email";
+                await axios.put(url, {email: email}, config)
+                .then(()=> {
+                    const _user : User = user;
+                    _user.login = undefined;
+                    setUser(_user);
+                    // router.push('/dashboard');
+                    
                 })
+                .catch((error)=> {
+                    console.log("errorrrrr", error);
+                    toast.error(error.response.data.message);
+                })
+            }
+            {   
+                if(!avatarToUpload)
+                    setSelectFileError(false);
+                else{
+    
+                    const url = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/auth/upload-avatar";
+                    const formData = new FormData();
+                    formData.append('avatar', avatarToUpload);
+                    await axios.post(url, formData ,config).then((response)=>{
+                        
+                        const _user : User = user;
+                        _user.avatarUrl = avatarUrl;
+                        setUser(_user);
+                        // router.push('/dashboard');
+                    })
+                    .catch((error) => {
+                        console.log("error image: ", error);
+                        toast.error(error.response.data.message);
+                    })
+                }
+            }
+            if(username != Array[2]){
+                const url = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/settings/update-login";
+               await axios.put(url, {login: username}, config).then(() => {
+                    // axios.post("http://e3r8p14.1337.ma:3000/api/atari-pong/v1/auth/regenerate-token", {id:Id, login: username}, config).then((response)=> {
+                        // console.log("response: ", response.data);
+                        socket.emit('offline', { token: localStorage.getItem('jwtToken'), login: username });
+                        localStorage.removeItem('jwtToken');
+                        const _user : User = user;
+                        _user.login = undefined;
+                        setUser(_user);
+
+                    router.push('/');
+                // });
+                }).catch((error)=> {
+                    console.log("errorrrrr", error);
+                    toast.error(error.response.data.message);
+                })
+                
             }
         
         }
 
-        {   
-            if(!avatarToUpload)
-                setSelectFileError(false);
-            else{
 
-                const url = "http://localhost:3000/api/atari-pong/v1/auth/upload-avatar";
-                const formData = new FormData();
-                formData.append('avatar', avatarToUpload);
-                axios.post(url, formData ,config).then((response)=>{
-                })
-                .catch((error) => {
-                    console.log("error image: ", error);
-                })
-            }
-        }
-        toast.success('Changes saved successfully!', {
-            position: 'top-center',
-            autoClose: 2500,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'dark',
-        });
-        router.push('/dashboard');
     }
+
+    const [qr, setQr] = useState(Upload);
+
+    const fetchQrCode = async () => {
+        const token = localStorage.getItem('jwtToken');
+        const config = {
+            headers: { Authorization: `Bearer ${token}` },
+        };
+        const url = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/two-factor-auth/qrcode";
+        await axios.get(url, config)
+        .then((response) => {
+            setQr(response.data);
+        })
+        .catch((error) => {
+            console.log("error: ", error);
+        })
+    }
+
+    const [result, setResult] = useState("");
+    const [isChecked, setIsChecked] = useState(user.twoFaActive);
+    const [showPupUp, setshowPupUp] = useState(false);
+
+    const handleChecked = () => {
+        if(!isChecked)
+        {
+            setIsChecked(false);
+            fetchQrCode();
+        }
+        setshowPupUp(!showPupUp);
+    }    
+
+    const closeLoginModal = () => {
+        setshowPupUp(false);
+    };    
+
+    const openLoginModal = () => {
+        setshowPupUp(true);
+    };    
+
+    const handleQrSubmit = (event: any) => {
+        if (result.length !== 6) {
+          event.preventDefault();
+          toast.error('The code must be 6 digits long.');
+          return;
+        }
+        else {
+          console.log(result);
+        }
+      };
 
     return (
     <OptionBar flag={5} >
@@ -201,15 +280,15 @@ function Settings() {
                     </div>
                     <div className="h-1/2 min-h-[42px]  NeonShadow" >
                         <div className="mb-1 lg:mb-4">Email:</div>
-                        <SimpleInput holder={'Email'} type1={"text"} SetValue={setEmail} val={email} setError={setEmailError} flag={true} regex={EmRegex}  isVerif={false} />
+                        <SimpleInput holder={'Email'} type1={"text"} SetValue={setEmail} val={email} setError={setEmailError} flag={true} regex={EmRegex}  isVerif={false} readonly={true} />
                     </div>
 
                 </div>
-                <div className="w-full h-auto md:h-[42%]    mt-8 md:mt-0 px-4 md:px-8  xl:px-16   ">
-                    <div className=" w-full  md:w-1/2 md:h-full h-auto  flex    flex-col ">
+                <div className="w-full h-auto md:h-[42%]    mt-8 md:mt-0 px-4 md:px-8  xl:px-16 flex  flex-col md:flex-row justify-between  ">
+                    <div className=" w-[98%]  md:w-[49%] md:h-full h-auto  flex    flex-col ">
                         <div className="w-full h-auto  md:h-1/2  flex flex-col justify-center">
                             <div className="w-1/6 pl-2">
-                                <Pdp  color={false} flag={true} image={user.avatar} name={""} />
+                                <Pdp  color={false} flag={true} image={avatarUrl} name={""} />
                             </div>
                             <span className={`w-1/2 NeonShadow text-[5px] md:text-[12px]  flex font-light items-center ${selectFileError? '' : 'text-red-600 redShadow'} `}>({filename})</span>
                         </div>
@@ -225,24 +304,81 @@ function Settings() {
                 
                         </div>
                     </div>
+                    <div className=" w-[98%]  md:w-[49%] md:h-full h-auto  flex flex-col items-center mt-24 mb-8">
+                        <div className="w-full flex flex-row justify-evenly">
+                            <div>Two factor authentication</div>
+                            <label className="switch mr-3">
+                                <input type="checkbox" checked={isChecked} onChange={handleChecked} />
+                                <span className="slider"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div className="w-2/3 md:w-1/3 h-12 md:h-[9%] my-4 md:my-0">
                     <SimpleButton buttonType={"submit"} content="Save" />
                 </div>
             </form>
+            <Transition appear show={showPupUp} as={Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={closeLoginModal}>
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 bg-black bg-opacity-25" />
+                </Transition.Child>
+
+                <div className="fixed inset-0 overflow-y-auto">
+                    <div className="flex justify-center items-center bg-opacity-40 backdrop-blur bg-[#282828] w-screen h-screen">
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0 scale-95"
+                        enterTo="opacity-100 scale-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100 scale-100"
+                        leaveTo="opacity-0 scale-95"
+                    >
+                        <Dialog.Panel className="flex flex-col justify-center bg-black NeonShadowBord">
+                            <div className="font-Orbitron">
+                                <div className="flex justify-end"><Image className="cursor-pointer" src={Close} alt="close" onClick={closeLoginModal} /></div>
+                                <div className="text-[24px] mx-8 mb-5 text-center">Scan the Qr bellow:</div>
+                                <div className="m-5">
+                                    {/* get the qr picture */}
+                                    <Image src={qr} alt="upload" className=" m-auto" width={200} height={200} />
+                                    <div className="flex flex-row">
+                                        <div className="flex flex-row  items-center mx-6 py-5">
+                                            <input
+                                            placeholder='___ ___'
+                                            className='h-[70px] w-[calc(54px*5)] mx-4 bg-[#282828] text-white font-Orbitron text-[39px] text-center neonBord'
+                                            type="text"
+                                            maxLength={6}
+                                            onChange={(e) => setResult(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="text-center m-3">
+                                        <button
+                                            className="NeonShadowBord px-[30px] py-[10px] text-[24px]"
+                                            // change the state of onclick
+                                            onClick={handleQrSubmit}
+                                        >
+                                            submit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </Dialog.Panel>
+                    </Transition.Child>
+                    </div>
+                </div>
+                </Dialog>
+            </Transition>
         </main>
-        <ToastContainer
-            position="top-center"
-            autoClose={4000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-          />
     </OptionBar>
     )
 }

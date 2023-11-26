@@ -12,6 +12,7 @@ import { Socket, io } from 'socket.io-client';
 import { useRouter } from 'next/navigation';
 import { set } from 'husky';
 import { StoreID } from 'recoil';
+import axios from 'axios';
 
 function Queue() {
     const [isOpen, setIsOpen] = useState(false);
@@ -26,9 +27,9 @@ function Queue() {
       _user.map = mode;
       setUser(_user);
       setIsOpen(true);
-          user.socket?.emit('NewGame', {map: user.map, type: user.gameType, opponent: 'adam'});
-          if (user.login !== 'adam'){
-            socket?.emit('notification', {login: 'adam'});
+          user.socket?.emit('NewGame', {map: user.map, type: user.gameType, opponent: user.opponent});
+          if (user.login !== user.opponent){
+            socket?.emit('notification', {login: user.opponent});
           }
           user.socket?.on('ready', ()=>{
           router.push('/game');
@@ -37,14 +38,13 @@ function Queue() {
     
     const checkCancel = () => {
       user.socket?.emit('CancelGame');
-      socket?.emit('cancel-notif', {login: 'adam'});
+      socket?.emit('cancel-notif', {login: user.opponent});
       setIsOpen(false);
     }
 
     useEffect(() => {
-      console.log('enterereererer');
-      if(!user.socket || ((user.socket)as Socket).disconnected){
-          let socket: Socket = io('http://localhost:3001', {
+      if(!user.socket || (user.socket as Socket).connected == false){
+          let socket: Socket = io('http://e3r8p14.1337.ma:3001', {
               auth: {
                   token: localStorage.getItem('jwtToken'),
               },
@@ -56,31 +56,47 @@ function Queue() {
           const usersocket : User = user;
           usersocket.socket = socket;
           setUser(usersocket);
-
-          socket?.on('already connected', () => {
-          console.log('already connected');
-          router.push('/dashboard');
-        })
       }
-      else 
-      {
-        user.socket?.on('already connected', () => {
+
+      user.socket?.on('already connected', () => {
           console.log('already connected');
           router.push('/dashboard');
       })
-      // console.log(user.socket.id)
-    }
+
     }, [user.socket]);
   
     useEffect(()=> {
-      if (!user.state && socket) {
-        socket.emit('online', { token: localStorage.getItem('jwtToken') });
-        const _user: User = user;
-        _user.state = 1;
-        setUser(_user);
+      if(!user.login && socket){
+  
+        const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+        const token = localStorage.getItem('jwtToken');
+        const config = {
+          headers: { Authorization: `Bearer ${token}` },
+        };
+        axios.get(apiUrl, config)
+        .then((response : any) => {
+          const _user = response.data;
+          socket.emit('inGame', { token: localStorage.getItem('jwtToken') });
+          _user.state = 2;
+          setUser(_user);
+        })
       }
-          
-    }, [user, socket])
+    }, [socket])
+
+    // useEffect(() => {
+    //   const handleBeforeUnload = () => {
+    //     console.log('disconnect');
+    //     user.socket.close();
+    //     user.socket?.disconnect()
+    //   };
+  
+    //   window.addEventListener('beforeunload', handleBeforeUnload);
+  
+    //   return () => {
+    //     window.removeEventListener('beforeunload', handleBeforeUnload);
+    //   };
+    // }, [user.socket]);
+
     return (
       <>
         <div className='flex flex-col items-center h-screen justify-center'>

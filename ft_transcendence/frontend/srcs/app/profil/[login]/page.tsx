@@ -7,7 +7,7 @@ import Profil from '../../components/forms/Profil';
 import AddFriend from '../../components/forms/AddFriend';
 import { use, useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 import axios from 'axios';
 import { error } from 'console';
 import Pdp from '../../components/shapes/Pdp';
@@ -29,6 +29,37 @@ function UserProfil(props: newType) {
   const router = useRouter();
   const [numberofMatchPlayed, setNumberOfMatchPlayed] = useState(0);
 
+  useEffect( ()=> {
+
+    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me';
+    const token = localStorage.getItem('jwtToken');
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+     axios.post(url, {userLogin: props.params.login}, config)
+    .catch((err)=>  {
+      router.push('/dashboard');
+    })
+    
+  })
+  useEffect(()=> {
+    if(!user.login){
+
+      const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+      const token = localStorage.getItem('jwtToken');
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      axios.get(apiUrl, config)
+      .then((response : any) => {
+        const _user = response.data;
+        socket?.emit('online', { token: localStorage.getItem('jwtToken') });
+        _user.state = 1;
+        setUser(_user);
+      })
+    }
+  })
+
   // useEffect(() => {
   //   if (!user.state)
   //   {
@@ -38,7 +69,7 @@ function UserProfil(props: newType) {
   // })
   const [otherProfileAvatar, setOtherProfileAvatar] = useState(alien);
   const getState = () => {
-    const url = 'http://localhost:3000/api/atari-pong/v1/user/check-relation';
+    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/check-relation';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },
@@ -54,7 +85,14 @@ function UserProfil(props: newType) {
         console.log('error: ', error);
       });
   };
-
+  useEffect(() => {
+    if((user.socket as Socket)?.connected){
+        (user.socket as Socket)?.disconnect();
+        const _user: User = user;
+        _user.socket = null;
+        setUser(_user);
+    }
+  },);
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
 		if (!token) router.push('/');
@@ -68,12 +106,12 @@ function UserProfil(props: newType) {
 			}
       else getState();
 
-      if (!user.state && socket) {
-        socket.emit('online', { token: localStorage.getItem('jwtToken') });
-        const _user: User = user;
-        _user.state = 1;
-        setUser(_user);
-      }
+      // if (!user.state && socket) {
+        // socket?.emit('online', { token: localStorage.getItem('jwtToken') });
+        // const _user: User = user;
+        // _user.state = 1;
+        // setUser(_user);
+      // }
     }
   }, []);
   const [Case, setCase] = useState(-2);
@@ -123,18 +161,6 @@ function UserProfil(props: newType) {
           <div className="w-full h-[8%]"></div>
         </>
       )}
-      <ToastContainer
-        position="top-center"
-        autoClose={4000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
     </main>
      </OptionBar>
   );

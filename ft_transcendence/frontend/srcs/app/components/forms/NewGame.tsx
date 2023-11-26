@@ -2,12 +2,10 @@
 import { useRouter } from 'next/navigation';
 import SimpleButton from '../buttons/simpleButton';
 import { useContext } from 'react';
-import { User, context } from '../../../context/context';
 
 
 function NewGame() {
   let router = useRouter();
-  const {user, setUser} = useContext(context);
 
   return (
     <div className="h-full w-full NeonShadowBord flex flex-col ">
@@ -18,9 +16,6 @@ function NewGame() {
         <div className="w-1/2 h-[50%]">
           <SimpleButton content="New game" buttonType="button" handleClick={
             () => {
-              const _user : User = user;
-              _user.gameType = 'private';
-              setUser(_user);
               router.push('/queue');
             }
           }/>

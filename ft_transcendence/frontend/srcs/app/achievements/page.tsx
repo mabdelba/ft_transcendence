@@ -14,7 +14,7 @@ const OptionBar = dynamic(() => import('../components/forms/OptionBar'), {ssr: f
 
 const fetchAchivements = async ()=>{
 
-	const res = await fetch("http://localhost:3000/api/atari-pong/v1/achievements/all-acquired", {
+	const res = await fetch("http://e3r8p14.1337.ma:3000/api/atari-pong/v1/achievements/all-acquired", {
 						headers: {
 					Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
 				},
@@ -24,7 +24,7 @@ const fetchAchivements = async ()=>{
 
 const fetchUnacquiredAchiev = async ()=>{
 
-	const res = await fetch("http://localhost:3000/api/atari-pong/v1/achievements/all-unacquired", {
+	const res = await fetch("http://e3r8p14.1337.ma:3000/api/atari-pong/v1/achievements/all-unacquired", {
 						headers: {
 					Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
 				},
@@ -43,7 +43,22 @@ function Achievements() {
 	const {data : achievements, status } = useQuery("achievements", fetchAchivements);
 	const {data : unacquiredAchiev, status : status1} = useQuery("unacquiredAchiev", fetchUnacquiredAchiev);
 	
+	useEffect(()=> {
+		if(!user.login){
 	
+		  const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+		  const token = localStorage.getItem('jwtToken');
+		  const config = {
+			headers: { Authorization: `Bearer ${token}` },
+		  };
+		  axios.get(apiUrl, config)
+		  .then((response : any) => {
+			const _user = response.data;
+			setUser(_user);
+	
+		  })
+		}
+	  })
 	useEffect(()=> {	
 		if(!user.achievements || !user.unacquiredAchiev)
 		{

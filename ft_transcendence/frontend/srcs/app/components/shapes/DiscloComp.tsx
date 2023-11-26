@@ -46,13 +46,14 @@ function DiscloComp(props: newType) {
                         <Pdp
                           name={divName.login}
                           myProfile={true}
-                          image={divName.avatar == `public/avatars/${divName.login}.jpg` ? alien : divName.avatar}
+                          // image={divName.avatar == `public/avatars/${divName.login}.jpg` ? alien : divName.avatar}
+                          image={divName.avatarUrl || alien}
                           color={props.Color}
                           handleClick={() => {
                             props.setOpen(true);
                             props.setLogin(divName.login);
                             props.setUserId(divName.id);
-                            props.setAvatar(divName.avatar);
+                            props.setAvatar(divName.avatarUrl || alien);
                           }}
                         />
                       ) : (

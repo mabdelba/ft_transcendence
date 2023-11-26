@@ -43,16 +43,25 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
+    let user;
+    try {
+    user = await this.prisma.user.findUnique({
       where: { login: dto.login, password: { not: null } },
     });
-    if (!user) throw new ForbiddenException('User not found');
+  } catch (e) {
+    throw new ForbiddenException('User not found');
+  }
+  try{
+
     const isPasswordValid = await argon.verify(user.password, dto.password);
     if (!isPasswordValid) throw new ForbiddenException('Wrong password');
     return {
       token: await this.getToken(user.id, user.login),
       twoFaActive: user.twoFaActive,
     };
+  } catch (e) {
+    throw new ForbiddenException('Wrong password');
+  }
   }
 
   async googleLogin(req: User) {
@@ -102,13 +111,13 @@ export class AuthService {
     }
     try {
       let user = await this.prisma.user.findUnique({
-        where: { login: req.login, password: { not: null } },
+        where: { email: req.email, password: { not: null } },
       });
       if (user) {
         throw new ForbiddenException('User already exists');
       }
       user = await this.prisma.user.findUnique({
-        where: { login: req.login },
+        where: { email: req.email },
       });
       if (!user) {
         const newUser = await this.prisma.user.create({
@@ -130,7 +139,7 @@ export class AuthService {
           token: await this.getToken(user.id, user.login),
         };
     } catch (e) {
-      throw e;
+      throw new ForbiddenException('User not found');
     }
   }
 

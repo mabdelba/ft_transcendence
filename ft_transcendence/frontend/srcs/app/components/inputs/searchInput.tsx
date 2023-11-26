@@ -6,6 +6,7 @@ import { types } from 'util';
 type InputProps = {
   holder: string;
   icon: string;
+  
 };
 
 function SearchInput(props: InputProps) {
