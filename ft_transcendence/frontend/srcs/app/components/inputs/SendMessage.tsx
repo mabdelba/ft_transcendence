@@ -22,7 +22,7 @@ function SendMessage(props: InputProps) {
         <div className="flex justify-center items-center bg-transparent font-Orbitron text-sm md:text-lg lg:text-xl h-full w-full">
           <input
             placeholder="Type message . . ."
-            className="h-full w-full pl-3 bg-transparent text-white outline-none placeholder-[#484848]"
+            className="h-full w-full pl-3 bg-transparent text-white text-[9px] xl:text-sm outline-none placeholder-[#484848]"
             type="text"
             onChange={(event) => props.SetValue(event.target.value)}
             value={props.value}

@@ -27,10 +27,11 @@ function SideBar({flag}: {flag: number}) {
 	const {user, setUser} = useContext(context);
 	const router = useRouter();
 	function handleLogOutClick() {
-		const _user : User = {};
-		setUser(_user);
 		socket.emit('offline', { token: localStorage.getItem('jwtToken') });
 		localStorage.removeItem('jwtToken');
+		const _user : User = user;
+		_user.login = undefined;
+		setUser(_user);
 		router.push('/');
 	}
   return (

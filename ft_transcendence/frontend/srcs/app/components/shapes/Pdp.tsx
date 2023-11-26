@@ -25,40 +25,6 @@ function Pdp(props: newType) {
 
     setUserAvatar(props.image);
   }, [props.image])
-  const {user, setUser} = useContext(context);
-  // async function getUserAvatar(login: string) {
-  //   if (login !== '') {
-  //     try {
-  //       const user_ = await axios.post(
-  //         'http://localhost:3000/api/atari-pong/v1/user/avatar',
-  //         { userLogin: login },
-  //         {
-  //           headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-  //           responseType: 'blob',
-  //         },
-  //       );
-  //       const imageBlob = URL.createObjectURL(user_.data) as string;
-  //       setUserAvatar(imageBlob);
-  //     } catch (err) {
-  //       // props.router.push('/');
-  //       console.log(err);
-  //     }
-  //   }
-  // }
-  // useEffect(() => {
-  //   const token = localStorage.getItem('jwtToken');
-	// 	if (!token) props.router.push('/');
-	// 	else {
-	// 		const decodedToken = JSON.parse(atob(token.split('.')[1]));
-	// 		const exp = decodedToken.exp;
-	// 		const current_time = Date.now() / 1000;
-	// 		if (exp < current_time) {
-	// 			localStorage.removeItem('jwtToken');
-	// 			props.router.push('/');
-	// 		}   else if(props.myProfile) getUserAvatar(props.name);
-  //     else setUserAvatar(user.avatar)
-  //   }
-  // }, [props.name]);
 
   const viewProfile = () => {
     props.router.push(`/profil/${props.name}`);

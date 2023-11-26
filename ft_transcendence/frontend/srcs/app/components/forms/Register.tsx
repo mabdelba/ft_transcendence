@@ -253,36 +253,22 @@ function Register(props: closeFunc) {
             pass={Data.password}
           />
         </div>
-        <div className="h-[10%] w-full ">
+        {/* <div className="h-[10%] w-full ">
           <SimpleButton
             buttonType="button"
             content="Upload avatar"
             icon={uploadIcon}
             icon2={blackupload}
           />
-        </div>
+        </div> */}
         <div className="h-[10%] w-full ">
           <SimpleButton buttonType="submit" content="Register" />
-          <ToastContainer
-            position="top-center"
-            autoClose={4000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-          />
         </div>
         <div className="h-[10%] w-full flex flex-row justify-center space-x-2">
-          <div className="w-1/2 h-full" onClick={handleFtClick}>
-            <SimpleButton buttonType="button" icon={QuaranteDeux} icon2={blackQuarante} />
-          </div>
-          <div className="w-[50%] h-full">
+            <SimpleButton buttonType="button" icon={QuaranteDeux} icon2={blackQuarante} handleClick={handleFtClick} />
+          {/* <div className="w-[50%] h-full">
             <SimpleButton buttonType="button" icon={google} icon2={google} />
-          </div>
+          </div> */}
         </div>
       </form>
     </div>

@@ -1,21 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { get } from 'http';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { getAvatarUrlFromLogin } from 'src/utils/get-avatar-from-login';
 import { getUserFromLogin } from 'src/utils/get-user-from-id';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
+  async getAllUsers(user: User){
+    try{
+    const test = await this.prisma.user.findMany({
+      select:{
+        login: true,
+      }
+    });
+    test['avatarUrl'] = getAvatarUrlFromLogin(user.login, user.avatar);
+    return test;
+  } catch (e) {
+    throw new ForbiddenException('User not found');
+  }
+  }
   async getMe(login: string) {
-    return await this.prisma.user.findUnique({
+    try{
+    const user =  await this.prisma.user.findUnique({
       where: {
         login,
       },
     });
+    user['avatarUrl'] = getAvatarUrlFromLogin(user.login, user.avatar);
+    return user;
+  } catch (e) {
+    throw new ForbiddenException('User not found');
   }
+  }
+
   async getRelation(user: User, userLogin: string) {
-    if (user.login === userLogin) {
+    try
+    {if (user.login === userLogin) {
       return -1;
     }
     const other = await getUserFromLogin(userLogin);
@@ -94,6 +116,8 @@ export class UserService {
     if (blockedByCheck.blockedBy.length) {
       return 5;
     }
-    return 0;
+    return 0;}catch (e) {
+      throw new ForbiddenException('User not found');
+    }
   }
 }

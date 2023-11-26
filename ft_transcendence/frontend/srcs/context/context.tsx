@@ -15,7 +15,7 @@ export interface User{
     lastName? : string,
     email? : string,
     password? : string,
-    avatar? :   string,
+    avatarUrl? :   string,
     twoFaActive? :   boolean,
     twoFaSecret? :  string,
     state? : number,
@@ -34,6 +34,7 @@ export interface User{
     history?: any,
     messagesSocket?: any;
     conversations?: any;
+    groups?: any;
 
 }
 

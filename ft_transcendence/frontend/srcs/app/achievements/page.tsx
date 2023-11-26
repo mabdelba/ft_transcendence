@@ -43,7 +43,22 @@ function Achievements() {
 	const {data : achievements, status } = useQuery("achievements", fetchAchivements);
 	const {data : unacquiredAchiev, status : status1} = useQuery("unacquiredAchiev", fetchUnacquiredAchiev);
 	
+	useEffect(()=> {
+		if(!user.login){
 	
+		  const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+		  const token = localStorage.getItem('jwtToken');
+		  const config = {
+			headers: { Authorization: `Bearer ${token}` },
+		  };
+		  axios.get(apiUrl, config)
+		  .then((response : any) => {
+			const _user = response.data;
+			setUser(_user);
+	
+		  })
+		}
+	  })
 	useEffect(()=> {	
 		if(!user.achievements || !user.unacquiredAchiev)
 		{

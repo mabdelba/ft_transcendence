@@ -52,37 +52,29 @@ function Friends() {
   const { data: requestListData, status } = useQuery('requestList', fetchRequestList);
   const { data: friendListData, status: status_ } = useQuery('friendList', fetchFriendList);
   const { data: blockedListData, status: status__ } = useQuery('blockedList', fetchBlockedList);
-  const getImageByLogin = async (login: string): Promise<string | null> => {
-    return new Promise<string | null>(async (resolve) => {
-      if (login != '') {
-        await axios
-          .post(
-            'http://localhost:3000/api/atari-pong/v1/user/avatar',
-            { userLogin: login },
-            {
-              headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-              responseType: 'blob',
-            },
-          )
-          .then((response) => {
-            const imageBlob = URL.createObjectURL(response.data) as string;
-            if (imageBlob) resolve(imageBlob);
-            else resolve(alien);
-          })
-          .catch(() => {
-            // resolve(alien);
-          });
-      }
-    });
-  };
 
-  const getReq = () => {
+  useEffect(()=> {
+    if(!user.login){
+
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+      const token = localStorage.getItem('jwtToken');
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      axios.get(apiUrl, config)
+      .then((response : any) => {
+        const _user = response.data;
+        setUser(_user);
+
+      })
+    }
+  })
+
+
+  const getReq = async () => {
     if (requestListData) {
-      requestListData.recievedFriendRequestsBy.forEach((obj: any) => {
-        getImageByLogin(obj.login).then((imageBlog) => {
-          obj.avatar = imageBlog;
-        });
-      });
+
+      
       setRequest(requestListData.recievedFriendRequestsBy);
       const _user: User = user;
       _user.friendRequestList = requestListData.recievedFriendRequestsBy;
@@ -94,13 +86,9 @@ function Friends() {
     }
   };
 
-  const getFriend = () => {
+  const getFriend = async () => {
     if (friendListData) {
-      friendListData.friends.forEach((obj: any) => {
-        getImageByLogin(obj.login).then((imageBlog) => {
-          obj.avatar = imageBlog;
-        });
-      });
+      
       setFriendsList(friendListData.friends);
       const _user: User = user;
       _user.friendList = friendListData.friends;
@@ -108,13 +96,9 @@ function Friends() {
     }
   };
 
-  const getBlocked = () => {
+  const getBlocked = async () => {
     if (blockedListData) {
-      blockedListData.blockedList.forEach((obj: any) => {
-        getImageByLogin(obj.login).then((imageBlog) => {
-          obj.avatar = imageBlog;
-        });
-      });
+      // console.log("test all: ", blockedListData.blockedList);
       setBlockedList(blockedListData.blockedList);
       const _user: User = user;
       _user.blockedList = blockedListData.blockedList;
@@ -170,16 +154,7 @@ function Friends() {
       .catch((error) => {
         console.log('error ', error);
       });
-    toast.error(`${userName} has been deleted from your friend list!`, {
-      position: 'top-center',
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'dark',
-    });
+    toast.error(`${userName} has been deleted from your friend list!`);
     setOpenFriend(false);
   };
 
@@ -188,11 +163,16 @@ function Friends() {
     if (elementToDelete !== -1) {
       friendsList.splice(elementToDelete, 1);
     }
-    const newObject = { id: userId, login: userName, avatar: userAvatar };
+    const newObject = { id: userId, login: userName, avatarUrl: userAvatar, avatar :'avatar'};
     blockedList.push(newObject);
     const _user: User = user;
     _user.friendList = friendsList;
     _user.blockedList = blockedList;
+    // const _user : User = user;
+    _user.groups = undefined;
+    _user.conversations = undefined;
+    // _user.conversations.isFrd =false;
+    // setUser(_user);
     setUser(_user);
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/block-user';
     const token = localStorage.getItem('jwtToken');
@@ -202,21 +182,13 @@ function Friends() {
     axios
       .post(url, { userId: userId }, conf)
       .then((response) => {
-        console.log('response ', response);
+
+        // console.log('response ', response);
       })
       .catch((error) => {
-        console.log('error ', error);
+        // console.log('error ', error);
       });
-    toast.error(`You blocked ${userName}!`, {
-      position: 'top-center',
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'dark',
-    });
+    toast.error(`You blocked ${userName}!`);
     setOpenFriend(false);
   };
 
@@ -260,34 +232,25 @@ function Friends() {
     if (elementToDelete !== -1) {
       requests.splice(elementToDelete, 1);
     }
-    const newObject = { id: userId, login: userName, avatar: userAvatar };
+    const newObject = { id: userId, login: userName, avatar: 'avatar', avatarUrl:userAvatar };
     friendsList.push(newObject);
     const _user: User = user;
     _user.friendRequestList = requests;
     _user.friendList = friendsList;
     setUser(_user);
+    toast.success(`New friend ${userName} added successfully!`);
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/accept-friend-request';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },
     };
     axios
-      .post(url, { senderId: userId }, conf)
-      .then((response) => {
-        console.log('response ', response);
-      })
-      .catch((error) => {
-        console.log('error ', error);
-      });
-    toast.success(`New friend ${userName} added successfully!`, {
-      position: 'top-center',
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'dark',
+    .post(url, { senderId: userId }, conf)
+    .then((response) => {
+        
+    })
+    .catch((error) => {
+        // console.log('error ', error);
     });
     setOpen(false);
   };
@@ -300,6 +263,12 @@ function Friends() {
       _user.blockedList = blockedList;
       setUser(_user);
     }
+    const _user : User = user;
+    _user.groups = undefined;
+    _user.conversations = undefined;
+    // _user.conversations.isFrd =false;
+
+    setUser(_user);
 
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/unblock-user';
     const token = localStorage.getItem('jwtToken');
@@ -309,15 +278,15 @@ function Friends() {
     axios
       .post(url, { userId: userId }, conf)
       .then((response) => {
-        console.log('response ', response);
+        // console.log('response ', response);
       })
       .catch((error) => {
-        console.log('error ', error);
+        // console.log('error ', error);
       });
     setOpenBlock(false);
   };
   const [userId, setUserId] = useState<any>(null);
-  const [userAvatar, setUserAvatar] = useState<any>(null);
+  const [userAvatar, setUserAvatar] = useState(alien);
   const [userName, setUserName] = useState('');
   const [open, setOpen] = useState(false);
   const [openFriend, setOpenFriend] = useState(false);
@@ -394,18 +363,6 @@ function Friends() {
               />
             </div>
           </div>}
-          <ToastContainer
-            position="top-center"
-            autoClose={4000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-          />
         </main>
       </OptionBar>
       {/* request */}

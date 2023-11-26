@@ -42,26 +42,14 @@ function Profil(props: profileProp) {
 				headers: { Authorization: `Bearer ${token}` },
 			};
 			try {
-				const user_ = await axios.post(url, { userLogin: props.login }, config);
+				const user_ = await axios.post(url, { userLogin: props.login }, config)
 				setProfile(user_.data);
 				{
 					props.setNumberOfMatch && props.setNumberOfMatch(user_.data.numberOfGamesPlayed);
 				}
-				const user__ = await axios.post(
-					'http://localhost:3000/api/atari-pong/v1/user/avatar',
-					{ userLogin: props.login },
-					{
-						headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-						responseType: 'blob',
-					},
-				);
-				const imageBlob = URL.createObjectURL(user__.data) as string;
-				setUserAvatar(imageBlob);
-				{
-					props.setUserAvatar && props.setUserAvatar(imageBlob);
-				}
+				setUserAvatar(user_.data.avatarUrl)
 			} catch (err) {
-				console.log(err);
+				props.router('/dashboard')
 			}
 		}
 	}
@@ -133,7 +121,7 @@ function Profil(props: profileProp) {
 						color={false}
 						router={props.router}
 						flag={true}
-						image={!props.myProfil ? user.avatar : userAvatar}
+						image={!props.myProfil ? user.avatarUrl : userAvatar}
 					/>
 				</div>
 				<div className="w-[75%] h-[40%] flex flex-col justify-center items-start px-2 text-[8px] md:text-sm xl:text-lg">
