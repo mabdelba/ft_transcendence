@@ -12,11 +12,14 @@ interface UserData {
   isMember: boolean;
   id: number;
   login: string;
+
 }
 
 type SearchBarProps = {
   users: UserData[];
   channels: UserData[];
+  setChannels: Function
+  
 }
 
 function ResultElements (props : SearchBarProps)
@@ -51,7 +54,7 @@ function ResultElements (props : SearchBarProps)
         && props.channels.map((results, id) => {
           return (
             (results.isMember === false &&
-            <SearchResult result={results.name} key={id} type={true} isMember={results.isMember} channelType={results.type} />)
+            <SearchResult result={results.name} key={id} type={true} isMember={results.isMember} channelType={results.type} setChannel={props.setChannels} channels={props.channels} />)
           );
         })
       }

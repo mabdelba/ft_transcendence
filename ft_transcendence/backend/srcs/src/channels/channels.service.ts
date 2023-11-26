@@ -223,7 +223,10 @@ export class ChannelsService {
       if (!dto.user){
         if (channelType == 2) {
           if (pass != dto.password)
+          {
+            console.log('hana hnaaaa==========');
             throw new ForbiddenException('Wrong password');
+          }
         userToAdd = login;
       }
     }
@@ -250,7 +253,7 @@ export class ChannelsService {
         },
       });
     } catch (e) {
-      throw new ForbiddenException('Channel not found');
+      throw new ForbiddenException(e);
     }
   }
 
