@@ -89,7 +89,7 @@ function TwoFactor() {
           <div className="flex justify-center mt-16 mb-32 mx-[40px] w-[568px] h-[70px]">
             <div className="text-[39px] w-full h-full">
               <button
-                className='font-Orbitron text-[39px] text-center SmallNeonShadowBord NeonShadow w-full h-full'
+                className='font-Orbitron text-[39px] hover:text-black hover:bg-white text-center SmallNeonShadowBord NeonShadow w-full h-full'
                 type="submit"
               >
                 Continue
