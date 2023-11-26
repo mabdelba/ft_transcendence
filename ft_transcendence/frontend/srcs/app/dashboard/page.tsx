@@ -65,6 +65,10 @@ function Dashboard() {
             theme: 'dark',
           });
         });
+        socket.on('cancelNotification', () => {
+          console.log('cancelNotification=======')
+          toast.dismiss();
+        });
       }
       setUser__(user);
     }

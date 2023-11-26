@@ -12,7 +12,7 @@ import { subscribe } from "diagnostics_channel";
 export class GameGateway {
     ConnectedUsers: Map<string, Socket[]> = new Map<string, Socket[]>();
     RandomGames: { game: GameModel, id1: string, id2: string, map: string }[] = [];
-    privateGame: { game: GameModel, id1: string, id2: string, map: string}[] = [];
+    privateGame: { game: GameModel, id1: string, id2: string}[] = [];
     constructor() {}
  
     @UseGuards(JwtGuard)
@@ -43,7 +43,6 @@ export class GameGateway {
         const check = this.RandomGames.findIndex((game) => game.id1 == login || game.id2 == login);
         const privateIndex = this.privateGame.findIndex((game) => ((game.id1 !== login && game.id2 !== login)));
         const privateCheck = this.privateGame.findIndex((game) => ((game.id1 == login || game.id2 == login)));
-        console.log("new game created");
         if(data.type == 'private'){
             if (privateCheck >= 0){
                 console.log("index "+ privateCheck +" "+ login +" joined private game");
@@ -57,7 +56,7 @@ export class GameGateway {
             {
                 let game: GameModel = new GameModel(socket);
                 console.log(login ,"private game create for "+ data.opponent);
-                this.privateGame.push({game: game, id1: login, id2: data.opponent, map: data.map});
+                this.privateGame.push({game: game, id1: login, id2: data.opponent});
             } 
         }
         else {
@@ -98,8 +97,6 @@ export class GameGateway {
         const privateIndex = this.privateGame.findIndex((game) => (game.game.id1 == socket.id || game.game.id2 == socket.id));
 
         if (index >= 0){
-            //check if a player disconnected and if so end the game
-            //read comment in page.tsx useEffect
             const game: GameModel = this.RandomGames[index].game;
             game.movePlayer(socket.id, data.x);
         }
@@ -152,7 +149,6 @@ export class GameGateway {
         const login = decoded['login'];
         const index = this.RandomGames.findIndex((game) => game.id1 == login || game.id2 == login);
         const privateIndex = this.privateGame.findIndex((game) => game.id1 == login || game.id2 == login);
-
         if(index >= 0){
             this.RandomGames.splice(index, 1);
         }
@@ -181,14 +177,14 @@ export class GameGateway {
             this.RandomGames.splice(gameIndex, 1);
         }
         else if(privateIndex >= 0){
-            const game: GameModel = this.privateGame[privateIndex].game;
-            if (socket.id == game.socket1.id){
-                game.socket2?.emit('gameEnded', {state: 'win'});
+            const pGame: GameModel = this.privateGame[privateIndex].game;
+            if (socket.id == pGame.socket1.id){
+                pGame.socket2?.emit('gameEnded', {state: 'win'});
             }
-            else if (socket.id == game.socket2.id){
-                game.socket1?.emit('gameEnded', {state: 'win'});
+            else if (socket.id == pGame.socket2.id){
+                pGame.socket1?.emit('gameEnded', {state: 'win'});
             }
-            game.destroy();
+            pGame.destroy();
             this.privateGame.splice(privateIndex, 1);
         }
         this.ConnectedUsers.delete(decoded['login']);

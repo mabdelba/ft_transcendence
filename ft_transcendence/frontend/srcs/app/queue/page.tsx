@@ -37,12 +37,13 @@ function Queue() {
     
     const checkCancel = () => {
       user.socket?.emit('CancelGame');
+      socket?.emit('cancel-notif', {login: 'adam'});
       setIsOpen(false);
     }
 
     useEffect(() => {
       console.log('enterereererer');
-      if(!user.socket){
+      if(!user.socket || ((user.socket)as Socket).disconnected){
           let socket: Socket = io('http://localhost:3001', {
               auth: {
                   token: localStorage.getItem('jwtToken'),
@@ -61,13 +62,13 @@ function Queue() {
           router.push('/dashboard');
         })
       }
-      else
+      else 
       {
         user.socket?.on('already connected', () => {
           console.log('already connected');
           router.push('/dashboard');
       })
-      console.log(user.socket.id)
+      // console.log(user.socket.id)
     }
     }, [user.socket]);
   

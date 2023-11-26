@@ -101,5 +101,13 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   sendMessage(client: Socket, data: {isChannel: boolean, senderLogin: string, receiverLogin: string, text: string}){
     this.dmsGateway.handleMessage(data, client, this.users, this.io);
   }
+
+  @SubscribeMessage('cancel-notif')
+  cancelNotif(client: Socket, data: {login : string}){
+    const key = [...this.users].find(([key, value]) => value === data.login)?.[0];
+    if (key != null){
+      console.log("cancel notif", data.login, " client id ", key);
+      this.io.to(key).emit('cancelNotification', {login: data.login});
+    }
+  }
 }
-  

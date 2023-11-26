@@ -41,14 +41,14 @@ class Game{
         this._setMouse();
         this._createWalls();
         this._createBall();
-        this._setEvents();
         this._createPlayers();
+        this._setEvents();
     }
 
     private _setEvents(): void{
         Events.on(this.mouseConstraint, "mousemove", () => {
             if (this.mouse){
-                if(this.mouse.position.x < this.width - 50 * this.scale && this.mouse.position.x > 50 * this.scale)
+                if(this.mouse.position.x < this.width - 60 * this.scale && this.mouse.position.x > 60 * this.scale)
                     this.socket?.emit('MovePlayer', {x: this._map(this.mouse.position.x, 0, this.width, 0, 600)});
             }
         });
@@ -59,7 +59,7 @@ class Game{
         this.mouseConstraint = Matter.MouseConstraint.create(this._engine, {
             mouse: this.mouse,
             constraint: {
-                stiffness: 0.1,
+                stiffness: 0.2,
                 render: {
                     visible: false
                 }
@@ -125,7 +125,7 @@ class Game{
     }
 
     public destroy(): void{
-        Matter.Events.off(this._engine, 'beforeUpdate', ()=> {});
+        Matter.Events.off(this._engine, 'mousemove', ()=> {});
         this._render.canvas.remove();
         Matter.Render.stop(this._render);
         Matter.World.clear(this._world, true);

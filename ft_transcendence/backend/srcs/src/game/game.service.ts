@@ -34,8 +34,8 @@ class GameModel{
         this._createWalls();
         this._createBall();
         this._createPlayers();
-        Runner.run(this._runner, this._engine);
         this._setEvents();
+        Runner.run(this._runner, this._engine);
     }
     
     setForce(x: number, y: number): void{

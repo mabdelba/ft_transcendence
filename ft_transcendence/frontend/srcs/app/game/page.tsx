@@ -54,7 +54,9 @@ useEffect(() => {
         }
 
          user.socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
+            console.log('player1', data.player1.x,data.player1.y , 'player2', data.player2.x, data.player2.y);
                 game?.setState(data.player1, data.player2, data.ball);
+            console.log('gamePlayer1', game?.player1?.position.x, game?.player1?.position.y, 'gamePlayer2', game?.player2?.position);
         });
     
         console.log('gameSocket', user.socket);
@@ -133,14 +135,11 @@ useEffect(() => {
             // gameSocket?.off('left game');
             // gameSocket?.off('connect');
             // gameSocket?.off('disconnect');
-            // setGameSocket(null);
-            // gameSocket?.disconnect();
-            // gameSocket?.close();
+            gameSocket?.disconnect();
+            gameSocket?.close();
             game?.destroy();
         }
     }, [gameEnded])
-
-    // const [startState, setStartState] = useState(true);
 
     return (
         <><div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
