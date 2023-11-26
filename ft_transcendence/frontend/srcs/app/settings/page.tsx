@@ -45,6 +45,8 @@ function Settings() {
 
     const [filename, setFilename] = useState('*No file selected');
     const [avatarToUpload , setAvatarToUpload] = useState<any>(null);
+    const [isChecked, setIsChecked] = useState<any>(false);
+
     let [counter, setCounter] = useState(0);
     
     var [Array, setArray] = useState<string[]>([]);
@@ -68,13 +70,13 @@ function Settings() {
                 const _user = response.data;
                 socket.emit('online', { token: localStorage.getItem('jwtToken') });
                 _user.state = 1;
-                setId(_user.id);setName(_user.firstName);setLastName(_user.lastName);setUsername(_user.login);setEmail(_user.email);setAvatarUrl(_user.avatarUrl)
+                setId(_user.id);setName(_user.firstName);setLastName(_user.lastName);setUsername(_user.login);setEmail(_user.email);setAvatarUrl(_user.avatarUrl);setIsChecked(_user.twoFaActive);
                 setUser(_user);
 
               })
             }
             else{
-                setId(user.id);setName(user.firstName);setLastName(user.lastName);setUsername(user.login);setEmail(user.email);setAvatarUrl(user.avatarUrl)
+                setId(user.id);setName(user.firstName);setLastName(user.lastName);setUsername(user.login);setEmail(user.email);setAvatarUrl(user.avatarUrl);setIsChecked(user.twoFaActive)
             }
             const Temp = [user.firstName || '', user.lastName || '', user.login || '', user.email || ''];
             setArray(Temp)
@@ -222,7 +224,8 @@ function Settings() {
     }
 
     const [result, setResult] = useState("");
-    const [isChecked, setIsChecked] = useState(user.twoFaActive);
+    console.log("checekd", isChecked);
+    console.log("user", user.twoFaActive);
     const [showPupUp, setshowPupUp] = useState(false);
 
     const handleChecked = () => {
@@ -230,8 +233,29 @@ function Settings() {
         {
             setIsChecked(false);
             fetchQrCode();
+            setshowPupUp(!showPupUp);
         }
-        setshowPupUp(!showPupUp);
+        else
+        {
+            const token = localStorage.getItem('jwtToken');
+            const config = {
+                headers: { Authorization: `Bearer ${token}` },
+            };
+            const url = "http://localhost:3000/api/atari-pong/v1/settings/disable-2fa";
+            axios.put(url, {}, config)
+            .then((response) => {
+                console.log("response: ", response.data);
+                toast.success('Two factor authentication disabled!');
+                const _user : User = user;
+                _user.twoFaActive = false;
+                setUser(_user);
+                setIsChecked(false);
+            })
+            .catch((error) => {
+                console.log("error: ", error);
+                toast.error(error.response.data.message);
+            })
+        }
     }    
 
     const closeLoginModal = () => {
@@ -246,9 +270,33 @@ function Settings() {
         if (result.length !== 6) {
           event.preventDefault();
           toast.error('The code must be 6 digits long.');
-          return;
         }
         else {
+            const token = localStorage.getItem('jwtToken');
+            const config = {
+                headers: { Authorization: `Bearer ${token}` },
+            };
+            const url = "http://localhost:3000/api/atari-pong/v1/two-factor-auth/verify";
+            axios.post(url, {code: result}, config)
+            .then((response) => {
+                console.log("response: ", response.data);
+                console.log("res: ", result);
+                if (response.data === true)
+                {
+                toast.success('Two factor authentication activated!');
+                const _user : User = user;
+                _user.twoFaActive = true;
+                setUser(_user);
+                setIsChecked(true);
+                closeLoginModal();
+                }
+                else
+                    toast.error('Wrong code!');
+            })
+            .catch((error) => {
+                console.log("error: ", error);
+                toast.error(error.response.data.message);
+            })
           console.log(result);
         }
       };
