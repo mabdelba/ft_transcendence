@@ -7,6 +7,7 @@ import { context } from '../../../context/context';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { error } from 'console';
+import { useRouter } from 'next/navigation';
 
 type SearchBarProps = {
     result: string;
@@ -14,6 +15,8 @@ type SearchBarProps = {
     type: boolean;
     isMember: boolean;
     channelType: number;
+    setChannel? : Function;
+    channels? : any;
 }
 
 function SearchResult(props: SearchBarProps)
@@ -21,6 +24,7 @@ function SearchResult(props: SearchBarProps)
   const [JoinPopUp, setJoinPopUp] = useState(false);
   // const [Joinpublic, setJoinPublic] = useState(true);
   const {user} = useContext(context)
+  const router = useRouter();
 
   const closeLoginModal = () => {
     setJoinPopUp(false);
@@ -41,6 +45,12 @@ function SearchResult(props: SearchBarProps)
     axios.post(apiUrl, {channelName: name, user: user.login}, config)
     .then(()=> {
       toast.success(`You joined ${name}!`)
+      const index = props.channels.findIndex((obj: any)=> obj.name == name)
+      if(index != -1){
+        const temp = props.channels
+        temp.splice(index, 1)
+        props.setChannel && props.setChannel(temp)
+      }
     }
     )
     .catch((error : any)=> {
@@ -65,6 +75,12 @@ function SearchResult(props: SearchBarProps)
     axios.post(apiUrl, {channelName: name, password: channelPass}, config)
     .then(()=> {
       toast.success(`You joined ${name}!`)
+      const index = props.channels.findIndex((obj: any)=> obj.name == name)
+      if(index != -1){
+        const temp = props.channels
+        temp.splice(index, 1)
+        props.setChannel && props.setChannel(temp)
+      }
     }
     )
     .catch((error : any)=> {
@@ -75,8 +91,9 @@ function SearchResult(props: SearchBarProps)
   }
 
   const handleDivClick = (user: string) => {
-    console.log(user);
-    window.location.href = 'http://localhost:4000/profil/' + user;
+    // console.log(user);
+    router.push(`/profil/${user}`);
+    // window.location.href = 'http://localhost:4000/profil/' + user;
   };
 
   return (
@@ -119,7 +136,7 @@ function SearchResult(props: SearchBarProps)
         }
       </div>
       <Transition appear show={JoinPopUp} as={Fragment}>
-        <Dialog as="div" className="relative z-20 font-Orbitron" onClose={closeLoginModal}>
+        <Dialog as="div" className="relative z-20 font-Orbitron bg-red-500" onClose={closeLoginModal}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"

@@ -47,6 +47,7 @@ export default function rootLayout({ children }: { children: React.ReactNode }) 
               draggable
               pauseOnHover
               theme="dark"
+              limit={1}
             />
           </QueryClientProvider>
         </Context>

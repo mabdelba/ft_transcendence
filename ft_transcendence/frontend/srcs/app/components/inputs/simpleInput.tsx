@@ -27,7 +27,8 @@ function SimpleInput(props: InputProps) {
     setShowPassword(!showpassword);
   }
 
-  const handleBlur = () => {
+  const handleChange = (event: any) => {
+    props.SetValue(event.target.value);
     if (props.isVerif && props.pass) {
       if (props.val !== props.pass) {
         setError(false);
@@ -46,11 +47,32 @@ function SimpleInput(props: InputProps) {
         props.setError(true);
       }
     }
-    // props.setError(verror);
-  };
+  } 
+
+  // const handleBlur = () => {
+  //   if (props.isVerif && props.pass) {
+  //     if (props.val !== props.pass) {
+  //       setError(false);
+  //       props.setError(false);
+  //     } else {
+  //       setError(true);
+  //       props.setError(true);
+  //     }
+  //   } else if (props.regex) {
+  //     const reg = props.regex.test(props.val);
+  //     if (!reg) {
+  //       setError(false);
+  //       props.setError(false);
+  //     } else {
+  //       setError(true);
+  //       props.setError(true);
+  //     }
+  //   }
+  //   props.setError(verror);
+  // };
 
   return (
-    <div onBlur={handleBlur} className="space-y-44 h-full w-full min-h-[45px]">
+    <div className="space-y-44 h-full w-full min-h-[45px]">
       <div
         className={`w-full h-full  flex justify-center  items-center ${
           verror ? 'NBord' : 'NeonShadowBordRed'
@@ -61,7 +83,8 @@ function SimpleInput(props: InputProps) {
             placeholder={props.holder}
             className="h-full w-full pl-3 bg-transparent text-white outline-none placeholder-[#484848]"
             type={!showpassword ? props.type1 : props.type2}
-            onChange={(event) => props.SetValue(event.target.value)}
+            onChange={(event) => handleChange(event)}
+            
             value={props.flag ? props.val: undefined}
             readOnly={props.readonly}
             
