@@ -18,6 +18,9 @@ import { SocketContext } from '../../../context/context';
 type closeFunc = {
   handler: any;
   rout: any;
+  setOpenTwoFact: any;
+  setJwtToken: any;
+  setLoginTwo: any
 };
 
 function Login(props: closeFunc) {
@@ -26,6 +29,7 @@ function Login(props: closeFunc) {
   const [Uerror, setUerror] = useState(false);
   const [Perror, setPerror] = useState(false);
   const {socket} = useContext(SocketContext);
+  // const [jwtTokenState, setjwtTokenState] = useState<any>('');
   const Data = { username, password };
 
   const regex = /^.+$/;
@@ -37,7 +41,7 @@ function Login(props: closeFunc) {
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
-
+    props.setLoginTwo(username);
     if (!Uerror || !Perror) {
       toast.error('Please fill out all fields with compatible format!');
       return;
@@ -52,10 +56,12 @@ function Login(props: closeFunc) {
       .post(apiUrl, logData)
       .then((response) => {
 
-        // console.log('response: ', response);
-        if (response.data.twoFaActive === true)
+        console.log('response: ', response);
+        if (response.data.twoFaActive == true)
         {
-          check2fa();
+          props.setOpenTwoFact(true);
+          props.setJwtToken(response.data.token)
+          // check2fa();
         }
         else
         {
