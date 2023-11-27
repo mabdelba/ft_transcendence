@@ -14,23 +14,23 @@ import { data } from 'autoprefixer';
 import { emit } from 'process';
 import GamePopup from '../components/shapes/GamePopup';
 import { BiHappyAlt, BiSad, BiLogOut } from 'react-icons/bi';
-import { context } from '../../context/context';
+import { User, context } from '../../context/context';
 import { start } from 'repl';
 
 let game: Game | null = null;
 
-const fetchInfo = async () => {
-    const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
-    const token = localStorage.getItem('jwtToken');
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    const res = await fetch(apiUrl, config);
-    return res.json();
-  };
+// const fetchInfo = async () => {
+//     const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+//     const token = localStorage.getItem('jwtToken');
+//     const config = {
+//         headers: { Authorization: `Bearer ${token}` },
+//     };
+//     const res = await fetch(apiUrl, config);
+//     return res.json();
+// };
 
 const gamePage = () => {
-    const {user} = useContext(context);
+    const {user, setUser} = useContext(context);
     const gameDiv = useRef<HTMLDivElement>(null);
     const [{width, height}, setWindowSize] = useState({width: 0, height: 0})
     const [gameSocket, setGameSocket] = useState<any>(null)
@@ -41,29 +41,30 @@ const gamePage = () => {
     const [startState, setStartState] = useState(true);
     const [player1Score, setPlayer1Score] = useState<number>(0);
     const [player2Score, setPlayer2Score] = useState<number>(0);
+    // opponent login and avatar
+    const [username, setUsername] = useState("");
+    const [avatar, setAvatar] = useState();
 
-useEffect(() => {
+    useEffect(() => {
         const handleResize = () => {
             setWindowSize({width: window.innerWidth, height: window.innerHeight});
         };
         window.addEventListener('resize', handleResize);
-
+        
         if (!user.socket) {
             game?.destroy();
             router.push('/dashboard');
         }
-
-         user.socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
-            console.log('player1', data.player1.x,data.player1.y , 'player2', data.player2.x, data.player2.y);
-                game?.setState(data.player1, data.player2, data.ball);
-            console.log('gamePlayer1', game?.player1?.position.x, game?.player1?.position.y, 'gamePlayer2', game?.player2?.position);
+        
+        user.socket?.on('GameState', (data: {player1: Matter.Vector, player2: Matter.Vector, ball: Matter.Vector}) => {
+            game?.setState(data.player1, data.player2, data.ball);
         });
-    
+        
         console.log('gameSocket', user.socket);
-
-         user.socket?.on('gameEnded', (data: {state: string}) => {
-             setGameEnded(data.state);
-         })
+        
+        user.socket?.on('gameEnded', (data: {state: string}) => {
+            setGameEnded(data.state);
+        })
         user.socket?.on('gameOver' , () => {
             user.socket?.emit('endGame');
         })
@@ -74,81 +75,89 @@ useEffect(() => {
         user.socket?.on('startBotton', () => {
             setStartState(true);
         })
-
+        
         setGameSocket(user.socket);
-
+        
         return () => {
             if (typeof window !== 'undefined') {
                 window.removeEventListener('resize', handleResize);
+                (user.socket as Socket)?.disconnect();
+                user.socket?.close();
+                const _user :User = user;
+                _user.socket = null;
+                _user.opponent = '';
+                _user.gameType = '';
+                _user.oppenentAvatar = '';
+                setUser(user);
             }
         };
     }, []);
-
-useEffect(() => {
+    
+    useEffect(() => {
         if (gameDiv.current){
             game = new Game(gameDiv.current, user.map!);
             if (gameSocket)
-                game.setSocket(gameSocket) 
-            game.start(); 
-        }
-        return () => {
-            game?.destroy();
-        }
-    }, [width, height, gameSocket])
-
-    const [username, setUsername] = useState("Username");
-    const [avatar, setAvatar] = useState(Alien);
-
-    fetchInfo()
-        .then((data) => {
-            setUsername(data.login);
-            // setAvatar(data.avatar);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-
-    const handleLeave = () => {;
-        gameSocket?.emit('endGame')
-        game?.destroy();
-        router.push('/dashboard');
+            game.setSocket(gameSocket) 
+        game.start(); 
     }
+    return () => {
+        game?.destroy();
+    }
+}, [width, height, gameSocket])
 
-   useEffect(() => {
-        gameSocket?.on('left game', () => {
-                setIsLeft(true);
-                console.log('isLeft', isLeft);
-           })
-         if (isLeft) {
-                handleLeave();
-         }
-        
-    }, [isLeft, gameSocket])
 
-    useEffect(() => {
+const handleLeave = () => {;
+    gameSocket?.emit('endGame')
+    game?.destroy();
+    router.push('/dashboard');
+}
 
-        if(gameEnded !== ''){
-            console.log('gameEnded', gameEnded);
-            setOpenModal(true)
-            // gameSocket?.off('GameState');
-            // gameSocket?.off('gameEnded');
-            // gameSocket?.off('left game');
-            // gameSocket?.off('connect');
-            // gameSocket?.off('disconnect');
-            gameSocket?.disconnect();
-            gameSocket?.close();
-            game?.destroy();
-        }
-    }, [gameEnded])
+useEffect(() => {
+    gameSocket?.on('left game', () => {
+        setIsLeft(true);
+        console.log('isLeft', isLeft);
+    })
+    if (isLeft) {
+        handleLeave();
+    }
+    
+}, [isLeft, gameSocket])
 
-    return (
-        <><div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
+useEffect(() => {
+    
+    if(gameEnded !== ''){
+        console.log('gameEnded', gameEnded);
+        setOpenModal(true)
+        // gameSocket?.off('GameState');
+        // gameSocket?.off('gameEnded');
+        // gameSocket?.off('left game');
+        // gameSocket?.off('connect');
+        // gameSocket?.off('disconnect');
+        gameSocket?.disconnect();
+        gameSocket?.close();
+        game?.destroy();
+    }
+}, [gameEnded])
+
+
+
+// fetchInfo()
+//     .then((data) => {
+//         setUsername(data.login);
+//         // setAvatar(data.avatar);
+//     })
+//     .catch((error) => {
+//         console.error('Error:', error);
+//     });
+
+return (
+    <><div className='font-Orbitron w-screen h-screen flex flex-col justify-center items-center'>
             <div className='flex flex-row items-center w-[100%] justify-evenly'>
                 <div className="flex flex-row items-center m-2">
                     <div className='NeonShadowBord h-[70px] w-[70px] md:w-[90px] md:h-[90px] m-auto flex'>
-                        <Image src={avatar} alt='avatar' className="" />
+                        <Image src={user.avatarUrl || Alien} alt='avatar' className="h-auto w-auto" width={"50"} height={"50"}/>
                     </div>
-                    <div className="blueShadow text-[20px] text-[#00B2FF] m-2 hidden md:block">{username}</div>
+                    <div className="blueShadow text-[20px] text-[#00B2FF] m-2 hidden md:block">{user.login}</div>
                 </div>
                 <button onClick={handleLeave} type="button" className="NeonShadowBord flex flex-row items-center h-fit px-4 py-3 hover:bg-white hover:text-[black] transition-[300]">
                     {/* <Image src={Logout} className='h-[20px]' alt="logout" />
@@ -157,13 +166,13 @@ useEffect(() => {
                     <div className="hidden md:block pl-2 text-[15px]">Leave</div>
                 </button>
                 <div className="flex flex-row items-center m-2">
-                    <div className="redShadow text-[20px] text-[#FF0742] m-2 hidden md:block">{username}</div>
+                    <div className="redShadow text-[20px] text-[#FF0742] m-2 hidden md:block">{user.opponent}</div>
                     <div className='NeonShadowBord h-[70px] w-[70px] md:w-[90px] md:h-[90px] m-auto flex'>
-                        <Image src={avatar} alt='avatar' className="" />
+                        <Image src={user.oppenentAvatar || Alien} alt='avatar' className="h-auto w-auto" width={"50"} height={"50"}/>
                     </div>
                 </div>
             </div>
-            <div className='text-[40px]'>
+            <div className='text-[40px] -mt-4'>
                 {player1Score} - {player2Score}
             </div>
             {startState && <button
@@ -173,7 +182,7 @@ useEffect(() => {
                     setStartState(false);
                     gameSocket?.emit('StartGame', {map: user.map});
                 } }
-                className='z-10 h-10 w-52 border'>Start Game</button>}
+                className='z-10 mb-2 w-fit NeonShadowBord flex flex-row items-center justify-center h-fit px-4 py-3 hover:bg-white hover:text-[black] transition-[300]'>Start Game</button>}
             <div className='w-[100%] h-[80%] flex justify-center items-center' ref={gameDiv}>
             </div>
 

@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { set } from 'husky';
 import { StoreID } from 'recoil';
 import axios from 'axios';
+import { availableParallelism } from 'os';
 
 function Queue() {
     const [isOpen, setIsOpen] = useState(false);
@@ -31,8 +32,13 @@ function Queue() {
           if (user.login !== user.opponent){
             socket?.emit('notification', {login: user.opponent});
           }
-          user.socket?.on('ready', ()=>{
-          router.push('/game');
+          user.socket?.on('ready', (opponent : any)=>{
+            const _user : User = user;
+            console.log('opponentdlknflkjd', opponent);
+            _user.opponent = opponent.login;
+            _user.oppenentAvatar = opponent.avatarUrl;
+            setUser(_user);
+            router.push('/game');
         })
       }
     

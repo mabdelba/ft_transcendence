@@ -16,6 +16,7 @@ import { GameGateway } from './game/game.gateway';
 import { ChannelsModule } from './channels/channels.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { join } from 'path';
     StateModule,
     ScheduleModule.forRoot(),
     ChannelsModule,
+    GameModule,
   ],
   controllers: [AppController],
   providers: [AppService, StateGateway, GameGateway, TasksService],

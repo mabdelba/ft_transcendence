@@ -1,5 +1,6 @@
 import { Socket } from "socket.io";
 import Matter, { Bodies, Engine, Events, Runner, Vector, World, Body } from "matter-js";
+import { PrismaService } from "src/prisma/prisma.service";
 
 class GameModel{
     private _engine: Engine;
@@ -22,7 +23,6 @@ class GameModel{
     // this id is the id of the user in database, not the socket id.
     id1: string | null = null;
     id2: string | null = null;
-
     constructor(socket: Socket){
         this.socket1 = socket;
         this.id1 = socket.id;
@@ -147,6 +147,11 @@ class GameModel{
         else if (id == this.id2 && this.player2)
             Body.setPosition(this.player2, {x: this.width - x, y: this.player2.position.y});
     }
+
+
+
+
+
 }
 
 // spownBall(): void {

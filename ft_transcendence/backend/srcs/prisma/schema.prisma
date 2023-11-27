@@ -102,10 +102,10 @@ model Achievement {
 
 model Game {
   id                Int      @id @default(autoincrement())
-  player1Id         Int
-  player2Id         Int
-  player1           User     @relation("player1", fields: [player1Id], references: [id])
-  player2           User     @relation("player2", fields: [player2Id], references: [id])
+  player1Login         String
+  player2Login         String
+  player1           User     @relation("player1", fields: [player1Login], references: [login])
+  player2           User     @relation("player2", fields: [player2Login], references: [login])
   scoreOfPlayer1    Int
   scoreOfPlayer2    Int
   dateOfGame        DateTime @default(now())

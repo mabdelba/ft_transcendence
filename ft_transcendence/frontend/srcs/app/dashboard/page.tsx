@@ -105,6 +105,7 @@ function Dashboard() {
   useEffect(() => {
     if((user.socket as Socket)?.connected){
         (user.socket as Socket)?.disconnect();
+        user.socket?.close();
         const _user: User = user;
         _user.socket = null;
         setUser(_user);

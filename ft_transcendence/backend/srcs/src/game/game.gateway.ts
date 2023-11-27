@@ -8,7 +8,7 @@ import GameModel from "./game.service";
 import { disconnect } from "process";
 import { subscribe } from "diagnostics_channel";
 import { PrismaService } from "src/prisma/prisma.service";
-
+import { getAvatarFromLogin2 } from "src/utils/get-avatar-from-login";
 @WebSocketGateway(3001, { cors: '*' }) 
 export class GameGateway {
     ConnectedUsers: Map<string, string[]> = new Map<string, string[]>();
@@ -44,7 +44,7 @@ export class GameGateway {
 
 
     @SubscribeMessage('NewGame')
-    handleNewGame(@ConnectedSocket() socket: Socket, @MessageBody() data: { map: string, type: string, opponent?: string}) {
+    async handleNewGame(@ConnectedSocket() socket: Socket, @MessageBody() data: { map: string, type: string, opponent?: string}) {
         const jwtToken = socket.handshake.auth.token;
         const decoded = jwtDecode(jwtToken);
         const login = decoded['login'];
@@ -59,8 +59,10 @@ export class GameGateway {
                 game.game.setSocket2(socket);
                 game.game.setID2(socket.id);
                 game.id2 = login;
-                game.game.socket1.emit('ready');
-                game.game.socket2.emit('ready');
+                const avatarUrl1 = await getAvatarFromLogin2(game.id1);
+                const avatarUrl2 = await getAvatarFromLogin2(game.id2);
+                game.game.socket1.emit('ready', {login: game.id2, avatarUrl: avatarUrl2});
+                game.game.socket2.emit('ready', {login: game.id1, avatarUrl: avatarUrl1});
             }else if(privateIndex < 0) 
             {
                 let game: GameModel = new GameModel(socket);
@@ -75,8 +77,10 @@ export class GameGateway {
                 game.game.setSocket2(socket);
                 game.game.setID2(socket.id);
                 game.id2 = login;
-                game.game.socket1.emit('ready');
-                game.game.socket2.emit('ready');
+                const avatarUrl1 = await getAvatarFromLogin2(game.id1);
+                const avatarUrl2 = await getAvatarFromLogin2(game.id2);
+                game.game.socket1.emit('ready', {login: game.id2, avatarUrl: avatarUrl2});
+                game.game.socket2.emit('ready', {login: game.id1, avatarUrl: avatarUrl1});
             }else if(check < 0)
             {
                 let game: GameModel = new GameModel(socket);
@@ -158,12 +162,16 @@ export class GameGateway {
         const login = decoded['login'];
         const index = this.RandomGames.findIndex((game) => game.id1 == login || game.id2 == login);
         const privateIndex = this.privateGame.findIndex((game) => game.id1 == login || game.id2 == login);
+        console.log("cancel game", index, this.RandomGames.length);
         if(index >= 0){
+            this.RandomGames[index].game.destroy();
             this.RandomGames.splice(index, 1);
         }
         else if(privateIndex >= 0){
+            this.privateGame[privateIndex].game.destroy();
             this.privateGame.splice(privateIndex, 1);
         }
+        console.log("cancel game", index, this.RandomGames.length);
     }
 
     @UseGuards(JwtGuard)
