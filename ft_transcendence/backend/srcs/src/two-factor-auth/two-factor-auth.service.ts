@@ -26,12 +26,18 @@ export class TwoFactorAuthService {
       });
     });
   }
-  verify(code, user: User) {
+  async verify(code, user: User) {
     const secret = user.twoFaSecret;
+    if (!user.twoFaActive){
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { twoFaActive: true },
+      });
+    }
     return speakeasy.totp.verify({
       secret,
       encoding: 'base32',
-      token: code,
+      token: code.code,
     });
   }
 }

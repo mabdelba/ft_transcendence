@@ -35,7 +35,7 @@ function LatestAchiev(props: newType) {
         setAchievement(res.data[0]);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
     }
     else

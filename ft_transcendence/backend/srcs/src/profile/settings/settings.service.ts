@@ -79,7 +79,8 @@ export class SettingsService {
     try{
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { twoFaActive: false },
+      data: { twoFaActive: false,
+      twoFaSecret: null },
     });
   } catch (e) {
     new ForbiddenException('User not found');

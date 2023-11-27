@@ -25,6 +25,7 @@ import UploadAvatar from '../components/buttons/uploadAvatar';
 import Upload from '../../public/uploadIcon.svg';
 import BlackUpload from '../../public/blackupload.svg';
 import { toast } from 'react-toastify';
+import Avatar from 'react-avatar'
 
 type ChatText = {
   sender: string;
@@ -364,10 +365,10 @@ function Messages() {
     if (socket) {
       if (!user.conversations || (user.conversations.length == 1 && user.conversations.isFrd)) {
         const _user: User = { ...user };
-       console.log('fles message: ', user.conversations);
+      //  console.log('fles message: ', user.conversations);
        socket.emit('users-with-conversation', { login: user.login || 'mabdelba' });
        socket.on('get-users', (data: any) => {
-         console.log('data users,', data)
+        //  console.log('data users,', data)
          if (user && user.conversations && user.conversations.length == 1) {
            const uLogin : string = user.conversations[0].login
            data.map((obj: any) => {
@@ -382,7 +383,7 @@ function Messages() {
           setUser(_user);
           setConversations(_user.conversations)
         } 
-        console.log('fles message wra : ', user.conversations);
+        // console.log('fles message wra : ', user.conversations);
             
           // console.log("nchufo hadi", _user.conversations);
           
@@ -394,7 +395,7 @@ function Messages() {
   // const [friendList, setFriendList] = useState(user.friendList);
 
   function recieveMessage(data: any) {
-    console.log('is enter: ', data)
+    // console.log('is enter: ', data)
     if (data.senderLogin == roomSelected || data.receiverLogin == roomSelected)
       setChatArea([
         ...chatArea,
@@ -563,6 +564,7 @@ function Messages() {
                           }`}
                         >
                           {
+                            selected == 0 ?
                             <Image
                               src={
                                  !obj.avatar 
@@ -575,7 +577,8 @@ function Messages() {
                               width="50"
                               height="50"
                               className={`rounded-full border-2 2xl:border-[3px] w-10 h-10  2xl:w-12 2xl:h-12 border-inherit bg-slate-800 `}
-                            />
+                            /> :
+                            <Avatar name={obj.name} className='rounded-full border border-inherit' size={'40'}/>
                           }
                           <span className="hidden  text-left pt-1 md:flex flex-col 2xl:-space-y-1">
                             <div className="flex flex-row  items-center justify-between">
@@ -635,7 +638,7 @@ function Messages() {
               <div className="h-auto  overflow-y-auto scroll-smooth" ref={messageEl}>
                 {chatArea &&
                   chatArea.map((obj: ChatText, index: number) => (
-                    <div key={obj.id } className=" w-full h-auto">
+                    <div key={ index } className=" w-full h-auto">
                       <MessageText sender={obj.sender} message={obj.text} selected={selected} />
                     </div>
                   ))}

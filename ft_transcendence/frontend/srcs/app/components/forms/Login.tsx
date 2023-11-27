@@ -18,6 +18,9 @@ import { SocketContext } from '../../../context/context';
 type closeFunc = {
   handler: any;
   rout: any;
+  setOpenTwoFact: any;
+  setJwtToken: any;
+  setLoginTwo: any
 };
 
 function Login(props: closeFunc) {
@@ -26,25 +29,21 @@ function Login(props: closeFunc) {
   const [Uerror, setUerror] = useState(false);
   const [Perror, setPerror] = useState(false);
   const {socket} = useContext(SocketContext);
+  // const [jwtTokenState, setjwtTokenState] = useState<any>('');
   const Data = { username, password };
 
   const regex = /^.+$/;
 
+
+  const check2fa = () => {
+    ;
+  }
+
   const handleSubmit = (event: any) => {
     event.preventDefault();
-
+    props.setLoginTwo(username);
     if (!Uerror || !Perror) {
-      toast.error('Please fill out all fields with compatible format!', {
-        position: 'top-center',
-        autoClose: 2500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'dark',
-        
-      });
+      toast.error('Please fill out all fields with compatible format!');
       return;
     }
 
@@ -52,24 +51,32 @@ function Login(props: closeFunc) {
     const password = Data.password;
 
     const logData = { login, password };
-    console.log("haaaa za: ", logData)
     const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/login';
     axios
       .post(apiUrl, logData)
       .then((response) => {
-        toast.success('You have successfully logged in!');
-        const jwtToken = response.data.token;
-        localStorage.setItem('jwtToken', jwtToken);
-        socket.emit('online', {token: jwtToken});
-        props.rout.push('/dashboard');
+
+        // console.log('response: ', response);
+        if (response.data.twoFaActive == true)
+        {
+          props.setOpenTwoFact(true);
+          props.setJwtToken(response.data.token)
+          // check2fa();
+        }
+        else
+        {
+          toast.success('You have successfully logged in!');
+          const jwtToken = response.data.token;
+          localStorage.setItem('jwtToken', jwtToken);
+          socket.emit('online', {token: jwtToken});
+          props.rout.push('/dashboard');
+        }
       })
       .catch((error) => {
         toast.error('Incorrect username or password!')})   ;
   };
 
   useEffect(()=> {
-
-    console.log('hello')
 
     const keyDownHandler = (e: any)=> {
       // console.log('user pressed: ', e.key);
@@ -79,7 +86,7 @@ function Login(props: closeFunc) {
       }
     }
     document.addEventListener('keydown', keyDownHandler);
-    return () => document.removeEventListener('keydown', keyDownHandler)
+    return ()=> document.removeEventListener('keydown', keyDownHandler)
   })
 
   const handleFtClick = (event: any) => {
@@ -130,7 +137,7 @@ function Login(props: closeFunc) {
                 progress: undefined,
                 theme: 'dark',
               });
-              console.log('Error', error);
+              // console.log('Error', error);
             });
         }
       }
@@ -163,7 +170,7 @@ function Login(props: closeFunc) {
               isVerif={false}
             />
           </div>
-          <div className="h-[30%] w-full ">
+          <div  className="h-[30%] w-full ">
             <SimpleInput
               SetValue={setPassword}
               holder="Password"
@@ -180,7 +187,7 @@ function Login(props: closeFunc) {
         </div>
         <div className="px-2 w-full h-[57.15%] space-y-10">
           <div className="h-[25%] w-full ">
-            <SimpleButton content="Log-in" buttonType="submit" />
+            <SimpleButton  content="Log-in" buttonType="submit" />
           </div>
           <div  className="h-[25%] w-full flex flex-row justify-center space-x-10">
               <SimpleButton icon={QuaranteDeux} icon2={blackQuarante} buttonType="button" handleClick={handleFtClick} />

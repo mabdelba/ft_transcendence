@@ -98,7 +98,7 @@ function Register(props: closeFunc) {
         localStorage.setItem('jwtToken', jwtToken);
         socket.emit('online', {token: jwtToken});
         props.rout.push('/dashboard');
-        console.log('Response from loclahost:3000', response.data);
+        // console.log('Response from loclahost:3000', response.data);
       })
       .catch((error) => {
         toast.error('This user is already registred!', {
@@ -111,7 +111,7 @@ function Register(props: closeFunc) {
           progress: undefined,
           theme: 'dark',
         });
-        console.log('Error', error);
+        // console.log('Error', error);
       });
   };
 
@@ -132,7 +132,7 @@ function Register(props: closeFunc) {
           axios
             .get(apiUrl)
             .then((response) => {
-              console.log('Response from 42 api: ', response.data);
+              // console.log('Response from 42 api: ', response.data);
               toast.success('You have successfully registred!', {
                 position: 'top-center',
                 autoClose: 2500,
@@ -159,7 +159,7 @@ function Register(props: closeFunc) {
                 progress: undefined,
                 theme: 'dark',
               });
-              console.log('Error', error);
+              // console.log('Error', error);
             });
         }
       }
