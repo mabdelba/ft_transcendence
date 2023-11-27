@@ -22,11 +22,11 @@ export class HistoryService {
       const matches = [];
 
       for (const match of matchesPlayedByUser) {
-        const me = await getUserFromId(
-          match.player1Id == user.id ? match.player1Id : match.player2Id,
+        const me = await getUserFromLogin(
+          match.player1Login == user.login ? match.player1Login : match.player2Login,
         );
-        const other = await getUserFromId(
-          match.player2Id == user.id ? match.player1Id : match.player2Id,
+        const other = await getUserFromLogin(
+          match.player2Login == user.login ? match.player1Login : match.player2Login,
         );
 
         const matchData = {
@@ -35,8 +35,8 @@ export class HistoryService {
           other: other.login,
           myAvatar: getAvatarFromLogin(me.login),
           otherAvatar: getAvatarFromLogin(other.login),
-          myScore: me.id == match.player1Id ? match.scoreOfPlayer1 : match.scoreOfPlayer2,
-          otherScore: other.id == match.player1Id ? match.scoreOfPlayer1 : match.scoreOfPlayer2,
+          myScore: me.login == match.player1Login ? match.scoreOfPlayer1 : match.scoreOfPlayer2,
+          otherScore: other.login == match.player1Login ? match.scoreOfPlayer1 : match.scoreOfPlayer2,
         };
         matches.push(matchData);
       }

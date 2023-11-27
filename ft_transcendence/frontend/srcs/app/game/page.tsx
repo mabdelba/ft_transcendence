@@ -88,6 +88,7 @@ const gamePage = () => {
                 _user.opponent = '';
                 _user.gameType = '';
                 _user.oppenentAvatar = '';
+                // _user.login = undefined
                 setUser(user);
             }
         };

@@ -47,7 +47,9 @@ function Profil(props: profileProp) {
 				{
 					props.setNumberOfMatch && props.setNumberOfMatch(user_.data.numberOfGamesPlayed);
 				}
+				console.log('haaaa lkhraaa', user_.data.avatarUrl);
 				setUserAvatar(user_.data.avatarUrl)
+				props.setUserAvatar && props.setUserAvatar(user_.data.avatarUrl)
 			} catch (err) {
 				props.router('/dashboard')
 			}

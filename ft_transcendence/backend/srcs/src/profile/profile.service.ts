@@ -20,15 +20,15 @@ export class ProfileService {
         return { id: null, me: null, other: null, myScore: null, otherScore: null };
       }
       const user = getUserFromLogin(login);
-      const me = await getUserFromId(
-        matchesPlayedByUser.player1Id == (await user).id
-          ? matchesPlayedByUser.player1Id
-          : matchesPlayedByUser.player2Id,
+      const me = await getUserFromLogin(
+        matchesPlayedByUser.player1Login == (await user).login
+          ? matchesPlayedByUser.player1Login
+          : matchesPlayedByUser.player2Login,
       );
-      const other = await getUserFromId(
-        matchesPlayedByUser.player2Id == (await user).id
-          ? matchesPlayedByUser.player1Id
-          : matchesPlayedByUser.player2Id,
+      const other = await getUserFromLogin(
+        matchesPlayedByUser.player2Login == (await user).login
+          ? matchesPlayedByUser.player1Login
+          : matchesPlayedByUser.player2Login,
       );
 
       return {
@@ -38,11 +38,11 @@ export class ProfileService {
         myAvatar: getAvatarUrlFromLogin(me.login, me.avatar),
         otherAvatar: getAvatarUrlFromLogin(other.login, other.avatar),
         myScore:
-          me.id == matchesPlayedByUser.player1Id
+          me.login == matchesPlayedByUser.player1Login
             ? matchesPlayedByUser.scoreOfPlayer1
             : matchesPlayedByUser.scoreOfPlayer2,
         otherScore:
-          other.id == matchesPlayedByUser.player1Id
+          other.login == matchesPlayedByUser.player1Login
             ? matchesPlayedByUser.scoreOfPlayer1
             : matchesPlayedByUser.scoreOfPlayer2,
       };

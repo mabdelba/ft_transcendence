@@ -104,7 +104,7 @@ function LastMatch(props: newType) {
         <div className="w-full h-[65%]  flex flex-row ">
           <div className="h-full w-[18%]"></div>
           <div className="w-[15%] h-[67%] flex flex-col justify-start items-end ">
-            <Pdp name={myLogin} image={!props.myProfile ? user.avatar : props.pdp} color={true} router={props.router} />
+            <Pdp name={myLogin} image={!props.myProfile ? user.avatarUrl : props.pdp} color={true} router={props.router} />
           </div>
           <div className="w-[34%] h-[55%]  NeonShadow text-sm base:text-base 2xl:text-2xl flex flex-col justify-around items-center">
             <div>

@@ -34,7 +34,6 @@ function Queue() {
           }
           user.socket?.on('ready', (opponent : any)=>{
             const _user : User = user;
-            console.log('opponentdlknflkjd', opponent);
             _user.opponent = opponent.login;
             _user.oppenentAvatar = opponent.avatarUrl;
             setUser(_user);

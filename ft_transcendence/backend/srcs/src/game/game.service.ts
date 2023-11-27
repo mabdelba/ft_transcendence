@@ -1,6 +1,10 @@
 import { Socket } from "socket.io";
 import Matter, { Bodies, Engine, Events, Runner, Vector, World, Body } from "matter-js";
 import { PrismaService } from "src/prisma/prisma.service";
+import { ForbiddenException } from "@nestjs/common";
+import { getAchievementFromId } from "src/utils/get-achievement-from-id";
+import { User } from "@prisma/client";
+import { getUserFromLogin } from "src/utils/get-user-from-id";
 
 class GameModel{
     private _engine: Engine;
@@ -23,7 +27,7 @@ class GameModel{
     // this id is the id of the user in database, not the socket id.
     id1: string | null = null;
     id2: string | null = null;
-    constructor(socket: Socket){
+    constructor(socket: Socket, private prisma: PrismaService){
         this.socket1 = socket;
         this.id1 = socket.id;
         console.log("Game constructor");
@@ -150,8 +154,180 @@ class GameModel{
 
 
 
+    async addNewGame(dto: { userLogin: string, opponentLogin: string, scoreP1: number, scoreP2: number }) {
+        console.log("addNewGame");
+        try {
+            await this.prisma.game.create({
+                data: {
+                    player1Login: dto.userLogin,
+                    player2Login: dto.opponentLogin,
+                    scoreOfPlayer1: dto.scoreP1,
+                    scoreOfPlayer2: dto.scoreP2,
+                    winnerLogin: dto.scoreP1 > dto.scoreP2 ? dto.userLogin : dto.opponentLogin,
+                },
+            });
+            await this.prisma.user.update({
+                where: {
+                    login: dto.userLogin,
+                },
+                data: {
+                    numberOfGamesPlayed: {
+                        increment: 1,
+                    }, 
+                },
+                }
+            );
+            await this.prisma.user.update({
+                where: {
+                    login: dto.opponentLogin,
+                },
+                data: {
+                    numberOfGamesPlayed: {
+                        increment: 1,
+                    }, 
+                },
+                }
+            );
+            if(dto.scoreP1 > dto.scoreP2)
+            {
+                await this.prisma.user.update({
+                    where: {
+                        login: dto.userLogin,
+                    },
+                    data: {
+                        numberOfGamesWon: {
+                            increment: 1,
+                        },
+                        level: {
+                            increment: 0.5,
+                        },
+                    },
+                });
+                await this.prisma.user.update({
+                    where: {
+                        login: dto.opponentLogin,
+                    },
+                    data: {
+                        level: {
+                            increment: 0.15,
+                        },
+                    },
+                });
+            }
+            else
+            {
+                await this.prisma.user.update({
+                    where: {
+                        login: dto.opponentLogin,
+                    },
+                    data: {
+                        numberOfGamesWon: {
+                            increment: 1,
+                        },
+                        level: {
+                            increment: 0.5,
+                        }
+                    },
+                    });
+                await this.prisma.user.update({
+                    where: {
+                        login: dto.userLogin,
+                    },
+                    data: {
+                        level: {
+                            increment: 0.15,
+                        },
+                    },
+                });
+            }
+        }
+        catch (e) {
+            return { status: 'error' };
+        }
+    
+    }
+    async checkIfAchievements(userId: number, achievementId: number) {
+        try{
+          const checkIfAcquired = await this.prisma.achievement.findUnique({
+            where: {
+              id: achievementId,
+            },
+            select: {
+              users: {
+                where: {
+                  id: userId,
+                },
+              },
+            },
+          });
+          if (!checkIfAcquired.users[0]) {
+            await this.prisma.achievement.update({
+              where: {
+                id: achievementId,
+              },
+              data: {
+                users: {
+                  connect: {
+                    id: userId,
+                  },
+                },
+              },
+            });
+            return (
+              'You have acquired the achievement: ' + (await getAchievementFromId(achievementId)).name
+            );
+          } else
+            return (
+              'You already have the achievement: ' + (await getAchievementFromId(achievementId)).name
+            );
+        } catch (e) {
+          throw new ForbiddenException('User not found')
+        }
+      }
+    async checkIfAchievementsAcquired(userLogin: string) {
+        const user = await getUserFromLogin(userLogin);
+        try{
+          if (user.numberOfGamesPlayed == 0) return await this.checkIfAchievements(user.id, 0);
+          if (user.level < 5 && user.level > 0) return await this.checkIfAchievements(user.id, 1);
+          else if (user.level < 10 && user.level >= 5) return await this.checkIfAchievements(user.id, 6);
+          else if (user.level < 15 && user.level >= 10) return await this.checkIfAchievements(user.id, 7);
+          else if (user.level < 22 && user.level >= 15) return await this.checkIfAchievements(user.id, 8);
+          else if (user.level < 30 && user.level >= 22) return await this.checkIfAchievements(user.id, 9);
+          else if (user.level < 40 && user.level >= 30)
+            return await this.checkIfAchievements(user.id, 10);
+          else if (user.level < 50 && user.level >= 40)
+            return await this.checkIfAchievements(user.id, 11);
+          else if (user.level < 55 && user.level >= 50)
+            return await this.checkIfAchievements(user.id, 12);
+          else if (user.level < 60 && user.level >= 55)
+            return await this.checkIfAchievements(user.id, 13);
+          else if (user.level < 66 && user.level >= 60)
+            return await this.checkIfAchievements(user.id, 14);
+          else if (user.level < 70 && user.level >= 66)
+            return await this.checkIfAchievements(user.id, 15);
+          else if (user.level < 77 && user.level >= 70)
+            return await this.checkIfAchievements(user.id, 16);
+          else if (user.level < 80 && user.level >= 77)
+            return await this.checkIfAchievements(user.id, 17);
+          else if (user.level < 88 && user.level >= 80)
+            return await this.checkIfAchievements(user.id, 18);
+          else if (user.level < 90 && user.level >= 88)
+            return await this.checkIfAchievements(user.id, 19);
+          else if (user.level < 99 && user.level >= 90)
+            return await this.checkIfAchievements(user.id, 20);
+          else if (user.level < 100 && user.level >= 99)
+            return await this.checkIfAchievements(user.id, 21);
+          else if (user.level == 100) return await this.checkIfAchievements(user.id, 22);
+        } catch (e) {
+          throw new ForbiddenException('User not found')
+        }
+      }
 
-
+      async endGame(userLogin: string, opponentLogin: string, scoreP1: number, scoreP2: number) {
+        await this.addNewGame({userLogin: userLogin, opponentLogin: opponentLogin, scoreP1: scoreP1, scoreP2: scoreP2});
+        await this.checkIfAchievementsAcquired(userLogin);
+        await this.checkIfAchievementsAcquired(opponentLogin);
+      }
 }
 
 // spownBall(): void {

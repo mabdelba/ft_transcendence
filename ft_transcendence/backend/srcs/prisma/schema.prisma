@@ -108,5 +108,6 @@ model Game {
   player2           User     @relation("player2", fields: [player2Login], references: [login])
   scoreOfPlayer1    Int
   scoreOfPlayer2    Int
+  winnerLogin       String
   dateOfGame        DateTime @default(now())
 }

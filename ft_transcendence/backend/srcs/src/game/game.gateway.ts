@@ -42,7 +42,6 @@ export class GameGateway {
         }
     }
 
-
     @SubscribeMessage('NewGame')
     async handleNewGame(@ConnectedSocket() socket: Socket, @MessageBody() data: { map: string, type: string, opponent?: string}) {
         const jwtToken = socket.handshake.auth.token;
@@ -65,7 +64,7 @@ export class GameGateway {
                 game.game.socket2.emit('ready', {login: game.id1, avatarUrl: avatarUrl1});
             }else if(privateIndex < 0) 
             {
-                let game: GameModel = new GameModel(socket);
+                let game: GameModel = new GameModel(socket, this.prisma);
                 console.log(login ,"private game create for "+ data.opponent);
                 this.privateGame.push({game: game, id1: login, id2: data.opponent});
             } 
@@ -83,7 +82,7 @@ export class GameGateway {
                 game.game.socket2.emit('ready', {login: game.id1, avatarUrl: avatarUrl1});
             }else if(check < 0)
             {
-                let game: GameModel = new GameModel(socket);
+                let game: GameModel = new GameModel(socket, this.prisma);
                 console.log( login +" created new game");
                 this.RandomGames.push({game: game, id1: login, id2: '', map: data.map});
             }
@@ -120,37 +119,45 @@ export class GameGateway {
     }
 
     @SubscribeMessage('endGame')
-    handleEndGame(@ConnectedSocket() socket: Socket) {
+    async handleEndGame(@ConnectedSocket() socket: Socket) {
         const index = this.RandomGames.findIndex((game) => (game.game.id1 == socket.id || game.game.id2 == socket.id));
         const privateIndex = this.privateGame.findIndex((game) => (game.game.id1 == socket.id || game.game.id2 == socket.id));
         console.log("end game");
         if (index >= 0){
             const game: GameModel = this.RandomGames[index].game;
+            const id1 = this.RandomGames[index].id1;
+            const id2 = this.RandomGames[index].id2;
             if (socket.id == game.socket2.id){
+                await game.endGame(id1, id2, game.player1Score, game.player2Score);
                 game.socket1.emit('gameEnded', {state: 'win'});
                 game.socket2.emit('gameEnded', {state: 'lose'});
             }
             else if(socket.id == game.socket1.id){
+                await game.endGame(id2, id1, game.player2Score, game.player1Score);
                 game.socket1.emit('gameEnded', {state: 'lose'});
                 game.socket2.emit('gameEnded', {state: 'win'});
             }
-            this.ConnectedUsers.delete(this.RandomGames[index].id1);
-            this.ConnectedUsers.delete(this.RandomGames[index].id2);
+            this.ConnectedUsers.delete(id1);
+            this.ConnectedUsers.delete(id2);
             game.destroy();
             this.RandomGames.splice(index, 1);
         }
         else if(privateIndex >= 0){
             const game: GameModel = this.privateGame[privateIndex].game;
+            const id1 = this.privateGame[privateIndex].id1;
+            const id2 = this.privateGame[privateIndex].id2;
             if (socket.id == game.socket2.id){
+                await game.endGame(id1, id2, game.player1Score, game.player2Score);
                 game.socket1.emit('gameEnded', {state: 'win'});
                 game.socket2.emit('gameEnded', {state: 'lose'});
             }
             else if(socket.id == game.socket1.id){
+                await game.endGame(id2, id1, game.player2Score, game.player1Score);
                 game.socket1.emit('gameEnded', {state: 'lose'});
                 game.socket2.emit('gameEnded', {state: 'win'});
             }
-            this.ConnectedUsers.delete(this.privateGame[privateIndex].id1);
-            this.ConnectedUsers.delete(this.privateGame[privateIndex].id2);
+            this.ConnectedUsers.delete(id1);
+            this.ConnectedUsers.delete(id2);
             game.destroy();
             this.privateGame.splice(privateIndex, 1);
         }
@@ -185,22 +192,30 @@ export class GameGateway {
         
         if (gameIndex >= 0){
             const game: GameModel = this.RandomGames[gameIndex].game;
+            const id1 = this.RandomGames[gameIndex].id1;
+            const id2 = this.RandomGames[gameIndex].id2;
             if (socket.id == game.socket1.id){
                 game.socket2?.emit('gameEnded', {state: 'win'});
+                await game.endGame(id2, id1, game.player2Score, game.player1Score);
             }
             else if (socket.id == game.socket2.id){
                 game.socket1?.emit('gameEnded', {state: 'win'});
+                await game.endGame(id1, id2, game.player1Score, game.player2Score);
             }
             game.destroy();
             this.RandomGames.splice(gameIndex, 1);
         }
         else if(privateIndex >= 0){
             const pGame: GameModel = this.privateGame[privateIndex].game;
+            const id1 = this.privateGame[privateIndex].id1;
+            const id2 = this.privateGame[privateIndex].id2;
             if (socket.id == pGame.socket1.id){
                 pGame.socket2?.emit('gameEnded', {state: 'win'});
+                await pGame.endGame(id2, id1, pGame.player2Score, pGame.player1Score);
             }
             else if (socket.id == pGame.socket2.id){
                 pGame.socket1?.emit('gameEnded', {state: 'win'});
+                await pGame.endGame(id1, id2, pGame.player1Score, pGame.player2Score);
             }
             pGame.destroy();
             this.privateGame.splice(privateIndex, 1);
