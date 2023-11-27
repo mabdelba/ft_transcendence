@@ -56,7 +56,7 @@ function Login(props: closeFunc) {
       .post(apiUrl, logData)
       .then((response) => {
 
-        console.log('response: ', response);
+        // console.log('response: ', response);
         if (response.data.twoFaActive == true)
         {
           props.setOpenTwoFact(true);
@@ -137,7 +137,7 @@ function Login(props: closeFunc) {
                 progress: undefined,
                 theme: 'dark',
               });
-              console.log('Error', error);
+              // console.log('Error', error);
             });
         }
       }

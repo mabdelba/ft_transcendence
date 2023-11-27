@@ -100,7 +100,7 @@ function Settings() {
 
         }
         // setAvatarUrl(e.target.files[0] as string);
-        console.log(e.target.files[0]);
+        // console.log(e.target.files[0]);
     }
 
 
@@ -126,7 +126,7 @@ function Settings() {
                     // router.push('/dashboard');
                 })
                 .catch((error)=> {
-                    console.log("errorrrrr", error);
+                    // console.log("errorrrrr", error);
                     toast.error(error.response.data.message);
                 })
             } 
@@ -140,7 +140,7 @@ function Settings() {
                     // router.push('/dashboard');
                 })
                 .catch((error)=> {
-                    console.log("errorrrrr", error);
+                    // console.log("errorrrrr", error);
                     toast.error(error.response.data.message);
                 
                 })
@@ -156,7 +156,7 @@ function Settings() {
                     
                 })
                 .catch((error)=> {
-                    console.log("errorrrrr", error);
+                    // console.log("errorrrrr", error);
                     toast.error(error.response.data.message);
                 })
             }
@@ -176,7 +176,7 @@ function Settings() {
                         // router.push('/dashboard');
                     })
                     .catch((error) => {
-                        console.log("error image: ", error);
+                        // console.log("error image: ", error);
                         toast.error(error.response.data.message);
                     })
                 }
@@ -195,12 +195,12 @@ function Settings() {
                     router.push('/');
                 // });
                 }).catch((error)=> {
-                    console.log("errorrrrr", error);
+                    // console.log("errorrrrr", error);
                     toast.error(error.response.data.message);
                 })
                 
             }
-        
+            router.push('/dashboard')
         }
 
 
@@ -219,13 +219,13 @@ function Settings() {
             setQr(response.data);
         })
         .catch((error) => {
-            console.log("error: ", error);
+            // console.log("error: ", error);
         })
     }
 
     const [result, setResult] = useState("");
-    console.log("checekd", isChecked);
-    console.log("user", user.twoFaActive);
+    // console.log("checekd", isChecked);
+    // console.log("user", user.twoFaActive);
     const [showPupUp, setshowPupUp] = useState(false);
 
     const handleChecked = () => {
@@ -244,7 +244,7 @@ function Settings() {
             const url = "http://localhost:3000/api/atari-pong/v1/settings/disable-2fa";
             axios.put(url, {}, config)
             .then((response) => {
-                console.log("response: ", response.data);
+                // console.log("response: ", response.data);
                 toast.success('Two factor authentication disabled!');
                 const _user : User = user;
                 _user.twoFaActive = false;
@@ -252,7 +252,7 @@ function Settings() {
                 setIsChecked(false);
             })
             .catch((error) => {
-                console.log("error: ", error);
+                // console.log("error: ", error);
                 toast.error(error.response.data.message);
             })
         }
@@ -279,8 +279,8 @@ function Settings() {
             const url = "http://localhost:3000/api/atari-pong/v1/two-factor-auth/verify";
             axios.post(url, {code: result}, config)
             .then((response) => {
-                console.log("response: ", response.data);
-                console.log("res: ", result);
+                // console.log("response: ", response.data);
+                // console.log("res: ", result);
                 if (response.data === true)
                 {
                 toast.success('Two factor authentication activated!');
@@ -294,10 +294,10 @@ function Settings() {
                     toast.error('Wrong code!');
             })
             .catch((error) => {
-                console.log("error: ", error);
+                // console.log("error: ", error);
                 toast.error(error.response.data.message);
             })
-          console.log(result);
+        //   console.log(result);
         }
       };
 

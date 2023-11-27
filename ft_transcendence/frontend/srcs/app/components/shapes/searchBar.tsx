@@ -69,7 +69,7 @@ function SearchBar (prop : SearchBarProps)
       prop.setUsersResults(usersResults);
       prop.setChannelsResults(channelsResults);
     } catch (error) {
-      console.log("No apparent user:", error);
+      // console.log("No apparent user:", error);
     }
   };
 
@@ -80,14 +80,14 @@ function SearchBar (prop : SearchBarProps)
         setUsers(data[0]);
         setChannels(data[1]);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
       }
     };
 
     fetchAllData();
 
     return () => {
-      console.log('Component unmounted, cleanup can be performed here');
+      // console.log('Component unmounted, cleanup can be performed here');
     };
   }, []);
 

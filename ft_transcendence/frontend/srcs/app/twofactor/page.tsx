@@ -61,9 +61,9 @@ function TwoFactor(props: {setopenModal: any, jwtToken: any, login: string}) {
     }
     else {
       
-      console.log(result);
-      console.log(props.login);
-      console.log(props.jwtToken);
+      // console.log(result);
+      // console.log(props.login);
+      // console.log(props.jwtToken);
 
       const url = "http://localhost:3000/api/atari-pong/v1/two-factor-auth/verify";
       const config = {
@@ -71,8 +71,8 @@ function TwoFactor(props: {setopenModal: any, jwtToken: any, login: string}) {
     };
       axios.post(url, {code: result}, config)
       .then((response) => {
-          console.log("response: ", response.data);
-          console.log("res: ", result);
+          // console.log("response: ", response.data);
+          // console.log("res: ", result);
           if (response.data === true)
           {
             toast.success('You have successfully logged in!')
@@ -85,7 +85,7 @@ function TwoFactor(props: {setopenModal: any, jwtToken: any, login: string}) {
               toast.error('Wrong code!');
       })
       .catch((error) => {
-          console.log("error: ", error);
+          // console.log("error: ", error);
           toast.error(error.response.data.message);
       })
     }
