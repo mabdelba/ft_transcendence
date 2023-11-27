@@ -114,14 +114,22 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('notification')
-  sendNotification(client: Socket, message: {login: string}) {
+  sendNotification(client: Socket, message: {login: string, senderId: string}) {
     const key = [...this.users].find(([key, value]) => value === message.login)?.[0];
   
     if (key != null) {
-      console.log("sendnotification---- ", this.users.get(key));
-      this.io.to(key).emit('inviteToGame', {idsocket: client.id, key: key});
+      this.io.to(key).emit('inviteToGame', {senderId: message.senderId, login: message.login});
     }
-  } 
+  }
+
+  @SubscribeMessage('cancel-invite')
+  cancelInvite(client: Socket, message: {senderId: string}) {
+    const key = [...this.users].find(([key, value]) => value === message.senderId)?.[0];
+    if (key != null){
+      console.log("cancel invite", message.senderId, " client id ", key);
+      this.io.to(key).emit('cancelInvite', {login: message.senderId});
+    }
+  }
 
   @SubscribeMessage('channels-with-conversation')
   async getChannelsWithConversation(

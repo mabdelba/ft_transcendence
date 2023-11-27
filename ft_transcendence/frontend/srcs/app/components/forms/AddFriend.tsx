@@ -31,7 +31,7 @@ function AddFriend(props: newType) {
         // console.log('asidi hak l id dyalk', response.data.id);
       })
       .catch((error) => {
-        console.log('error ', error);
+        // console.log('error ', error);
       });
 
     if (props.state == 3) setFlag(true);
@@ -60,10 +60,10 @@ function AddFriend(props: newType) {
     axios
       .post(url, { recieverId: userId }, conf)
       .then((response) => {
-        console.log('response ', response);
+        // console.log('response ', response);
       })
       .catch((error) => {
-        console.log('error ', error);
+        // console.log('error ', error);
       });
     setFlag(true);
   };
@@ -77,10 +77,10 @@ function AddFriend(props: newType) {
     axios
       .post(url, { senderId: userId }, conf)
       .then((response) => {
-        console.log('response ', response);
+        // console.log('response ', response);
       })
       .catch((error) => {
-        console.log('error ', error);
+        // console.log('error ', error);
       });
     toast.error(`Friend request from ${props.login} has been deleted!`, {
       position: 'top-center',
@@ -103,10 +103,10 @@ function AddFriend(props: newType) {
     axios
       .post(url, { senderId: userId }, conf)
       .then((response) => {
-        console.log('response ', response);
+        // console.log('response ', response);
       })
       .catch((error) => {
-        console.log('error ', error);
+        // console.log('error ', error);
       });
     toast.success(`New friend ${props.login} added successfully!`, {
       position: 'top-center',

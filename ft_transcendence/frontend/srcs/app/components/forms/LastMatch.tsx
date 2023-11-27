@@ -49,7 +49,7 @@ function LastMatch(props: newType) {
           }
         
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     }
     else

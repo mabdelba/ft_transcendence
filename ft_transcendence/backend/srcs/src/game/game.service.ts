@@ -14,7 +14,8 @@ class GameModel{
     height: number = 800;
     xForce: number = 0;
     yForce: number = 0;
-    gameStarted: boolean = false;
+    gameStarted: boolean = true;
+    lance: boolean = true;
     walls: Body[] = [];
     ball: Body | null = null;
     player1: Body | null = null;
@@ -82,12 +83,12 @@ class GameModel{
                    World.remove(this._world, this.ball);
                     Body.setPosition(this.ball, {x: this.width / 2, y: this.height / 2});
                     this.player1Score++;
-                    this.socket1?.emit('startBotton');
+                    this.socket2?.emit('startBotton');
                     this.socket1?.emit('Score', {player1: this.player1Score, player2: this.player2Score});
                     this.socket2?.emit('Score', {player1: this.player2Score, player2: this.player1Score});
                     if(this.player1Score == 10)
                         this.socket2?.emit('gameOver');
-                    this.gameStarted = !this.gameStarted;
+                    this.lance = false;
                 }
                 else if ((pair.bodyA.label == "ball" && pair.bodyB.label == "bottomWall") || (pair.bodyB.label == "ball" && pair.bodyA.label == "bottomWall"))
                 {
@@ -99,7 +100,7 @@ class GameModel{
                     this.socket2?.emit('Score', {player1: this.player2Score, player2: this.player1Score}); 
                     if(this.player2Score == 10)
                         this.socket1?.emit('gameOver');
-                    this.gameStarted = !this.gameStarted;
+                    this.lance = true;
                 }
 
             }
@@ -130,11 +131,15 @@ class GameModel{
         
     // }
     public runGame(): void{
-        if(!this.gameStarted){
-            this.gameStarted = !this.gameStarted;
-            this._createBall();
-            World.add(this._world, this.ball);
-        }
+       
+          // this.gameStarted = !this.gameStarted;
+          this._createBall();
+          if(this.lance)
+            this.setForce(-1.40, -1.40);
+          else
+            this.setForce(1.40, 1.40);
+          World.add(this._world, this.ball);
+        
     }
 //destroy this function when the game ends
     public destroy(): void{
@@ -319,7 +324,7 @@ class GameModel{
             return await this.checkIfAchievements(user.id, 21);
           else if (user.level == 100) return await this.checkIfAchievements(user.id, 22);
         } catch (e) {
-          throw new ForbiddenException('User not found')
+           new ForbiddenException('User not found')
         }
       }
 

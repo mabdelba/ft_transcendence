@@ -128,38 +128,40 @@ export class GameGateway {
             const id1 = this.RandomGames[index].id1;
             const id2 = this.RandomGames[index].id2;
             if (socket.id == game.socket2.id){
-                await game.endGame(id1, id2, game.player1Score, game.player2Score);
                 game.socket1.emit('gameEnded', {state: 'win'});
                 game.socket2.emit('gameEnded', {state: 'lose'});
+                this.RandomGames.splice(index, 1);
+                await game.endGame(id1, id2, game.player1Score, game.player2Score);
             }
             else if(socket.id == game.socket1.id){
-                await game.endGame(id2, id1, game.player2Score, game.player1Score);
                 game.socket1.emit('gameEnded', {state: 'lose'});
                 game.socket2.emit('gameEnded', {state: 'win'});
+                this.RandomGames.splice(index, 1);
+                await game.endGame(id2, id1, game.player2Score, game.player1Score);
             }
             this.ConnectedUsers.delete(id1);
             this.ConnectedUsers.delete(id2);
             game.destroy();
-            this.RandomGames.splice(index, 1);
         }
         else if(privateIndex >= 0){
             const game: GameModel = this.privateGame[privateIndex].game;
             const id1 = this.privateGame[privateIndex].id1;
             const id2 = this.privateGame[privateIndex].id2;
             if (socket.id == game.socket2.id){
-                await game.endGame(id1, id2, game.player1Score, game.player2Score);
                 game.socket1.emit('gameEnded', {state: 'win'});
                 game.socket2.emit('gameEnded', {state: 'lose'});
+                this.privateGame.splice(privateIndex, 1);
+                await game.endGame(id1, id2, game.player1Score, game.player2Score);
             }
             else if(socket.id == game.socket1.id){
-                await game.endGame(id2, id1, game.player2Score, game.player1Score);
                 game.socket1.emit('gameEnded', {state: 'lose'});
                 game.socket2.emit('gameEnded', {state: 'win'});
+                this.privateGame.splice(privateIndex, 1);
+                await game.endGame(id2, id1, game.player2Score, game.player1Score);
             }
             this.ConnectedUsers.delete(id1);
             this.ConnectedUsers.delete(id2);
             game.destroy();
-            this.privateGame.splice(privateIndex, 1);
         }
     }
     @SubscribeMessage('CancelGame')
