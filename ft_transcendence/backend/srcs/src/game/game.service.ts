@@ -324,7 +324,7 @@ class GameModel{
             return await this.checkIfAchievements(user.id, 21);
           else if (user.level == 100) return await this.checkIfAchievements(user.id, 22);
         } catch (e) {
-           throw new ForbiddenException('User not found')
+            new ForbiddenException('User not found')
         }
       }
 

@@ -6,6 +6,8 @@ import { useContext, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { User, context, SocketContext } from '../../context/context';
 import { useQuery } from 'react-query';
+import { toast } from 'react-toastify';
+import InviteToast from '../components/shapes/invitetoast';
 
 
 
@@ -53,6 +55,21 @@ function Achievements() {
 		  axios.get(apiUrl, config)
 		  .then((response : any) => {
 			const _user = response.data;
+			socket?.on('inviteToGame', (data: {senderId: string, login: string}) => {
+				console.log('inviteToGame');
+				toast(<InviteToast senderId={data.senderId} login={data.login}/>,{
+				  position: "top-center",
+				  autoClose: false,
+				  hideProgressBar: false,
+				  closeOnClick: false,
+				  draggable: true,
+				  theme: 'dark',
+				});
+			  });
+			  socket?.on('cancelNotification', () => {
+				console.log('cancelNotification=======')
+				toast.dismiss();
+			  });
 			setUser(_user);
 	
 		  })

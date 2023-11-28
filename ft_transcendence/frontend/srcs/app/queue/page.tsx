@@ -96,19 +96,19 @@ function Queue() {
       }
     }, [socket])
 
-    // useEffect(() => {
-    //   const handleBeforeUnload = () => {
-    //     console.log('disconnect');
-    //     user.socket.close();
-    //     user.socket?.disconnect()
-    //   };
-  
-    //   window.addEventListener('beforeunload', handleBeforeUnload);
-  
-    //   return () => {
-    //     window.removeEventListener('beforeunload', handleBeforeUnload);
-    //   };
-    // }, [user.socket]);
+    useEffect(() => {
+      return () => {
+        socket?.emit('cancel-notif', {login: user.opponent});
+        // user.socket?.emit('CancelGame');
+        const _user : User = user;
+        _user.opponent = '';
+        _user.gameType = '';
+        setUser(_user);
+        console.log('unmount');
+      }
+    }, [])
+
+
 
     return (
       <>

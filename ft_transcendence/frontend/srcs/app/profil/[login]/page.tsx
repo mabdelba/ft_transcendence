@@ -6,7 +6,7 @@ import LatestAchiev from '../../components/forms/LatestAchiev';
 import Profil from '../../components/forms/Profil';
 import AddFriend from '../../components/forms/AddFriend';
 import { use, useEffect, useState } from 'react';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import io, { Socket } from 'socket.io-client';
 import axios from 'axios';
 import { error } from 'console';
@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import OptionBar from '../../components/forms/OptionBar';
 import { context, User, SocketContext } from '../../../context/context';
 import { useContext } from 'react';
+import InviteToast from '../../components/shapes/invitetoast';
 
 
 type newType = {
@@ -55,6 +56,21 @@ function UserProfil(props: newType) {
         const _user = response.data;
         socket?.emit('online', { token: localStorage.getItem('jwtToken') });
         _user.state = 1;
+        socket?.on('inviteToGame', (data: {senderId: string, login: string}) => {
+          console.log('inviteToGame');
+          toast(<InviteToast senderId={data.senderId} login={data.login}/>,{
+            position: "top-center",
+            autoClose: false,
+            hideProgressBar: false,
+            closeOnClick: true,
+            draggable: true,
+            theme: 'dark',
+          });
+        });
+        socket?.on('cancelNotification', () => {
+          console.log('cancelNotification=======')
+          toast.dismiss();
+        });
         setUser(_user);
       })
     }

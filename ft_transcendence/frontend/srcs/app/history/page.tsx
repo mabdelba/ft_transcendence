@@ -8,6 +8,8 @@ import axios from 'axios';
 import OptionBar from '../components/forms/OptionBar';
 import { User, context, SocketContext } from '../../context/context';
 import { useQuery } from 'react-query';
+import InviteToast from '../components/shapes/invitetoast';
+import { toast } from 'react-toastify';
 
 const fetchHistory = async () => {
   const res = await fetch('http://localhost:3000/api/atari-pong/v1/history', {
@@ -38,6 +40,21 @@ function History() {
       axios.get(apiUrl, config)
       .then((response : any) => {
         const _user = response.data;
+        socket?.on('inviteToGame', (data: {senderId: string, login: string}) => {
+          console.log('inviteToGame');
+          toast(<InviteToast senderId={data.senderId} login={data.login}/>,{
+            position: "top-center",
+            autoClose: false,
+            hideProgressBar: false,
+            closeOnClick: true,
+            draggable: true,
+            theme: 'dark',
+          });
+        });
+        socket?.on('cancelNotification', () => {
+          console.log('cancelNotification=======')
+          toast.dismiss();
+        });
         setUser(_user);
 
       })

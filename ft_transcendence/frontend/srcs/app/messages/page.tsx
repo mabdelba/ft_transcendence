@@ -27,6 +27,7 @@ import BlackUpload from '../../public/blackupload.svg';
 import { toast } from 'react-toastify';
 import { Socket } from 'socket.io-client';
 import Avatar from 'react-avatar'
+import InviteToast from '../components/shapes/invitetoast';
 
 type ChatText = {
   sender: string;
@@ -82,6 +83,21 @@ function Messages() {
           socket.emit('online', { token: localStorage.getItem('jwtToken') });
           _user.state = 1;
         // }
+        socket?.on('inviteToGame', (data: {senderId: string, login: string}) => {
+          console.log('inviteToGame');
+          toast(<InviteToast senderId={data.senderId} login={data.login}/>,{
+            position: "top-center",
+            autoClose: false,
+            hideProgressBar: false,
+            closeOnClick: true,
+            draggable: true,
+            theme: 'dark',
+          });
+        });
+        socket?.on('cancelNotification', () => {
+          console.log('cancelNotification=======')
+          toast.dismiss();
+        });
         setUser(_user);
 
       })

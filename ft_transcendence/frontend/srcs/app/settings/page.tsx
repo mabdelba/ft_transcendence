@@ -18,6 +18,7 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { set } from "husky";
 import Close from "../../public/close.svg";
+import InviteToast from "../components/shapes/invitetoast";
 
 
 
@@ -71,6 +72,21 @@ function Settings() {
                 socket.emit('online', { token: localStorage.getItem('jwtToken') });
                 _user.state = 1;
                 setId(_user.id);setName(_user.firstName);setLastName(_user.lastName);setUsername(_user.login);setEmail(_user.email);setAvatarUrl(_user.avatarUrl);setIsChecked(_user.twoFaActive);
+                socket?.on('inviteToGame', (data: {senderId: string, login: string}) => {
+                    console.log('inviteToGame');
+                    toast(<InviteToast senderId={data.senderId} login={data.login}/>,{
+                      position: "top-center",
+                      autoClose: false,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      draggable: true,
+                      theme: 'dark',
+                    });
+                  });
+                  socket?.on('cancelNotification', () => {
+                    console.log('cancelNotification=======')
+                    toast.dismiss();
+                  });
                 setUser(_user);
 
               })
