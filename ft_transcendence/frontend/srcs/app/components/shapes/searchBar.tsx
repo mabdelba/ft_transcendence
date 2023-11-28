@@ -29,7 +29,7 @@ function SearchBar (prop : SearchBarProps)
   const [users, setUsers] = useState([]);
   const [channels, setChannels] = useState([]);
   const fetchUsers = async () => {
-    const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/all-users';
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/all-users';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },
@@ -39,7 +39,7 @@ function SearchBar (prop : SearchBarProps)
   };
 
   const fetchChannels = async () => {
-    const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/channels/list-all-channels';
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/list-all-channels';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },

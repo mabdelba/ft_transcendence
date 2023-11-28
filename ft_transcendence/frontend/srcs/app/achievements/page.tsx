@@ -14,7 +14,7 @@ const OptionBar = dynamic(() => import('../components/forms/OptionBar'), {ssr: f
 
 const fetchAchivements = async ()=>{
 
-	const res = await fetch("http://e3r8p14.1337.ma:3000/api/atari-pong/v1/achievements/all-acquired", {
+	const res = await fetch("http://localhost:3000/api/atari-pong/v1/achievements/all-acquired", {
 						headers: {
 					Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
 				},
@@ -24,7 +24,7 @@ const fetchAchivements = async ()=>{
 
 const fetchUnacquiredAchiev = async ()=>{
 
-	const res = await fetch("http://e3r8p14.1337.ma:3000/api/atari-pong/v1/achievements/all-unacquired", {
+	const res = await fetch("http://localhost:3000/api/atari-pong/v1/achievements/all-unacquired", {
 						headers: {
 					Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
 				},
@@ -46,7 +46,7 @@ function Achievements() {
 	useEffect(()=> {
 		if(!user.login){
 	
-		  const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+		  const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
 		  const token = localStorage.getItem('jwtToken');
 		  const config = {
 			headers: { Authorization: `Bearer ${token}` },

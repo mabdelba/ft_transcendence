@@ -69,7 +69,7 @@ function Messages() {
   useEffect(()=> {
     if(!user.login && socket){
 
-      const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
       const token = localStorage.getItem('jwtToken');
       const config = {
         headers: { Authorization: `Bearer ${token}` },
@@ -97,7 +97,7 @@ function Messages() {
   const handleChangeSettings = (e: any)=>{
 
     e.preventDefault();
-    const apiUrl = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/channels/update-channel-password";
+    const apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/update-channel-password";
     const token = localStorage.getItem('jwtToken');
     const config ={
       headers : {Authorization: `Bearer ${token}`}
@@ -123,7 +123,7 @@ function Messages() {
   useEffect(() => {
     if (selected == 1 && roomSelected != '') {
       setGroupMembers([]);
-      const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/channels/channel-members';
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/channel-members';
       axios
         .post(
           apiUrl,
@@ -160,7 +160,7 @@ function Messages() {
       let groupType = 0;
       enabled ? (groupType = 1) : groupPassword != '' ? (groupType = 2) : (groupType = 0);
       // const newChannel = [{ownerLogin: user.login, name : groupName, password: groupPassword, type : groupType}];
-      const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/channels/add-new-channel';
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/add-new-channel';
       axios
         .post(
           apiUrl,
@@ -191,7 +191,7 @@ function Messages() {
   useEffect(() => {
     if (selected == 1 && roomSelected != '') {
       setFriendList([]);
-      const urlreq = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/channels/friend-list-for-channel';
+      const urlreq = 'http://localhost:3000/api/atari-pong/v1/channels/friend-list-for-channel';
       axios
         .post(
           urlreq,
@@ -512,7 +512,7 @@ function Messages() {
   const handleAddToGroup  = ( login: string) => {
 
     setOpenInviteModal(false);
-    const apiUrl = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/channels/add-user-to-channel";
+    const apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/add-user-to-channel";
     const config =   {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,

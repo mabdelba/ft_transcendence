@@ -49,7 +49,7 @@ export class AuthService {
       where: { login: dto.login, password: { not: null } },
     });
   } catch (e) {
-     new ForbiddenException('User not found');
+     throw new ForbiddenException('User not found');
   }
   try{
 
@@ -60,7 +60,7 @@ export class AuthService {
       twoFaActive: user.twoFaActive,
     };
   } catch (e) {
-     new ForbiddenException('Wrong password');
+     throw new ForbiddenException('Wrong password');
   }
   }
 
@@ -139,7 +139,7 @@ export class AuthService {
           token: await this.getToken(user.id, user.login),
         };
     } catch (e) {
-       new ForbiddenException('User not found');
+       throw new ForbiddenException('User not found');
     }
   }
 

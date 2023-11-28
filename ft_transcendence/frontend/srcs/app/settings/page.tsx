@@ -60,7 +60,7 @@ function Settings() {
         if(socket){
             if(!user.login ){
         
-              const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+              const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
               const token = localStorage.getItem('jwtToken');
               const config = {
                 headers: { Authorization: `Bearer ${token}` },
@@ -117,7 +117,7 @@ function Settings() {
           };
         {
             if(name != Array[0]){
-                const url = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/settings/update-firstname";
+                const url = "http://localhost:3000/api/atari-pong/v1/settings/update-firstname";
                 await axios.put(url, {firstname: name}, config)
                 .then(()=> {
                     const _user : User = user;
@@ -131,7 +131,7 @@ function Settings() {
                 })
             } 
             if(Lastname != Array[1]){
-                const url = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/settings/update-lastname";
+                const url = "http://localhost:3000/api/atari-pong/v1/settings/update-lastname";
                 await axios.put(url, {lastname: Lastname}, config)
                 .then(()=> {
                     const _user : User = user;
@@ -146,7 +146,7 @@ function Settings() {
                 })
             }
             if(email != Array[3]){
-                const url = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/settings/update-email";
+                const url = "http://localhost:3000/api/atari-pong/v1/settings/update-email";
                 await axios.put(url, {email: email}, config)
                 .then(()=> {
                     const _user : User = user;
@@ -165,7 +165,7 @@ function Settings() {
                     setSelectFileError(false);
                 else{
     
-                    const url = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/auth/upload-avatar";
+                    const url = "http://localhost:3000/api/atari-pong/v1/auth/upload-avatar";
                     const formData = new FormData();
                     formData.append('avatar', avatarToUpload);
                     await axios.post(url, formData ,config).then((response)=>{
@@ -182,9 +182,9 @@ function Settings() {
                 }
             }
             if(username != Array[2]){
-                const url = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/settings/update-login";
+                const url = "http://localhost:3000/api/atari-pong/v1/settings/update-login";
                await axios.put(url, {login: username}, config).then(() => {
-                    // axios.post("http://e3r8p14.1337.ma:3000/api/atari-pong/v1/auth/regenerate-token", {id:Id, login: username}, config).then((response)=> {
+                    // axios.post("http://localhost:3000/api/atari-pong/v1/auth/regenerate-token", {id:Id, login: username}, config).then((response)=> {
                         // console.log("response: ", response.data);
                         socket.emit('offline', { token: localStorage.getItem('jwtToken'), login: username });
                         localStorage.removeItem('jwtToken');
@@ -213,7 +213,7 @@ function Settings() {
         const config = {
             headers: { Authorization: `Bearer ${token}` },
         };
-        const url = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/two-factor-auth/qrcode";
+        const url = "http://localhost:3000/api/atari-pong/v1/two-factor-auth/qrcode";
         await axios.get(url, config)
         .then((response) => {
             setQr(response.data);

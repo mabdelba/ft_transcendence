@@ -116,6 +116,9 @@ export class DmsService {
           }),
         ); 
       } else {
+        if (this.getClientFromLogin(data.receiverLogin, users) !== null) 
+          io.sockets.sockets.get(this.getClientFromLogin(data.receiverLogin, users)).join(roomName);
+        client.to(roomName).emit('receive-message', data);
         await this.prisma.message.create({
           data: {
             text: data.text,
@@ -131,13 +134,6 @@ export class DmsService {
             },
           },
         });
-        if (this.getClientFromLogin(data.receiverLogin, users) === null) console.log('null');
-        else {
-          io.sockets.sockets.get(this.getClientFromLogin(data.receiverLogin, users)).join(roomName);
-
-          console.log(data.receiverLogin, ' join this room === ', roomName);
-        }
-        client.to(roomName).emit('receive-message', data);
       }
     } catch (e) {
      new ForbiddenException('User not found');

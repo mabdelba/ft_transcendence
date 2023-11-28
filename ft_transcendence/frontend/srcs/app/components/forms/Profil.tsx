@@ -36,7 +36,7 @@ function Profil(props: profileProp) {
 
 	async function getProfile() {
 		if (props.login) {
-			const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me';
+			const url = 'http://localhost:3000/api/atari-pong/v1/user/me';
 			const token = localStorage.getItem('jwtToken');
 			const config = {
 				headers: { Authorization: `Bearer ${token}` },

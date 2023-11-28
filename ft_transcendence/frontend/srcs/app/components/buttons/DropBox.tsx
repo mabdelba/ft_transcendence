@@ -68,7 +68,7 @@ function MyMenu(props: {slected: number, setOpenMembers : any, setOpenSettings: 
       setUser(_user)
     }
 
-    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/block-user';
+    const url = 'http://localhost:3000/api/atari-pong/v1/friend/block-user';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },

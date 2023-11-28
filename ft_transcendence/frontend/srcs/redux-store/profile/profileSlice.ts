@@ -28,7 +28,7 @@ const initialState: ProfileState = {
   profile: {} as Profile,
 };
 
-const profileUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me';
+const profileUrl = 'http://localhost:3000/api/atari-pong/v1/user/me';
 
 export const fetchProfile = createAsyncThunk('profile/fetchProfile', async () => {
   try {
@@ -46,7 +46,7 @@ export const fetchProfile = createAsyncThunk('profile/fetchProfile', async () =>
 export const userOnline = createAsyncThunk('profile/userOnline', async () => {
   try {
     const token = localStorage.getItem('jwtToken');
-    io('http://e3r8p14.1337.ma:3000', {
+    io('http://localhost:3000', {
       transports: ['websocket'],
       auth: {
         token: token,

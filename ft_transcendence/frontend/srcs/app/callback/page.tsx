@@ -11,7 +11,7 @@ const CallbackPage = () => {
       const searchParams = new URLSearchParams(window.location.search);
       const code = searchParams.get('code');
       if (window.opener && code) {
-        window.opener.postMessage({ code }, 'http://e3r8p14.1337.ma:4000');
+        window.opener.postMessage({ code }, 'http://localhost:4000');
       }
     }
   }, []);

@@ -16,7 +16,7 @@ import { useQueries, useQuery } from 'react-query';
 
 
 const fetchRequestList = async () => {
-  const urlreq = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/friend-requests-list';
+  const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-requests-list';
   const res = await fetch(urlreq, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
@@ -25,7 +25,7 @@ const fetchRequestList = async () => {
   return res.json();
 };
 const fetchFriendList = async () => {
-  const urlreq = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/friend-list';
+  const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-list';
   const res = await fetch(urlreq, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
@@ -35,7 +35,7 @@ const fetchFriendList = async () => {
 };
 
 const fetchBlockedList = async () => {
-  const urlreq = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/blocked-user-list';
+  const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/blocked-user-list';
   const res = await fetch(urlreq, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
@@ -56,7 +56,7 @@ function Friends() {
   useEffect(()=> {
     if(!user.login){
 
-      const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
       const token = localStorage.getItem('jwtToken');
       const config = {
         headers: { Authorization: `Bearer ${token}` },
@@ -113,7 +113,7 @@ function Friends() {
 
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
-    if (!token) router.push('/');
+    if (!token || token == undefined) router.push('/');
     else {
       const decodedToken = JSON.parse(atob(token.split('.')[1]));
       const exp = decodedToken.exp;
@@ -141,7 +141,7 @@ function Friends() {
       _user.friendList = friendsList;
       setUser(_user);
     }
-    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/remove-friend';
+    const url = 'http://localhost:3000/api/atari-pong/v1/friend/remove-friend';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },
@@ -174,7 +174,7 @@ function Friends() {
     // _user.conversations.isFrd =false;
     // setUser(_user);
     setUser(_user);
-    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/block-user';
+    const url = 'http://localhost:3000/api/atari-pong/v1/friend/block-user';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },
@@ -201,7 +201,7 @@ function Friends() {
       setUser(_user);
     }
 
-    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/reject-friend-request';
+    const url = 'http://localhost:3000/api/atari-pong/v1/friend/reject-friend-request';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },
@@ -239,7 +239,7 @@ function Friends() {
     _user.friendList = friendsList;
     setUser(_user);
     toast.success(`New friend ${userName} added successfully!`);
-    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/accept-friend-request';
+    const url = 'http://localhost:3000/api/atari-pong/v1/friend/accept-friend-request';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },
@@ -270,7 +270,7 @@ function Friends() {
 
     setUser(_user);
 
-    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/friend/unblock-user';
+    const url = 'http://localhost:3000/api/atari-pong/v1/friend/unblock-user';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },

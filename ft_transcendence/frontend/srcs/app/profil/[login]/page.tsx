@@ -31,7 +31,7 @@ function UserProfil(props: newType) {
 
   useEffect( ()=> {
 
-    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me';
+    const url = 'http://localhost:3000/api/atari-pong/v1/user/me';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },
@@ -45,7 +45,7 @@ function UserProfil(props: newType) {
   useEffect(()=> {
     if(!user.login){
 
-      const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
       const token = localStorage.getItem('jwtToken');
       const config = {
         headers: { Authorization: `Bearer ${token}` },
@@ -69,7 +69,7 @@ function UserProfil(props: newType) {
   // })
   const [otherProfileAvatar, setOtherProfileAvatar] = useState(alien);
   const getState = () => {
-    const url = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/check-relation';
+    const url = 'http://localhost:3000/api/atari-pong/v1/user/check-relation';
     const token = localStorage.getItem('jwtToken');
     const conf = {
       headers: { Authorization: `Bearer ${token}` },
@@ -95,7 +95,7 @@ function UserProfil(props: newType) {
   },);
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
-		if (!token) router.push('/');
+		if (!token || token == undefined) router.push('/');
 		else {
 			const decodedToken = JSON.parse(atob(token.split('.')[1]));
 			const exp = decodedToken.exp;

@@ -49,7 +49,7 @@ function Queue() {
 
     useEffect(() => {
       if(!user.socket || (user.socket as Socket).connected == false){
-          let socket: Socket = io('http://e3r8p14.1337.ma:3001', {
+          let socket: Socket = io('http://localhost:3001', {
               auth: {
                   token: localStorage.getItem('jwtToken'),
               },
@@ -81,7 +81,7 @@ function Queue() {
     useEffect(()=> {
       if(!user.login && socket){
   
-        const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+        const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
         const token = localStorage.getItem('jwtToken');
         const config = {
           headers: { Authorization: `Bearer ${token}` },

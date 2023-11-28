@@ -50,7 +50,7 @@ const Context = ({children}: {children: React.ReactNode}) => {
     const [user, setUser] = useState<User>({conversations: []});
     const [socket, setSocket] = useState<any>(null);
     useEffect(() => {
-        const sock = io('http://e3r8p14.1337.ma:3000', {
+        const sock = io('http://localhost:3000', {
           transports: ['websocket'],
         });
         setSocket(sock);

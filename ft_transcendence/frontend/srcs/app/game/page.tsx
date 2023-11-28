@@ -20,7 +20,7 @@ import { start } from 'repl';
 let game: Game | null = null;
 
 // const fetchInfo = async () => {
-//     const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+//     const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
 //     const token = localStorage.getItem('jwtToken');
 //     const config = {
 //         headers: { Authorization: `Bearer ${token}` },
@@ -180,7 +180,7 @@ return (
                 type='button'
                 onClick={() => {
                     console.log(gameSocket);
-                    setStartState(false);
+                    setStartState(true);
                     gameSocket?.emit('StartGame', {map: user.map});
                 } }
                 className='z-10 mb-2 w-fit NeonShadowBord flex flex-row items-center justify-center h-fit px-4 py-3 hover:bg-white hover:text-[black] transition-[300]'>Start Game</button>}

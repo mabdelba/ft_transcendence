@@ -22,7 +22,7 @@ function MyDropDown(props : {iAm: string, memberSelected : string, roomSelected:
   const setAsAdmin = () =>{
 
     props.setOpenModal(false);
-    const apiUrl = "http://e3r8p14.1337.ma:3000/api/atari-pong/v1/channels/add-admin-to-channel";
+    const apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/add-admin-to-channel";
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: {Authorization : `Bearer ${token}`}

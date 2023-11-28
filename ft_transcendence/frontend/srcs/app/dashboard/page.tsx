@@ -20,7 +20,7 @@ import InviteToast from '../components/shapes/invitetoast';
 import { set } from 'husky';
 
 const fetchDashboard = async () => {
-  const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+  const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
   const token = localStorage.getItem('jwtToken');
   const config = {
     headers: { Authorization: `Bearer ${token}` },
@@ -42,7 +42,7 @@ function Dashboard() {
   
   const  getProfile = () => {
     
-    const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },
@@ -82,7 +82,7 @@ function Dashboard() {
   useEffect(() => {
     // console.log('this is myLogin: ', user.login);
     const token = localStorage.getItem('jwtToken');
-    if (!token) router.push('/');
+    if (!token || token == undefined) router.push('/');
     else {
       const decodedToken = JSON.parse(atob(token.split('.')[1]));
       const exp = decodedToken.exp;

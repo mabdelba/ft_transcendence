@@ -19,7 +19,7 @@ function LatestAchiev(props: newType) {
   async function getAchievements() {
 
     if((!props.myProfile && !user.matchData) || props.myProfile){ 
-    const lastAchievUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/profile/last-achievement';
+    const lastAchievUrl = 'http://localhost:3000/api/atari-pong/v1/profile/last-achievement';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },

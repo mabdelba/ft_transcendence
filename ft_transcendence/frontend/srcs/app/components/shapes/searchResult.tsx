@@ -36,7 +36,7 @@ function SearchResult(props: SearchBarProps)
   }
 
   const joinChannel = async (name: string) => {
-    const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/channels/add-user-to-channel';
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/add-user-to-channel';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },
@@ -67,7 +67,7 @@ function SearchResult(props: SearchBarProps)
   };
 
   const joinProtectedChannel = async (name: string) => {
-    const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/channels/add-user-to-channel';
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/add-user-to-channel';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },
@@ -93,7 +93,7 @@ function SearchResult(props: SearchBarProps)
   const handleDivClick = (user: string) => {
     // console.log(user);
     router.push(`/profil/${user}`);
-    // window.location.href = 'http://e3r8p14.1337.ma:4000/profil/' + user;
+    // window.location.href = 'http://localhost:4000/profil/' + user;
   };
 
   return (

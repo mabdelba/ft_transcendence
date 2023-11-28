@@ -15,18 +15,18 @@ async function getAvatarFromLogin(login:string, avatar?: string){
 }
 function getAvatarUrlFromLogin(login: string, avatar?: string) {
   if (avatar !== null) {
-    return `http://e3r8p14.1337.ma:3000/avatars/${login}.jpg`;
+    return `http://localhost:3000/avatars/${login}.jpg`;
   } else {
-    return `http://e3r8p14.1337.ma:3000/avatars/avatar.png`;
+    return `http://localhost:3000/avatars/avatar.png`;
   }
 }
 
 async function getAvatarFromLogin2(login:string){
   const avatar = (await getUserFromLogin(login)).avatar;
   if (avatar !== null) {
-    return `http://e3r8p14.1337.ma:3000/avatars/${login}.jpg`;
+    return `http://localhost:3000/avatars/${login}.jpg`;
   } else {
-    return `http://e3r8p14.1337.ma:3000/avatars/avatar.png`;
+    return `http://localhost:3000/avatars/avatar.png`;
   }
 }
 export { getAvatarFromLogin, getAvatarUrlFromLogin ,getAvatarFromLogin2};

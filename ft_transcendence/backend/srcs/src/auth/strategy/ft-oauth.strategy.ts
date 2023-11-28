@@ -26,7 +26,7 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
         avatar: image.link,
       };
     } catch (e) {
-       new UnauthorizedException('Invalid authorization grant');
+      throw new UnauthorizedException('Invalid authorization grant');
     }
   }
 }

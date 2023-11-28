@@ -48,7 +48,7 @@ export class AuthController {
     try {
       return this.authService.ftLogin(req.user as User);
     } catch (e) {
-      new UnauthorizedException('Invalid authorization grant');
+      throw new UnauthorizedException('Invalid authorization grant');
     }
   }
 

@@ -11,7 +11,7 @@ import { User, context, SocketContext } from '../../context/context';
 import { useQuery } from 'react-query';
 
 const fetchHistory = async () => {
-  const res = await fetch('http://e3r8p14.1337.ma:3000/api/atari-pong/v1/history', {
+  const res = await fetch('http://localhost:3000/api/atari-pong/v1/history', {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
     },
@@ -31,7 +31,7 @@ function History() {
   useEffect(()=> {
     if(!user.login){
 
-      const apiUrl = 'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/me-from-token';
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
       const token = localStorage.getItem('jwtToken');
       const config = {
         headers: { Authorization: `Bearer ${token}` },
@@ -67,7 +67,7 @@ function History() {
 
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
-    if (!token) router.push('/');
+    if (!token || token == undefined) router.push('/');
     else {
       const decodedToken = JSON.parse(atob(token.split('.')[1]));
       const exp = decodedToken.exp;
@@ -91,7 +91,7 @@ function History() {
       if (login != '') {
         await axios
           .post(
-            'http://e3r8p14.1337.ma:3000/api/atari-pong/v1/user/avatar',
+            'http://localhost:3000/api/atari-pong/v1/user/avatar',
             { userLogin: login },
             {
               headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
