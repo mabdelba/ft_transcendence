@@ -56,9 +56,9 @@ function Dashboard() {
         _user.state = 1;
         (_user.socket as Socket)?.disconnect();
       // }
-      socket.on('inviteToGame', () => {
+      socket.on('inviteToGame', (data: {senderId: string, login: string}) => {
         console.log('inviteToGame');
-        toast(<InviteToast/>,{
+        toast(<InviteToast senderId={data.senderId} login={data.login}/>,{
           position: "top-center",
           autoClose: false,
           hideProgressBar: false,

@@ -1,11 +1,12 @@
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
-import { User, context } from "../../../context/context";
+import { SocketContext, User, context } from "../../../context/context";
 
 
-function InviteToast() {
+function InviteToast({senderId, login}: {senderId: string, login: string}) {
   const router = useRouter();
   const {user, setUser} = useContext(context);
+  const { socket } = useContext(SocketContext);
   
   function handlAccept() {
     const _user : User = user;
@@ -15,7 +16,7 @@ function InviteToast() {
   }
 
   function handlCancel() {
-    console.log('cancel');
+    socket?.emit('cancel-invite', {senderId: senderId, login: login});
   }
 
   return (

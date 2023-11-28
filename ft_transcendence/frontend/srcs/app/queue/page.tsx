@@ -30,7 +30,7 @@ function Queue() {
       setIsOpen(true);
           user.socket?.emit('NewGame', {map: user.map, type: user.gameType, opponent: user.opponent});
           if (user.login !== user.opponent){
-            socket?.emit('notification', {login: user.opponent});
+            socket?.emit('notification', {login: user.opponent, senderId: user.login});
           }
           user.socket?.on('ready', (opponent : any)=>{
             const _user : User = user;
@@ -62,11 +62,19 @@ function Queue() {
           usersocket.socket = socket;
           setUser(usersocket);
       }
+      socket?.on('cancelInvite',() => {
+        user.socket?.emit('CancelGame');
+        const _user : User = user;
+        _user.opponent = '';
+        _user.gameType = '';
+        setUser(_user);
+        setIsOpen(false);
+      });
 
       user.socket?.on('already connected', () => {
           console.log('already connected');
           router.push('/dashboard');
-      })
+      });
 
     }, [user.socket]);
   

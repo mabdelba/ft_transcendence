@@ -17,7 +17,7 @@ export class TasksService {
       },
     });
   } catch (e) {
-    throw new ForbiddenException('User not found');
+     new ForbiddenException('User not found');
   }
   }
 }

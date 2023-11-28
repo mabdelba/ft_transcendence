@@ -37,7 +37,7 @@ export class DmsService {
       if (muted) return true;
       return false;
     } catch (e) {
-      throw new ForbiddenException('User not found');
+     new ForbiddenException('User not found');
     }
   }
 
@@ -140,7 +140,7 @@ export class DmsService {
         client.to(roomName).emit('receive-message', data);
       }
     } catch (e) {
-      throw new ForbiddenException('User not found');
+     new ForbiddenException('User not found');
     }
   }
 
@@ -159,7 +159,7 @@ export class DmsService {
       if (!sender || !receiver) return false;
       return true;
     } catch (e) {
-      throw new ForbiddenException('User not found');
+     new ForbiddenException('User not found');
     }
   }
 
@@ -208,7 +208,7 @@ export class DmsService {
       }
       return messages;
     } catch (e) {
-      throw new ForbiddenException('User not found');
+     new ForbiddenException('User not found');
     }
   }
   async getUsersWithConversation(login: string) {
@@ -239,7 +239,7 @@ export class DmsService {
       });
       return usersWithConversation;
     } catch (e) {
-      throw new ForbiddenException('User not found');
+     new ForbiddenException('User not found');
     }
   }
 
@@ -306,7 +306,7 @@ export class DmsService {
     // console.log('users with conversation == ', users );
     return users;
   } catch (e) {
-    throw new ForbiddenException('User not found');
+   new ForbiddenException('User not found');
   }
   }
 
@@ -335,7 +335,7 @@ export class DmsService {
     return messagesWithoutBlocked;
   }
   catch (e) {
-    throw new ForbiddenException('User not found');
+   new ForbiddenException('User not found');
   }
   }
 }

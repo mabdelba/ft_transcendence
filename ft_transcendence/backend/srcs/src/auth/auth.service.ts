@@ -36,9 +36,9 @@ export class AuthService {
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError)
         if (e.code === 'P2002') {
-          throw new ForbiddenException('User already exists');
+           new ForbiddenException('User already exists');
         }
-      throw e;
+       e;
     }
   }
 
@@ -49,7 +49,7 @@ export class AuthService {
       where: { login: dto.login, password: { not: null } },
     });
   } catch (e) {
-    throw new ForbiddenException('User not found');
+     new ForbiddenException('User not found');
   }
   try{
 
@@ -60,7 +60,7 @@ export class AuthService {
       twoFaActive: user.twoFaActive,
     };
   } catch (e) {
-    throw new ForbiddenException('Wrong password');
+     new ForbiddenException('Wrong password');
   }
   }
 
@@ -106,10 +106,10 @@ export class AuthService {
   }
 
   async ftLogin(req: User) {
-    if (!req) {
-      throw new ForbiddenException('No user from 42');
-    }
     try {
+      if (!req) {
+        throw new ForbiddenException('No user from 42');
+      }
       let user = await this.prisma.user.findUnique({
         where: { email: req.email, password: { not: null } },
       });
@@ -139,7 +139,7 @@ export class AuthService {
           token: await this.getToken(user.id, user.login),
         };
     } catch (e) {
-      throw new ForbiddenException('User not found');
+       new ForbiddenException('User not found');
     }
   }
 

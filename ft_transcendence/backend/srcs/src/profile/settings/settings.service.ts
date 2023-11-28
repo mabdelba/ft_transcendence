@@ -32,7 +32,7 @@ export class SettingsService {
         console.error('Original image file not found');
       }
     } catch (e) {
-      throw new ForbiddenException('Login already exists');
+       new ForbiddenException('Login already exists');
     }
   }
   async updateEmail(user: User, email: string) {
@@ -42,7 +42,7 @@ export class SettingsService {
         data: { email: email },
       });
     } catch (e) {
-      throw new ForbiddenException('Email already exists');
+       new ForbiddenException('Email already exists');
     }
   }
   async updateFirstname(user: User, firstname: string) {
@@ -52,7 +52,7 @@ export class SettingsService {
       data: { firstName: firstname },
     });
   } catch (e) {
-    throw new ForbiddenException('User not found');
+     new ForbiddenException('User not found');
   }
   }
   async updateLastname(user: User, lastname: string) {
@@ -62,7 +62,7 @@ export class SettingsService {
       data: { lastName: lastname },
     });
   } catch (e) {
-    throw new ForbiddenException('User not found');
+     new ForbiddenException('User not found');
   }
   }
   async enable2fa(user: User) {
@@ -72,7 +72,7 @@ export class SettingsService {
       data: { twoFaActive: true },
     });
   } catch (e) {
-    throw new ForbiddenException('User not found');
+     new ForbiddenException('User not found');
   }
   }
   async disable2fa(user: User) {

@@ -72,9 +72,9 @@ const gamePage = () => {
             setPlayer1Score(data.player1);
             setPlayer2Score(data.player2);
         })
-        user.socket?.on('startBotton', () => {
-            setStartState(true);
-        })
+        // user.socket?.on('startBotton', (start : boolean) => {
+        //     setStartState(start);
+        // })
         
         setGameSocket(user.socket);
         

@@ -42,7 +42,7 @@ export class HistoryService {
       }
       return matches;
     } catch (e) {
-      throw new ForbiddenException('User not found');
+       new ForbiddenException('User not found');
     }
   }
 }

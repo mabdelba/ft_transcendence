@@ -47,7 +47,7 @@ export class ProfileService {
             : matchesPlayedByUser.scoreOfPlayer2,
       };
     } catch (e) {
-      throw new ForbiddenException('User not found');
+       new ForbiddenException('User not found');
     }
   }
 
@@ -71,7 +71,7 @@ export class ProfileService {
       }
       return achievements;
     } catch (e) {
-      throw new ForbiddenException('User not found');
+       new ForbiddenException('User not found');
     }
   }
 }
