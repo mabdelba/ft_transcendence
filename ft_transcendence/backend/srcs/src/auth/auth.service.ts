@@ -36,9 +36,9 @@ export class AuthService {
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError)
         if (e.code === 'P2002') {
-           new ForbiddenException('User already exists');
+           throw new ForbiddenException('User already exists');
         }
-       e;
+       throw e;
     }
   }
 

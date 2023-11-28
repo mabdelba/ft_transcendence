@@ -37,7 +37,7 @@ export class DmsService {
       if (muted) return true;
       return false;
     } catch (e) {
-     new ForbiddenException('User not found');
+     throw new ForbiddenException('User not found');
     }
   }
 
@@ -136,7 +136,7 @@ export class DmsService {
         });
       }
     } catch (e) {
-     new ForbiddenException('User not found');
+     throw new ForbiddenException('User not found');
     }
   }
 
@@ -155,7 +155,7 @@ export class DmsService {
       if (!sender || !receiver) return false;
       return true;
     } catch (e) {
-     new ForbiddenException('User not found');
+     throw new ForbiddenException('User not found');
     }
   }
 
@@ -204,7 +204,7 @@ export class DmsService {
       }
       return messages;
     } catch (e) {
-     new ForbiddenException('User not found');
+     throw new ForbiddenException('User not found');
     }
   }
   async getUsersWithConversation(login: string) {
@@ -235,7 +235,7 @@ export class DmsService {
       });
       return usersWithConversation;
     } catch (e) {
-     new ForbiddenException('User not found');
+     throw new ForbiddenException('User not found');
     }
   }
 
@@ -252,7 +252,7 @@ export class DmsService {
       });
       return blockedList;
     } catch (e) {
-      new ForbiddenException('User not found');
+     throw  new ForbiddenException('User not found');
     }
   }
 
@@ -302,7 +302,7 @@ export class DmsService {
     // console.log('users with conversation == ', users );
     return users;
   } catch (e) {
-   new ForbiddenException('User not found');
+   throw new ForbiddenException('User not found');
   }
   }
 
@@ -331,7 +331,7 @@ export class DmsService {
     return messagesWithoutBlocked;
   }
   catch (e) {
-   new ForbiddenException('User not found');
+   throw new ForbiddenException('User not found');
   }
   }
 }

@@ -286,7 +286,7 @@ class GameModel{
               'You already have the achievement: ' + (await getAchievementFromId(achievementId)).name
             );
         } catch (e) {
-           new ForbiddenException('User not found')
+           throw new ForbiddenException('User not found')
         }
       }
     async checkIfAchievementsAcquired(userLogin: string) {
@@ -324,7 +324,7 @@ class GameModel{
             return await this.checkIfAchievements(user.id, 21);
           else if (user.level == 100) return await this.checkIfAchievements(user.id, 22);
         } catch (e) {
-           new ForbiddenException('User not found')
+           throw new ForbiddenException('User not found')
         }
       }
 

@@ -2,7 +2,6 @@
 import axios from 'axios';
 import DiscloComp from '../components/shapes/DiscloComp';
 import { useContext, useEffect, useState } from 'react';
-import io from 'socket.io-client';
 // import OptionBar from '../components/forms/OptionBar'
 import dynamic from 'next/dynamic';
 import { User, context, SocketContext } from '../../context/context';

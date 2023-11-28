@@ -18,7 +18,7 @@ export class UserService {
     test['avatarUrl'] = getAvatarUrlFromLogin(user.login, user.avatar);
     return test;
   } catch (e) {
-     new ForbiddenException('User not found');
+    throw new ForbiddenException('User not found');
   }
   }
   async getMe(login: string) {
@@ -31,7 +31,7 @@ export class UserService {
     user['avatarUrl'] = getAvatarUrlFromLogin(user.login, user.avatar);
     return user;
   } catch (e) {
-     new ForbiddenException('User not found');
+    throw new ForbiddenException('User not found');
   }
   }
 
@@ -117,7 +117,7 @@ export class UserService {
       return 5;
     }
     return 0;}catch (e) {
-       new ForbiddenException('User not found');
+      throw new ForbiddenException('User not found');
     }
   }
 }

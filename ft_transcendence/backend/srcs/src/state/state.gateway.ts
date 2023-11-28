@@ -41,7 +41,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
       this.users.delete(client.id);
     } catch (e) {
-       new ForbiddenException('User not found');
+      throw new ForbiddenException('User not found');
     }
     }
   }
@@ -61,7 +61,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
       },
     });
   } catch (e) {
-     new ForbiddenException('User not found');
+    throw new ForbiddenException('User not found');
   }
   }
   @SubscribeMessage('inGame')
@@ -80,7 +80,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
       },
     });
   } catch (e) {
-     new ForbiddenException('User not found');
+    throw new ForbiddenException('User not found');
   }
   }
 @SubscribeMessage('offline')
@@ -100,7 +100,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
       },
     }); 
   } catch (e) {
-     new ForbiddenException('User not found');
+    throw new ForbiddenException('User not found');
   }
   }
 

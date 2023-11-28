@@ -4,7 +4,6 @@ import alien from '../../public/alien.svg';
 import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import io from 'socket.io-client';
 import axios from 'axios';
 import OptionBar from '../components/forms/OptionBar';
 import { User, context, SocketContext } from '../../context/context';

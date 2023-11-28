@@ -20,7 +20,7 @@ export class ChannelsService {
         });
       } else throw new ForbiddenException('You are not owner of this channel');
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -71,7 +71,7 @@ export class ChannelsService {
         }
       } else throw new ForbiddenException('You are not owner of this channel');
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -104,7 +104,7 @@ export class ChannelsService {
       });
       return friendsNotInChannel;
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -121,7 +121,7 @@ export class ChannelsService {
       if (channel.admins.find((admin) => admin.login == dto.user)) return true;
       return false;
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   } 
 
@@ -138,7 +138,7 @@ export class ChannelsService {
       if (channel.owner.login == dto.user) return true;
       return false;
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -176,7 +176,7 @@ export class ChannelsService {
       });
       return channel.type;
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -189,7 +189,7 @@ export class ChannelsService {
       });
       return channel.password;
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -253,7 +253,7 @@ export class ChannelsService {
         },
       });
     } catch (e) {
-       new ForbiddenException(e);
+       throw new ForbiddenException(e);
     }
   }
 
@@ -270,7 +270,7 @@ export class ChannelsService {
       if (channel.members.find((member) => member.login == login)) return true;
       return false;
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
   /// use in channel gateway
@@ -375,6 +375,7 @@ export class ChannelsService {
         } else throw new ForbiddenException('You are not admin or owner of this channel');
     }
       }
+      client.to(dto.channelName).emit('user-removed-from-channel', {login: userToRemove, channelName: dto.channelName});
       await this.prismaservice.userMutedInChannel.deleteMany({
         where: {
           AND: [
@@ -387,9 +388,8 @@ export class ChannelsService {
           ]
         }
       })
-      client.to(dto.channelName).emit('user-removed-from-channel', {login: userToRemove, channelName: dto.channelName});
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -417,7 +417,7 @@ export class ChannelsService {
       } else throw new ForbiddenException('You are not admin or owner of this channel');
       client.to(dto.channelName).emit('user-muted-in-channel',  {login: dto.otherLogin, channelName: dto.channelName});
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -556,7 +556,7 @@ export class ChannelsService {
       } else throw new ForbiddenException('You are not owner of this channel');
       client.to(dto.channelName).emit('channel-removed',  {channelName: dto.channelName});
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -575,7 +575,7 @@ export class ChannelsService {
       if (channel) return true; 
       return false;
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -606,7 +606,7 @@ export class ChannelsService {
       if (await this.checkIfUserMuted(dto)) return "muted";
       return 5;
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -623,7 +623,7 @@ export class ChannelsService {
         ban['avatarUrl'] = getAvatarUrlFromLogin(ban.login, ban.avatar);
       });
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -652,7 +652,7 @@ export class ChannelsService {
         banned: banned,
       };
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 
@@ -685,7 +685,7 @@ export class ChannelsService {
       );
       return channels;
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
   async channelsWithConversation(client: any, login: string) {
@@ -745,7 +745,7 @@ export class ChannelsService {
         );
         return channelsWithConversation;
     } catch (e) {
-       new ForbiddenException('Channel not found');
+       throw new ForbiddenException('Channel not found');
     }
   }
 }

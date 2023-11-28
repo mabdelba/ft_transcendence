@@ -33,7 +33,7 @@ export class FriendService {
   
     return { ...friendList, friends: updatedFriendList };
     } catch (e) {
-       new ForbiddenException('User not found');
+      throw new ForbiddenException('User not found');
     }
   }
 
@@ -62,7 +62,7 @@ export class FriendService {
       // console.log("this is friendRequestsList", updatedFriendReqList);
     return { ...friendRequestsList, recievedFriendRequestsBy: updatedFriendReqList };
     } catch (e) {
-       new ForbiddenException('User not found');
+      throw new ForbiddenException('User not found');
     }
   }
 
@@ -90,7 +90,7 @@ export class FriendService {
     );
     return { ...blockedUserList, blockedList: updatedFriendBlockedList };
     } catch (e) {
-       new ForbiddenException('User not found');
+      throw new ForbiddenException('User not found');
     }
   }
 
@@ -173,7 +173,7 @@ export class FriendService {
         message: 'Friend request sended',
       };
     } catch (e) {
-       new ForbiddenException('User not found');
+      throw new ForbiddenException('User not found');
     }
   }
   async acceptFriendRequest(user: User, senderId: number) {
@@ -245,7 +245,7 @@ export class FriendService {
         status: 200,
         message: 'Friend request accepted',
       };} catch (e) {
-         new ForbiddenException('User not found');
+         throw new ForbiddenException('User not found');
       }
   }
   async rejectFriendRequest(user: User, senderId: number) {
@@ -304,7 +304,7 @@ export class FriendService {
       status: 200,
       message: 'Friend request rejected',
     };} catch (e) {
-       new ForbiddenException('User not found');
+       throw new ForbiddenException('User not found');
     }
   }
   async removeFriend(user: User, friendId: number) {
@@ -363,7 +363,7 @@ export class FriendService {
       message: 'Friend removed',
     };
   } catch (e) {
-     new ForbiddenException('User not found');
+    throw new ForbiddenException('User not found');
   }
   }
   async blockUser(user: User, userId: number) {
@@ -429,7 +429,7 @@ export class FriendService {
       message: 'User blocked',
     };
   } catch (e) {
-     new ForbiddenException('User not found');
+    throw new ForbiddenException('User not found');
   }
   }
   async unblockUser(user: User, userId: number) {
@@ -488,7 +488,7 @@ export class FriendService {
       message: 'User unblocked',
     };
   } catch (e) {
-     new ForbiddenException('User not found');
+    throw new ForbiddenException('User not found');
   }
   }
 }
