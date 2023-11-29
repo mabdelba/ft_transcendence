@@ -6,10 +6,12 @@ function Popup({
   children,
   openModal,
   setOpenModal,
+  flag,
 }: {
   children: ReactNode;
   openModal: boolean;
   setOpenModal: any;
+  flag?: boolean
 }) {
   return (
     <Transition appear show={openModal} as={Fragment}>
@@ -43,7 +45,7 @@ function Popup({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="relative min-w-[260px] min-h-[280px]  h-[60%] xl:h-[60%] w-4/5  sm:w-2/3 md:w-1/2 focus:outline-none xl:w-1/3 bg-black NeonShadowBord">
+              <Dialog.Panel className={`relative min-w-[260px] min-h-[280px] ${flag ? 'h-fit' : ' h-[60%] xl:h-[60%]'} w-4/5  sm:w-2/3 md:w-1/2 focus:outline-none xl:w-1/3 bg-black NeonShadowBord`}>
                 {children}
               </Dialog.Panel>
             </Transition.Child>

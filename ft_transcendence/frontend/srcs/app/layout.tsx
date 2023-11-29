@@ -2,13 +2,12 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { Providers } from '../redux-store/provider';
+
 import OptionBar from './components/forms/OptionBar';
 import Context from '../context/context';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 import Logo from '../public/logo.svg';
 import { Provider } from 'react-redux';
-import { store } from '../redux_tool';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -27,7 +26,6 @@ export default function rootLayout({ children }: { children: React.ReactNode }) 
         {/* <link rel="icon" type="image/svg" href={Logo}/> */}
       </head>
       <body className={inter.className}>
-        <Provider store={store}>
           <Context>
             <QueryClientProvider client={new QueryClient()}>
               {children}
@@ -46,7 +44,6 @@ export default function rootLayout({ children }: { children: React.ReactNode }) 
               />
             </QueryClientProvider>
           </Context>
-        </Provider>
       </body>
     </html>
   );

@@ -61,6 +61,8 @@ function Friends() {
       };
       axios.get(apiUrl, config).then((response: any) => {
         const _user = response.data;
+        socket.emit('online', { token: localStorage.getItem('jwtToken') });
+        _user.state = 1;
         socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
           console.log('inviteToGame');
           toast(<InviteToast senderId={data.senderId} login={data.login} />, {

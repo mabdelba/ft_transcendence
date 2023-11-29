@@ -88,6 +88,8 @@ function Queue() {
       };
       axios.get(apiUrl, config).then((response: any) => {
         const _user = response.data;
+        socket.emit('online', { token: localStorage.getItem('jwtToken') });
+        _user.state = 1;
         socket.emit('inGame', { token: localStorage.getItem('jwtToken') });
         _user.state = 2;
         setUser(_user);
@@ -100,7 +102,6 @@ function Queue() {
       socket?.emit('cancel-notif', { login: user.opponent });
       // user.socket?.emit('CancelGame');
       const _user: User = user;
-      _user.opponent = '';
       _user.gameType = '';
       setUser(_user);
       console.log('unmount');

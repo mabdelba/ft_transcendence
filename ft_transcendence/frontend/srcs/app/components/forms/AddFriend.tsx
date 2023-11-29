@@ -140,7 +140,7 @@ function AddFriend(props: newType) {
     };
     axios.post(url, { userLogin: props.login }, config)
     .then((response: any)=> {
-
+      // response.data.level = toFixed(response.data.level);
       setProfile(response.data);
     })
     .catch((err)=> {
@@ -161,6 +161,9 @@ function AddFriend(props: newType) {
       } else getUserData();
     }
   }, [props.login]);
+
+
+
   return (
     <div className="h-full w-full NeonShadowBord flex flex-col ">
       {props.state == -2 ? (
@@ -217,7 +220,7 @@ function AddFriend(props: newType) {
                 </div>
                 <div className="flex flex-row justify-between">
                   Level
-                  <div>{profile.level}</div>
+                  <div>{profile.level.toFixed(2)}</div>
                 </div>
               </div>
             )}

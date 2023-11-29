@@ -765,13 +765,13 @@ function Messages() {
           </div>
         </div>
       </Popup>
-      <Popup openModal={openSettingModal} setOpenModal={setOpenSettingModal}>
+      <Popup openModal={openSettingModal} setOpenModal={setOpenSettingModal} flag={true}>
         <div className="h-[10%] w-full flex justify-end items-center pr-3 NeonShadow">
           <AiOutlineClose
             onClick={() => {
               setOpenSettingModal(false);
             }}
-            className="cursor-pointer h-7 w-7  lg:h-10 lg:w-10"
+            className="cursor-pointer h-7 w-7 "
           />
         </div>
         <h1 className="h-[10%] w-full font-Orbitron NeonShadow text-base md:text-xl 2xl:text-3xl flex justify-center items-center">
@@ -788,16 +788,7 @@ function Messages() {
                sm:min-h-[70px] p-4 text-sm md:text-lg lg:text-xl font-Orbitron  text-white outline-none placeholder-[#484848] max-h-36 sm:max-h-44 z-10 w-full NeonShadowBord bg-[#272727]"
             />
           </div>
-          <div className="h-1/5 z-0">
-            <div className="mb-1 font-Orbitron lg:mb-4 truncate">
-              Group avatar : <span className="text-cyan-400 truncate">{fileName}</span>
-            </div>
-            <input onChange={handleImage} type="file" id="files" className="hidden" />
-            <label htmlFor="files">
-              <UploadAvatar content="Upload avatar" icon2={BlackUpload} icon={Upload} />
-            </label>
-          </div>
-          <div className="h-1/5 z-0">
+          <div className="h-20 mt-2 z-0">
             <SimpleButton content="Save" buttonType={'submit'} handleClick={handleChangeSettings} />
           </div>
         </form>
