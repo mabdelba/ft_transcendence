@@ -59,7 +59,6 @@ function Achievements() {
       axios.get(apiUrl, config).then((response: any) => {
         const _user = response.data;
         socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
-          console.log('inviteToGame');
           toast(<InviteToast senderId={data.senderId} login={data.login} />, {
             position: 'top-center',
             autoClose: false,
@@ -70,7 +69,6 @@ function Achievements() {
           });
         });
         socket?.on('cancelNotification', () => {
-          console.log('cancelNotification=======');
           toast.dismiss();
         });
         setUser(_user);

@@ -50,7 +50,7 @@ export class DmsService {
 
   async sendAndSaveMessage(client: any, data: any, io: any, users: Map<string, string>) {
     try{
-      console.log(`User ${data.senderLogin} sent message to ${data.receiverLogin}`);
+      
       const roomName = data.isChannel
         ? data.receiverLogin
         : this.createRoomName(data.senderLogin, data.receiverLogin);
@@ -110,7 +110,7 @@ export class DmsService {
             });
             if (!checkIfBlocked || checkIfBlocked.length === 0) {
               socket.emit('receive-message', data);
-              console.log('send message to ', users.get(socket.id));
+        
             }
           }
           }),
@@ -302,7 +302,7 @@ export class DmsService {
         isBlocked: allBlocked.includes(user.login),
         avatarUrl: getAvatarUrlFromLogin(user.login, user.avatar),
       });
-      console.log(login, 'join ', this.createRoomName(login, user.login));
+
       client.join(this.createRoomName(login, user.login));
     });
     // console.log('users with conversation == ', users );
@@ -319,7 +319,6 @@ export class DmsService {
       ? data.receiverLogin
       : this.createRoomName(data.senderLogin, data.receiverLogin);
     client.join(roomName);
-    console.log(`User ${data.senderLogin} joined room ${roomName}`);
     const messages = await this.getConversation(
       data.senderLogin,
       data.receiverLogin,

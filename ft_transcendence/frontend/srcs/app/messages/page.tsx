@@ -90,7 +90,6 @@ function Messages() {
         _user.state = 1;
         // }
         socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
-          console.log('inviteToGame');
           toast(<InviteToast senderId={data.senderId} login={data.login} />, {
             position: 'top-center',
             autoClose: false,
@@ -101,7 +100,6 @@ function Messages() {
           });
         });
         socket?.on('cancelNotification', () => {
-          console.log('cancelNotification=======');
           toast.dismiss();
         });
         setUser(_user);
@@ -247,7 +245,7 @@ function Messages() {
         })
       }
       catch(e){
-        console.log("catchiteeeek=============");
+  
       }
         const _chatArea = [
           ...chatArea,

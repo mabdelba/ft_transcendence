@@ -48,12 +48,12 @@ function Login(props: closeFunc) {
     const password = Data.password;
 
     const logData = { login, password };
-    console.log('haaaa za: ', logData);
+
     const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/login';
     axios
       .post(apiUrl, logData)
       .then((response) => {
-        console.log('response: ', response);
+  
         if (response.data.twoFaActive == true) {
           props.setOpenTwoFact(true);
           props.setJwtToken(response.data.token);

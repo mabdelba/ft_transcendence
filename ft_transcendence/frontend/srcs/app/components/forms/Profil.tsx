@@ -50,7 +50,7 @@ function Profil(props: profileProp) {
         {
           props.setNumberOfMatch && props.setNumberOfMatch(user_.data.numberOfGamesPlayed);
         }
-        console.log('haaaa lkhraaa', user_.data);
+   
         setUserAvatar(user_.data.avatarUrl);
         props.setUserAvatar && props.setUserAvatar(user_.data.avatarUrl);
         const stats: dataType = {
@@ -67,7 +67,7 @@ function Profil(props: profileProp) {
           stats.winPercent = Math.floor(
             (user_.data?.numberOfGamesWon! * 100) / user_.data?.numberOfGamesPlayed!,
           );
-        console.log('blackhole; ', user_.data);
+
         stats.lev = Math.floor(user_.data.level!);
         stats.percentage = Math.floor((user_.data?.level! - stats.lev) * 100);
         stats.percentageChar = `${stats.percentage}%`;
@@ -91,7 +91,7 @@ function Profil(props: profileProp) {
             stats.stateImage = 'bg-red-300';
             break;
         }
-        console.log('hello', stats);
+
         setStaistics(stats);
       } catch (err) {
         props.router.push('/dashboard');
@@ -125,7 +125,7 @@ function Profil(props: profileProp) {
           stats.winPercent = Math.floor(
             (user?.numberOfGamesWon! * 100) / user?.numberOfGamesPlayed!,
           );
-        console.log('blackhole; ', user);
+   
         stats.lev = Math.floor(user.level!);
         stats.percentage = Math.floor((user?.level! - stats.lev) * 100);
         stats.percentageChar = `${stats.percentage}%`;
@@ -149,7 +149,6 @@ function Profil(props: profileProp) {
             stats.stateImage = 'bg-red-300';
             break;
         }
-        console.log('hello', stats);
         setStaistics(stats);
       }
     }

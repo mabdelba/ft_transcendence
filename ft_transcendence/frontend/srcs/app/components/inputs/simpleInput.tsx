@@ -31,13 +31,12 @@ function SimpleInput(props: InputProps) {
     props.SetValue(event.target.value);
     if (props.isVerif && props.pass) {
       if (event.target.value != props.pass) {
-        console.log(event.target.value);
-        console.log('false', props.pass);
+
         setError(false);
         props.setError(false);
       } else {
         setError(true);
-        console.log('true', event.target.value, props.pass);
+
         props.setError(true);
       }
     } else if (props.regex) {

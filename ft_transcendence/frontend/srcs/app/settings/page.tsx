@@ -73,7 +73,7 @@ function Settings() {
           setAvatarUrl(_user.avatarUrl);
           setIsChecked(_user.twoFaActive);
           socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
-            console.log('inviteToGame');
+    
             toast(<InviteToast senderId={data.senderId} login={data.login} />, {
               position: 'top-center',
               autoClose: false,
@@ -84,7 +84,7 @@ function Settings() {
             });
           });
           socket?.on('cancelNotification', () => {
-            console.log('cancelNotification=======');
+
             toast.dismiss();
           });
           setUser(_user);

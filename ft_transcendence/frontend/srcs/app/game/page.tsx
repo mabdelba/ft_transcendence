@@ -66,7 +66,7 @@ const gamePage = () => {
             game?.setState(data.player1, data.player2, data.ball);
         });
         
-        console.log('gameSocket', user.socket);
+       
         
         user.socket?.on('gameEnded', (data: {state: string}) => {
             setGameEnded(data.state);
@@ -123,7 +123,7 @@ const handleLeave = () => {;
   useEffect(() => {
     gameSocket?.on('left game', () => {
       setIsLeft(true);
-      console.log('isLeft', isLeft);
+   
     });
     if (isLeft) {
       handleLeave();
@@ -132,7 +132,6 @@ const handleLeave = () => {;
 
   useEffect(() => {
     if (gameEnded !== '') {
-      console.log('gameEnded', gameEnded);
       setOpenModal(true);
       // gameSocket?.off('GameState');
       // gameSocket?.off('gameEnded');

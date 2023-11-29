@@ -55,7 +55,7 @@ function UserProfil(props: newType) {
           socket?.emit('online', { token: localStorage.getItem('jwtToken') });
           _user.state = 1;
           socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
-            console.log('inviteToGame');
+    
             toast(<InviteToast senderId={data.senderId} login={data.login} />, {
               position: 'top-center',
               autoClose: false,
@@ -66,7 +66,7 @@ function UserProfil(props: newType) {
             });
           });
           socket?.on('cancelNotification', () => {
-            console.log('cancelNotification=======');
+
             toast.dismiss();
           });
           setUser(_user);
@@ -92,7 +92,7 @@ function UserProfil(props: newType) {
         else setCase(response.data);
       })
       .catch((error: any) => {
-        console.log('error: ', error);
+   
       });
   };
   useEffect(() => {

@@ -22,11 +22,11 @@ export class DmsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   io: Namespace;
 
   async handleConnection(client: any, room: String) {
-    console.log('connected dm ', client.id);
+   
     // this.dmsService.joinRoom(client, socket, this.io.server);
   }
   handleDisconnect(client: any) {
-    console.log('disconnected');
+
   }
 
   @SubscribeMessage('send-message')

@@ -21,7 +21,7 @@ class Game {
   socket: Socket | null = null;
 
   constructor(element: HTMLElement, map: string) {
-    console.log('Game constructor');
+
     this._element = element;
     this.map = map;
     [this.width, this.height] = this._calculateDimensions();

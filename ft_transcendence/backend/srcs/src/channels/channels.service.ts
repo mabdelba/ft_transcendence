@@ -219,12 +219,12 @@ export class ChannelsService {
       let userToAdd = dto.user;
       const checkIfAdmin = await this.checkIfAdmin({ channelName: dto.channelName, user: login });
       const checkIfOwner = await this.checkIfOwner({ channelName: dto.channelName, user: login });
-      console.log("dto.user ===== ", dto.user);
+      // console.log("dto.user ===== ", dto.user);
       if (!dto.user){
         if (channelType == 2) {
           if (pass != dto.password)
           {
-            console.log('hana hnaaaa==========');
+            // console.log('hana hnaaaa==========');
             throw new ForbiddenException('Wrong password');
           }
         userToAdd = login;

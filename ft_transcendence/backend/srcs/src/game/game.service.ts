@@ -33,7 +33,7 @@ class GameModel{
     constructor(socket: Socket, private prisma: PrismaService){
         this.socket1 = socket;
         this.id1 = socket.id;
-        console.log("Game constructor");
+
         this._runner = Runner.create();
         this._engine = Engine.create({gravity: {x: 0, y: 0}});
         this._world = this._engine.world;
@@ -148,7 +148,7 @@ class GameModel{
     }
 //destroy this function when the game ends
     public destroy(): void{
-        console.log("destroy");
+
         Events.off(this._engine, 'beforeUpdate', ()=> {});
         Runner.stop(this._runner);
         World.clear(this._world, true);
@@ -166,7 +166,7 @@ class GameModel{
 
     async addNewGame(dto: { userLogin: string, opponentLogin: string, scoreP1: number, scoreP2: number }) {
         try {
-          console.log('game added====================');
+
             await this.prisma.game.create({
                 data: {
                     player1Login: dto.userLogin,
@@ -294,45 +294,46 @@ class GameModel{
            throw new ForbiddenException('User not found')
         }
       }
-    async checkIfAchievementsAcquired(userLogin: string) {
-        const user = await getUserFromLogin(userLogin);
+
+
+      async checkIfAchievementsAcquired(userLogin: string) {
         try{
-          if (user.numberOfGamesPlayed == 0) return await this.checkIfAchievements(user.id, 0);
-          if (user.level < 5 && user.level > 0) return await this.checkIfAchievements(user.id, 1);
-          else if (user.level < 10 && user.level >= 5) return await this.checkIfAchievements(user.id, 6);
-          else if (user.level < 15 && user.level >= 10) return await this.checkIfAchievements(user.id, 7);
-          else if (user.level < 22 && user.level >= 15) return await this.checkIfAchievements(user.id, 8);
-          else if (user.level < 30 && user.level >= 22) return await this.checkIfAchievements(user.id, 9);
+          const user = await getUserFromLogin(userLogin);
+          if (user.numberOfGamesPlayed == 1) await this.checkIfAchievements(user.id, 1);
+          if (user.level < 5 && user.level > 0) return await this.checkIfAchievements(user.id, 2);
+          else if (user.level < 10 && user.level >= 5) return await this.checkIfAchievements(user.id, 3);
+          else if (user.level < 15 && user.level >= 10) return await this.checkIfAchievements(user.id, 4);
+          else if (user.level < 22 && user.level >= 15) return await this.checkIfAchievements(user.id, 5);
+          else if (user.level < 30 && user.level >= 22) return await this.checkIfAchievements(user.id, 6);
           else if (user.level < 40 && user.level >= 30)
-            return await this.checkIfAchievements(user.id, 10);
+            return await this.checkIfAchievements(user.id, 7);
           else if (user.level < 50 && user.level >= 40)
-            return await this.checkIfAchievements(user.id, 11);
+            return await this.checkIfAchievements(user.id, 8);
           else if (user.level < 55 && user.level >= 50)
-            return await this.checkIfAchievements(user.id, 12);
+            return await this.checkIfAchievements(user.id, 9);
           else if (user.level < 60 && user.level >= 55)
-            return await this.checkIfAchievements(user.id, 13);
+            return await this.checkIfAchievements(user.id, 10);
           else if (user.level < 66 && user.level >= 60)
-            return await this.checkIfAchievements(user.id, 14);
+            return await this.checkIfAchievements(user.id, 11);
           else if (user.level < 70 && user.level >= 66)
-            return await this.checkIfAchievements(user.id, 15);
+            return await this.checkIfAchievements(user.id, 12);
           else if (user.level < 77 && user.level >= 70)
-            return await this.checkIfAchievements(user.id, 16);
+            return await this.checkIfAchievements(user.id, 13);
           else if (user.level < 80 && user.level >= 77)
-            return await this.checkIfAchievements(user.id, 17);
+            return await this.checkIfAchievements(user.id, 14);
           else if (user.level < 88 && user.level >= 80)
-            return await this.checkIfAchievements(user.id, 18);
+            return await this.checkIfAchievements(user.id, 15);
           else if (user.level < 90 && user.level >= 88)
-            return await this.checkIfAchievements(user.id, 19);
+            return await this.checkIfAchievements(user.id, 16);
           else if (user.level < 99 && user.level >= 90)
-            return await this.checkIfAchievements(user.id, 20);
+            return await this.checkIfAchievements(user.id, 17);
           else if (user.level < 100 && user.level >= 99)
-            return await this.checkIfAchievements(user.id, 21);
-          else if (user.level == 100) return await this.checkIfAchievements(user.id, 22);
+            return await this.checkIfAchievements(user.id, 18);
+          else if (user.level == 100) return await this.checkIfAchievements(user.id, 19);
         } catch (e) {
-            new ForbiddenException('User not found')
+           throw new ForbiddenException('User not found')
         }
       }
-
       async endGame(userLogin: string, opponentLogin: string, scoreP1: number, scoreP2: number) {
         await this.addNewGame({userLogin: userLogin, opponentLogin: opponentLogin, scoreP1: scoreP1, scoreP2: scoreP2});
         await this.checkIfAchievementsAcquired(userLogin);

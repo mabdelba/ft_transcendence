@@ -58,7 +58,7 @@ function Queue() {
       });
 
       socket.on('connect', () => {
-        console.log('connectedff', socket.id);
+
       });
       const usersocket: User = user;
       usersocket.socket = socket;
@@ -74,7 +74,7 @@ function Queue() {
     });
 
     user.socket?.on('already connected', () => {
-      console.log('already connected');
+    
       router.push('/dashboard');
     });
   }, [user.socket]);

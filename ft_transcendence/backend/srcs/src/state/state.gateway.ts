@@ -23,13 +23,12 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   users = new Map();
   @UseGuards(JwtGuard)
   handleConnection(client: Socket) {
-    console.log('connected state  ', client.id);
    this.users.set(client.id, null);
   }
 
   async handleDisconnect(client: any) {
     if (this.users.has(client.id) && this.users.get(client.id) != null) {
-      console.log('offline----', this.users.get(client.id));
+
       try{
       await this.prisma.user.update({
         where: {
@@ -49,7 +48,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async setOnline(client: Socket, message: { token: string }) {
     const jwtToken = message.token;
     const decoded = jwtDecode(jwtToken);
-    console.log('online----', decoded['login']);
+
     this.users.set(client.id, decoded['login']);
     try{
     await this.prisma.user.update({
@@ -68,7 +67,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async setInGame(client: Socket, message: { token: string }) {
     const jwtToken = message.token;
     const decoded = jwtDecode(jwtToken);
-    console.log('inGame----', decoded['login']);
+  
     this.users.set(client.id, decoded['login']);
     try{
     await this.prisma.user.update({
@@ -87,7 +86,6 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async setOffline(client: Socket, message: { token: string, login?: string }) {
     const jwtToken = message.token;
     const decoded = jwtDecode(jwtToken);
-    console.log('offline----', decoded['login']);
     this.users.delete(client.id);
     const log = message.login ? message.login : decoded['login'];
     try{ 
@@ -126,7 +124,6 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   cancelInvite(client: Socket, message: {senderId: string}) {
     const key = [...this.users].find(([key, value]) => value === message.senderId)?.[0];
     if (key != null){
-      console.log("cancel invite", message.senderId, " client id ", key);
       this.io.to(key).emit('cancelInvite', {login: message.senderId});
     }
   }
@@ -158,7 +155,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   cancelNotif(client: Socket, data: {login : string}){
     const key = [...this.users].find(([key, value]) => value === data.login)?.[0];
     if (key != null){
-      console.log("cancel notif", data.login, " client id ", key);
+
       this.io.to(key).emit('cancelNotification', {login: data.login});
     }
   }

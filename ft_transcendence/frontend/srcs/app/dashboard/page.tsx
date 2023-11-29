@@ -56,7 +56,7 @@ function Dashboard() {
         (_user.socket as Socket)?.disconnect();
         // }
         socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
-          console.log('inviteToGame');
+    
           toast(<InviteToast senderId={data.senderId} login={data.login} />, {
             position: 'top-center',
             autoClose: false,
@@ -67,7 +67,7 @@ function Dashboard() {
           });
         });
         socket?.on('cancelNotification', () => {
-          console.log('cancelNotification=======');
+
           toast.dismiss();
         });
 

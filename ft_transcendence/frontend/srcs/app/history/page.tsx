@@ -42,7 +42,7 @@ function History() {
         socket.emit('online', { token: localStorage.getItem('jwtToken') });
         _user.state = 1;
         socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
-          console.log('inviteToGame');
+      
           toast(<InviteToast senderId={data.senderId} login={data.login} />, {
             position: 'top-center',
             autoClose: false,
@@ -53,7 +53,7 @@ function History() {
           });
         });
         socket?.on('cancelNotification', () => {
-          console.log('cancelNotification=======');
+
           toast.dismiss();
         });
         setUser(_user);
@@ -73,7 +73,7 @@ function History() {
       // });
 
       setMatches(data);
-      console.log('data********: ', data);
+
       const _user: User = user;
       _user.history = data;
       setUser(_user);

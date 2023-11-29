@@ -25,7 +25,6 @@ export class SettingsService {
             console.error('File rename error:', error);
             throw new Error('File rename failed'); // Handle the error appropriately
           } else {
-            console.log('File renamed successfully!');
           }
         });
       } else {

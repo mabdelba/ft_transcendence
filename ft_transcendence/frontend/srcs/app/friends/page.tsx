@@ -72,7 +72,7 @@ function Friends() {
         socket.emit('online', { token: localStorage.getItem('jwtToken') });
         _user.state = 1;
         socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
-          console.log('inviteToGame');
+    
           toast(<InviteToast senderId={data.senderId} login={data.login} />, {
             position: 'top-center',
             autoClose: false,
@@ -83,7 +83,7 @@ function Friends() {
           });
         });
         socket?.on('cancelNotification', () => {
-          console.log('cancelNotification=======');
+
           toast.dismiss();
         });
         setUser(_user);
@@ -166,10 +166,10 @@ function Friends() {
     axios
       .post(url, { friendId: userId }, conf)
       .then((response) => {
-        console.log('response ', response);
+  
       })
       .catch((error) => {
-        console.log('error ', error);
+
       });
     toast.error(`${userName} has been deleted from your friend list!`);
     setOpenFriend(false);
@@ -225,10 +225,10 @@ function Friends() {
     axios
       .post(url, { senderId: userId }, conf)
       .then((response) => {
-        console.log('response ', response);
+
       })
       .catch((error) => {
-        console.log('error ', error);
+ 
       });
     toast.error(`Friend request from ${userName} has been deleted!`, {
       position: 'top-center',
