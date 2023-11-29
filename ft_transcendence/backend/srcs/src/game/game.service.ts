@@ -84,6 +84,8 @@ class GameModel{
                    World.remove(this._world, this.ball);
                     Body.setPosition(this.ball, {x: this.width / 2, y: this.height / 2});
                     this.lance = false;
+                    this.socket1?.emit('startState');
+                    this.socket2?.emit('startState');
                     this.runGame();
                     this.player1Score++;
                     this.socket1?.emit('Score', {player1: this.player1Score, player2: this.player2Score});
@@ -96,6 +98,8 @@ class GameModel{
                     World.remove(this._world, this.ball);
                     Body.setPosition(this.ball, {x: this.width / 2, y: this.height / 2});
                     this.lance = true;
+                    this.socket1?.emit('startState');
+                    this.socket2?.emit('startState');
                     this.runGame();
                     this.player2Score++;
                     this.socket1?.emit('Score', {player1: this.player1Score, player2: this.player2Score});

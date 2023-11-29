@@ -15,7 +15,7 @@ type InputProps = {
   setError: Function;
   isVerif: boolean;
   pass?: string;
-  flag? : boolean;
+  flag?: boolean;
   readonly?: boolean;
 };
 
@@ -30,15 +30,18 @@ function SimpleInput(props: InputProps) {
   const handleChange = (event: any) => {
     props.SetValue(event.target.value);
     if (props.isVerif && props.pass) {
-      if (props.val !== props.pass) {
+      if (event.target.value != props.pass) {
+        console.log(event.target.value);
+        console.log('false', props.pass);
         setError(false);
         props.setError(false);
       } else {
         setError(true);
+        console.log('true', event.target.value, props.pass);
         props.setError(true);
       }
     } else if (props.regex) {
-      const reg = props.regex.test(props.val);
+      const reg = props.regex.test(event.target.value);
       if (!reg) {
         setError(false);
         props.setError(false);
@@ -47,7 +50,7 @@ function SimpleInput(props: InputProps) {
         props.setError(true);
       }
     }
-  } 
+  };
 
   // const handleBlur = () => {
   //   if (props.isVerif && props.pass) {
@@ -84,10 +87,9 @@ function SimpleInput(props: InputProps) {
             className="h-full w-full pl-3 bg-transparent text-white outline-none placeholder-[#484848]"
             type={!showpassword ? props.type1 : props.type2}
             onChange={(event) => handleChange(event)}
-            
-            value={props.flag ? props.val: undefined}
+            value={props.flag ? props.val : undefined}
             readOnly={props.readonly}
-            
+
             // required
           />
         </div>

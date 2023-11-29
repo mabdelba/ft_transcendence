@@ -39,45 +39,44 @@ function Dashboard() {
   // const [myLogin, setMyLogin] = useState('');
 
   // const { data, status } = useQuery('dashboard', fetchDashboard);
-  
-  const  getProfile = () => {
-    
+
+  const getProfile = () => {
     const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
     const token = localStorage.getItem('jwtToken');
     const config = {
       headers: { Authorization: `Bearer ${token}` },
-    }
-    axios.get(apiUrl, config)
-    .then((response : any) => {
-    
-      const _user: User = response.data;
-      // if (!_user.state) {
+    };
+    axios
+      .get(apiUrl, config)
+      .then((response: any) => {
+        const _user: User = response.data;
+        // if (!_user.state) {
         socket.emit('online', { token: localStorage.getItem('jwtToken') });
         _user.state = 1;
         (_user.socket as Socket)?.disconnect();
-      // }
-      socket?.on('inviteToGame', (data: {senderId: string, login: string}) => {
-        console.log('inviteToGame');
-        toast(<InviteToast senderId={data.senderId} login={data.login}/>,{
-          position: "top-center",
-          autoClose: false,
-          hideProgressBar: false,
-          closeOnClick: true,
-          draggable: true,
-          theme: 'dark',
+        // }
+        socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
+          console.log('inviteToGame');
+          toast(<InviteToast senderId={data.senderId} login={data.login} />, {
+            position: 'top-center',
+            autoClose: false,
+            hideProgressBar: false,
+            closeOnClick: true,
+            draggable: true,
+            theme: 'dark',
+          });
         });
-      });
-      socket?.on('cancelNotification', () => {
-        console.log('cancelNotification=======')
-        toast.dismiss();
-      });
+        socket?.on('cancelNotification', () => {
+          console.log('cancelNotification=======');
+          toast.dismiss();
+        });
 
-      setProfile(response.data);
-      setUser(_user);
-      setStatus('success');
-    })
-    .catch()
-  }
+        setProfile(response.data);
+        setUser(_user);
+        setStatus('success');
+      })
+      .catch();
+  };
 
   useEffect(() => {
     // console.log('this is myLogin: ', user.login);
@@ -90,27 +89,24 @@ function Dashboard() {
       if (exp < current_time) {
         localStorage.removeItem('jwtToken');
         router.push('/');
-      } 
-      else if (!user.login && socket)
-         getProfile();
-      else
-        {
-          setStatus('success');
-          setProfile(user);
-        }
+      } else if (!user.login && socket) getProfile();
+      else {
+        setStatus('success');
+        setProfile(user);
+      }
     }
   }, [status, socket]);
 
-//disconnect gameSocket
+  //disconnect gameSocket
   useEffect(() => {
-    if((user.socket as Socket)?.connected){
-        (user.socket as Socket)?.disconnect();
-        user.socket?.close();
-        const _user: User = user;
-        _user.socket = null;
-        setUser(_user);
+    if ((user.socket as Socket)?.connected) {
+      (user.socket as Socket)?.disconnect();
+      user.socket?.close();
+      const _user: User = user;
+      _user.socket = null;
+      setUser(_user);
     }
-  },)
+  });
 
   return (
     <OptionBar flag={0}>
@@ -120,36 +116,36 @@ function Dashboard() {
           <div className="spinner"></div>
         </div>
       )}
-      {
-		(status == "success" && profile.login != undefined) &&
-		<main className="h-auto w-auto md:w-full md:h-full font-Orbitron NeonShadow min-h-[480px] min-w-[280px] ">
-        <div className="w-full h-[8%] pl-6 md:pl-12 font-semibold flex justify-start items-center NeonShadow text-base xl:text-3xl">
-          Hello {profile.firstName}!
-        </div>
-        <div className=" w-full md:h-[84%] h-auto flex flex-col md:flex-row justify-center items-center px-2 md:px-12 space-y-6 md:space-y-0 md:space-x-6 xl:space-x-12 ">
-          <div className="md:h-full h-auto w-full md:w-[60%]  space-y-6 xl:space-y-12 flex flex-col -red-600">
-            <div className="w-full md:h-[60%] h-52">
-              <Profil router={router} />
+      {status == 'success' && profile.login != undefined && (
+        <main className="h-auto w-auto md:w-full md:h-full font-Orbitron NeonShadow min-h-[480px] min-w-[280px] ">
+          <div className="w-full h-[8%] pl-6 md:pl-12 font-semibold flex justify-start items-center NeonShadow text-base xl:text-3xl">
+            Hello {profile.firstName}!
+          </div>
+          <div className=" w-full md:h-[84%] h-auto flex flex-col md:flex-row justify-center items-center px-2 md:px-12 space-y-6 md:space-y-0 md:space-x-6 xl:space-x-12 ">
+            <div className="md:h-full h-auto w-full md:w-[60%]  space-y-6 xl:space-y-12 flex flex-col -red-600">
+              <div className="w-full md:h-[60%] h-52">
+                <Profil router={router} />
+              </div>
+              <div className="w-full md:h-[40%] h-40">
+                <LastMatch
+                  matchPlayed={profile.numberOfGamesPlayed || 0}
+                  login={profile.login || ''}
+                  router={router}
+                />
+              </div>
             </div>
-            <div className="w-full md:h-[40%] h-40">
-              <LastMatch
-                matchPlayed={profile.numberOfGamesPlayed || 0}
-                login={profile.login || ''}
-                router={router}
-              />
+            <div className="md:h-full h-auto w-full md:w-[40%] space-y-6  xl:space-y-12 flex flex-col -yellow-300">
+              <div className="w-full md:h-[40%] h-40">
+                <NewGame />
+              </div>
+              <div className="w-full md:h-[60%] h-auto">
+                <LatestAchiev login={profile.login || ''} router={router} />
+              </div>
             </div>
           </div>
-          <div className="md:h-full h-auto w-full md:w-[40%] space-y-6  xl:space-y-12 flex flex-col -yellow-300">
-            <div className="w-full md:h-[40%] h-40">
-              <NewGame />
-            </div>
-            <div className="w-full md:h-[60%] h-auto">
-              <LatestAchiev login={profile.login || ''} router={router} />
-            </div>
-          </div>
-        </div>
-        <div className="w-full h-[8%]"></div>
-      </main>}
+          <div className="w-full h-[8%]"></div>
+        </main>
+      )}
     </OptionBar>
   );
 }

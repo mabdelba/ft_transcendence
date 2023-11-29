@@ -26,9 +26,13 @@ function UploadAvatar(props: ButtonProps) {
       className={`Register bg-transparent text-white hover:bg-white  hover:text-black hover:Boxshad transition-all duration-500 text-sm md:text-lg lg:text-xl h-full w-full  font-Orbitron flex flex-row justify-center items-center`}
     >
       {props.icon && props.icon2 && (
-        <Image src={!hoverBool ? props.icon : props.icon2} alt="upload icon" className=" w-8 h-7 pr-2" />
+        <Image
+          src={!hoverBool ? props.icon : props.icon2}
+          alt="upload icon"
+          className=" w-8 h-7 pr-2"
+        />
       )}
-      <div className={`${props.flag ? 'hidden xl:block': '' }`}>{props.content}</div>
+      <div className={`${props.flag ? 'hidden xl:block' : ''}`}>{props.content}</div>
     </div>
   );
 }

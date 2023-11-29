@@ -1,24 +1,23 @@
 'use client';
 import { use, useState, MouseEvent } from 'react';
 import Image from 'next/image';
-import {BsKeyboardFill , BsFillSendFill} from 'react-icons/bs'
+import { BsKeyboardFill, BsFillSendFill } from 'react-icons/bs';
 
 type InputProps = {
-
   SetValue: Function;
   value: string;
   handleClick: any;
 };
 
 function SendMessage(props: InputProps) {
-
-
   return (
     <form className="space-y-44 h-full w-full">
       <div
         className={`w-full h-full  flex justify-center  items-center  bg-transparent px-2 sm:px-7`}
       >
-        <div className='mr-4'><BsKeyboardFill size="25"/></div>
+        <div className="mr-4">
+          <BsKeyboardFill size="25" />
+        </div>
         <div className="flex justify-center items-center bg-transparent font-Orbitron text-sm md:text-lg lg:text-xl h-full w-full">
           <input
             placeholder="Type message . . ."
@@ -28,14 +27,13 @@ function SendMessage(props: InputProps) {
             value={props.value}
           />
         </div>
-          <button
-            onClick={props.handleClick}
-            type='submit'
-    
-            className="right-5 flex w-15 h-10 justify-center items-center p-2 hover:text-[#FF184F] text-xl 2xl:text-2xl hover:text-3xl transition-all duration-500"
-          >
-            <BsFillSendFill  />
-          </button>
+        <button
+          onClick={props.handleClick}
+          type="submit"
+          className="right-5 flex w-15 h-10 justify-center items-center p-2 hover:text-[#FF184F] text-xl 2xl:text-2xl hover:text-3xl transition-all duration-500"
+        >
+          <BsFillSendFill />
+        </button>
       </div>
     </form>
   );

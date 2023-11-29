@@ -39,15 +39,15 @@ function AddFriend(props: newType) {
 
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
-		if (!token) props.router.push('/');
-		else {
-			const decodedToken = JSON.parse(atob(token.split('.')[1]));
-			const exp = decodedToken.exp;
-			const current_time = Date.now() / 1000;
-			if (exp < current_time) {
-				localStorage.removeItem('jwtToken');
-				props.router.push('/');
-			} else requestSended();
+    if (!token) props.router.push('/');
+    else {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      const exp = decodedToken.exp;
+      const current_time = Date.now() / 1000;
+      if (exp < current_time) {
+        localStorage.removeItem('jwtToken');
+        props.router.push('/');
+      } else requestSended();
     }
   }, [props.state]);
 
@@ -138,87 +138,92 @@ function AddFriend(props: newType) {
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
-    const user = await axios.post(url, { userLogin: props.login }, config);
-    setProfile(user.data);
+    axios.post(url, { userLogin: props.login }, config)
+    .then((response: any)=> {
+
+      setProfile(response.data);
+    })
+    .catch((err)=> {
+      toast.error('User not found');
+    })
   };
 
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
-		if (!token) props.router.push('/');
-		else {
-			const decodedToken = JSON.parse(atob(token.split('.')[1]));
-			const exp = decodedToken.exp;
-			const current_time = Date.now() / 1000;
-			if (exp < current_time) {
-				localStorage.removeItem('jwtToken');
-				props.router.push('/');
-			} else getUserData();
+    if (!token) props.router.push('/');
+    else {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      const exp = decodedToken.exp;
+      const current_time = Date.now() / 1000;
+      if (exp < current_time) {
+        localStorage.removeItem('jwtToken');
+        props.router.push('/');
+      } else getUserData();
     }
   }, [props.login]);
   return (
     <div className="h-full w-full NeonShadowBord flex flex-col ">
-      {
-        props.state == -2 ? 
+      {props.state == -2 ? (
         <div className=" flex flex-col space-y-2 w-full h-[80%] items-center justify-center">
-        <h1>Loading</h1>
-        <div className="spinner"></div>
-        </div>:
-      <>
-      <div
-        className={`w-full ${
-          props.state == 1 ? 'h-1/5' : 'h-1/2'
-        } flex justify-center items-center text-xs  xl:text-xl`}
-      >
-        {props.state == 0 || props.state == 3
-          ? `Add ${props.login} to your friends list!`
-          : props.state == 2
-          ? `You have a friend request from ${props.login} :`
-          : 'All time stats'}
-      </div>
-      <div
-        className={`w-full ${
-          props.state == 1 ? 'h-4/5' : 'h-1/2'
-        }   flex justify-center items-start`}
-      >
-        {props.state == 0 || props.state == 3 ? (
-          <div className="w-1/2 h-[50%]" onClick={handleAdd}>
-            {!flag ? (
-              <SimpleButton content="Add friend" buttonType="button" />
+          <h1>Loading</h1>
+          <div className="spinner"></div>
+        </div>
+      ) : (
+        <>
+          <div
+            className={`w-full ${
+              props.state == 1 ? 'h-1/5' : 'h-1/2'
+            } flex justify-center items-center text-xs  xl:text-xl`}
+          >
+            {props.state == 0 || props.state == 3
+              ? `Add ${props.login} to your friends list!`
+              : props.state == 2
+              ? `You have a friend request from ${props.login} :`
+              : 'All time stats'}
+          </div>
+          <div
+            className={`w-full ${
+              props.state == 1 ? 'h-4/5' : 'h-1/2'
+            }   flex justify-center items-start`}
+          >
+            {props.state == 0 || props.state == 3 ? (
+              <div className="w-1/2 h-[50%]" onClick={handleAdd}>
+                {!flag ? (
+                  <SimpleButton content="Add friend" buttonType="button" />
+                ) : (
+                  <div className="bg-[#272727] hover:cursor-pointer redShadowBord text-[#00B2FF] blueShadow  transition-all duration-500 text-sm md:text-lg lg:text-xl h-full w-full  font-Orbitron flex justify-center items-center">
+                    Requested
+                  </div>
+                )}
+              </div>
+            ) : props.state == 2 ? (
+              <div className="w-[70%] h-[50%] flex flex-row items-start justify-around space-x-3">
+                <SimpleButton buttonType="button" content="Accept" handleClick={handleAccept} />
+                <SimpleButton buttonType="button" content="Delete" handleClick={handleDelete} />
+              </div>
             ) : (
-              <div className="bg-[#272727] hover:cursor-pointer redShadowBord text-[#00B2FF] blueShadow  transition-all duration-500 text-sm md:text-lg lg:text-xl h-full w-full  font-Orbitron flex justify-center items-center">
-                Requested
+              <div className="w-[70%] h-[90%] flex flex-col justify-center space-y-4 text-xs md:text-base xl:text-xl">
+                <div className="flex flex-row justify-between">
+                  Matches played
+                  <div>{profile.numberOfGamesPlayed}</div>
+                </div>
+                <div className="flex flex-row justify-between">
+                  Matches won
+                  <div>{profile.numberOfGamesWon}</div>
+                </div>
+                <div className="flex flex-row justify-between">
+                  Matches lost
+                  <div>{profile.numberOfGamesPlayed - profile.numberOfGamesWon}</div>
+                </div>
+                <div className="flex flex-row justify-between">
+                  Level
+                  <div>{profile.level}</div>
+                </div>
               </div>
             )}
           </div>
-        ) : props.state == 2 ? (
-          <div className="w-[70%] h-[50%] flex flex-row items-start justify-around space-x-3">
-            <SimpleButton buttonType="button" content="Accept" handleClick={handleAccept} />
-            <SimpleButton buttonType="button" content="Delete" handleClick={handleDelete} />
-          </div>
-        ) : (
-          <div className="w-[70%] h-[90%] flex flex-col justify-center space-y-4 text-xs md:text-base xl:text-xl">
-            <div className="flex flex-row justify-between">
-              Matches played
-              <div>{profile.numberOfGamesPlayed}</div>
-            </div>
-            <div className="flex flex-row justify-between">
-              Matches won
-              <div>{profile.numberOfGamesWon}</div>
-            </div>
-            <div className="flex flex-row justify-between">
-              Matches lost
-              <div>{profile.numberOfGamesPlayed - profile.numberOfGamesWon}</div>
-            </div>
-            <div className="flex flex-row justify-between">
-              Level
-              <div>{profile.level}</div>
-            </div>
-          </div>
-        )}
-      </div>
-      
-      </>
-}
+        </>
+      )}
     </div>
   );
 }

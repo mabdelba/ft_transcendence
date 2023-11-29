@@ -3,7 +3,7 @@ import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/20/solid';
 import Achievement from '../shapes/Achievement';
 import Pdp from '../shapes/Pdp';
-import alien from '../../../public/alien.svg'
+import alien from '../../../public/alien.svg';
 
 type newType = {
   title: string;
@@ -40,8 +40,8 @@ function DiscloComp(props: newType) {
                 } gap-1 2xl:gap-4`}
               >
                 {props.divArray &&
-                  props.divArray.map((divName: any) => (
-                    <div key={divName.id}>
+                  props.divArray.map((divName: any, index : number) => (
+                    <div key={divName.id || index}>
                       {props.isFriend ? (
                         <Pdp
                           name={divName.login}

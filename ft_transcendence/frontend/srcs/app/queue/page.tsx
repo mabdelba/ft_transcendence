@@ -1,5 +1,5 @@
-'use client'
-import * as React from 'react'
+'use client';
+import * as React from 'react';
 import Image from 'next/image';
 import LightMap from '../../public/lightmap.svg';
 import DarkMap from '../../public/darkmap.svg';
@@ -16,11 +16,11 @@ import axios from 'axios';
 import { availableParallelism } from 'os';
 
 function Queue() {
-    const [isOpen, setIsOpen] = useState(false);
-    const {user, setUser} = useContext(context);
-    const { socket } = useContext(SocketContext);
-    const router = useRouter();
-    // const [map, setMap] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const { user, setUser } = useContext(context);
+  const { socket } = useContext(SocketContext);
+  const router = useRouter();
+  // const [map, setMap] = useState('');
 
     const toggleModal = (mode: string) => {
       // setMap(mode);
@@ -49,126 +49,114 @@ function Queue() {
       setIsOpen(false);
     }
 
-    useEffect(() => {
-      if(!user.socket || (user.socket as Socket).connected == false){
-          let socket: Socket = io('http://localhost:3001', {
-              auth: {
-                  token: localStorage.getItem('jwtToken'),
-              },
-          });
-
-          socket.on('connect', () => {
-              console.log('connectedff', socket.id );
-          });
-          const usersocket : User = user;
-          usersocket.socket = socket;
-          setUser(usersocket);
-      }
-      socket?.on('cancelInvite',() => {
-        user.socket?.emit('CancelGame');
-        const _user : User = user;
-        _user.opponent = '';
-        _user.gameType = '';
-        setUser(_user);
-        setIsOpen(false);
+  useEffect(() => {
+    if (!user.socket || (user.socket as Socket).connected == false) {
+      const socket: Socket = io('http://localhost:3001', {
+        auth: {
+          token: localStorage.getItem('jwtToken'),
+        },
       });
 
-      user.socket?.on('already connected', () => {
-          console.log('already connected');
-          router.push('/dashboard');
+      socket.on('connect', () => {
+        console.log('connectedff', socket.id);
       });
+      const usersocket: User = user;
+      usersocket.socket = socket;
+      setUser(usersocket);
+    }
+    socket?.on('cancelInvite', () => {
+      user.socket?.emit('CancelGame');
+      const _user: User = user;
+      _user.opponent = '';
+      _user.gameType = '';
+      setUser(_user);
+      setIsOpen(false);
+    });
 
-    }, [user.socket]);
-  
-    useEffect(()=> {
-      if(!user.login && socket){
-  
-        const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
-        const token = localStorage.getItem('jwtToken');
-        const config = {
-          headers: { Authorization: `Bearer ${token}` },
-        };
-        axios.get(apiUrl, config)
-        .then((response : any) => {
-          const _user = response.data;
-          socket.emit('inGame', { token: localStorage.getItem('jwtToken') });
-          _user.state = 2;
-          setUser(_user);
-        })
-      }
-    }, [socket])
+    user.socket?.on('already connected', () => {
+      console.log('already connected');
+      router.push('/dashboard');
+    });
+  }, [user.socket]);
 
-    useEffect(() => {
-      return () => {
-        socket?.emit('cancel-notif', {login: user.opponent});
-        // user.socket?.emit('CancelGame');
-        const _user : User = user;
-        _user.opponent = '';
-        _user.gameType = '';
+  useEffect(() => {
+    if (!user.login && socket) {
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+      const token = localStorage.getItem('jwtToken');
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      axios.get(apiUrl, config).then((response: any) => {
+        const _user = response.data;
+        socket.emit('inGame', { token: localStorage.getItem('jwtToken') });
+        _user.state = 2;
         setUser(_user);
-        console.log('unmount');
-      }
-    }, [])
+      });
+    }
+  }, [socket]);
 
+  useEffect(() => {
+    return () => {
+      socket?.emit('cancel-notif', { login: user.opponent });
+      // user.socket?.emit('CancelGame');
+      const _user: User = user;
+      _user.opponent = '';
+      _user.gameType = '';
+      setUser(_user);
+      console.log('unmount');
+    };
+  }, []);
 
-
-    return (
-      <>
-        <div className='flex flex-col items-center h-screen justify-center'>
-          <h1 className='font-Orbitron NeonShadow text-[30px] mb-[30px]'>Choose a map</h1>
-          <div className='flex content-center justify-center'>
-            <button className='' onClick={()=>toggleModal('white')}>
-              <Image src={LightMap} alt="LightMap" />
-            </button>
-            <button className='' onClick={()=>toggleModal('black')}>
-              <Image src={DarkMap} alt="DarkMap" />
-            </button>
-          </div>
+  return (
+    <>
+      <div className="flex flex-col items-center h-screen justify-center">
+        <h1 className="font-Orbitron NeonShadow text-[30px] mb-[30px]">Choose a map</h1>
+        <div className="flex content-center justify-center">
+          <button className="" onClick={() => toggleModal('white')}>
+            <Image src={LightMap} alt="LightMap" />
+          </button>
+          <button className="" onClick={() => toggleModal('black')}>
+            <Image src={DarkMap} alt="DarkMap" />
+          </button>
         </div>
-        {isOpen && (
-          <Transition appear show={isOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-10" onClose={()=>{}}>
-              <div className="fixed inset-0 overflow-y-auto">
-                <div className="flex justify-center items-center bg-opacity-40 bg-[#282828] w-screen h-screen">
-                  <Transition.Child
-                    as={Fragment}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0 scale-95"
-                    enterTo="opacity-100 scale-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100 scale-100"
-                    leaveTo="opacity-0 scale-95"
-                  >
-                    <Dialog.Panel className="font-Orbitron NeonShadow px-6 py-1 flex flex-col justify-center items-center min-w-[280px] min-h-[479px] w-full h-[50%] md:w-2/3  lg:w-1/3  bg-black NeonShadowBord">
-                      <div className='text-[35px]'>Waiting for opponents</div>
+      </div>
+      {isOpen && (
+        <Transition appear show={isOpen} as={Fragment}>
+          <Dialog as="div" className="relative z-10" onClose={() => {}}>
+            <div className="fixed inset-0 overflow-y-auto">
+              <div className="flex justify-center items-center bg-opacity-40 bg-[#282828] w-screen h-screen">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <Dialog.Panel className="font-Orbitron NeonShadow px-6 py-1 flex flex-col justify-center items-center min-w-[280px] min-h-[479px] w-full h-[50%] md:w-2/3  lg:w-1/3  bg-black NeonShadowBord">
+                    <div className="text-[35px]">Waiting for opponents</div>
 
+                    <Loader />
 
-
-
-
-                      <Loader />
-
-
-
-
-
-                      <button className='NeonShadow flex items-center justify-center NBord Boxshad h-[68px] w-[196px] text-[20px] hover:bg-white hover:text-black duration-300'onClick={()=>{checkCancel()}}>
-                        <Image
-                          src={Logout}
-                          alt='Logout'
-                          className='mr-3'
-                        />
-                        <div>Cancel</div>
-                      </button>
-                    </Dialog.Panel>
-                  </Transition.Child>
-                </div>
+                    <button
+                      className="NeonShadow flex items-center justify-center NBord Boxshad h-[68px] w-[196px] text-[20px] hover:bg-white hover:text-black duration-300"
+                      onClick={() => {
+                        checkCancel();
+                      }}
+                    >
+                      <Image src={Logout} alt="Logout" className="mr-3" />
+                      <div>Cancel</div>
+                    </button>
+                  </Dialog.Panel>
+                </Transition.Child>
               </div>
-            </Dialog>
-          </Transition>
-        )}
-      </>
-    )
+            </div>
+          </Dialog>
+        </Transition>
+      )}
+    </>
+  );
 }
 
 export default Queue;

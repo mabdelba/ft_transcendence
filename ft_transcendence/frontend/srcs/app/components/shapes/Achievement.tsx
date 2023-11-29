@@ -14,12 +14,14 @@ function Achievement(props: newType) {
         props.color ? 'blueShadow text-[#00B2FF]' : 'text-[#FF0742] redShadow'
       }`}
     >
+      <abbr title="rbehti telaja dial saboun">
       <Image
         src={props.color ? blueAchiev : redAchiev}
         alt="achievment"
         className="w-auto h-auto"
       />
       {props.name}
+      </abbr>
     </div>
   );
 }
