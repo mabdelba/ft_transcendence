@@ -28,23 +28,27 @@ function LastMatch(props: newType) {
       try {
         const res = await axios.post(lastMatchUrl, { userLogin: props.login }, config);
 
-        const user__ = await axios.post(
-          'http://localhost:3000/api/atari-pong/v1/user/avatar',
-          { userLogin: res.data.other },
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-            responseType: 'blob',
-          },
-        );
-        const imageBlob = URL.createObjectURL(user__.data) as string;
-        setOtherAvatar(imageBlob);
-        setMatchData(res.data);
-        if (!props.myProfile) {
-          const _user: User = user;
-          _user.matchData = res.data;
-          _user.otherProfileAvatar = imageBlob;
-          setUser(_user);
+        try{
+
+          const user__ = await axios.post(
+            'http://localhost:3000/api/atari-pong/v1/user/avatar',
+            { userLogin: res.data.other },
+            {
+              headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+              responseType: 'blob',
+            },
+          );
+          const imageBlob = URL.createObjectURL(user__.data) as string;
+          setOtherAvatar(imageBlob);
+          setMatchData(res.data);
+          if (!props.myProfile) {
+            const _user: User = user;
+            _user.matchData = res.data;
+            _user.otherProfileAvatar = imageBlob;
+            setUser(_user);
+          }
         }
+        catch(e){}
       } catch (err) {
         // console.log(err);
       }

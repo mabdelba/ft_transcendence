@@ -33,8 +33,12 @@ function SearchBar(prop: SearchBarProps) {
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
-    const res = await fetch(apiUrl, config);
-    return res.json();
+    try{
+
+      const res = await fetch(apiUrl, config);
+      return res.json();
+    }
+    catch(e){}
   };
 
   const fetchChannels = async () => {
@@ -43,8 +47,10 @@ function SearchBar(prop: SearchBarProps) {
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
-    const res = await fetch(apiUrl, config);
-    return res.json();
+    try{
+      const res = await fetch(apiUrl, config);
+      return res.json();
+    } catch(e){}
   };
 
   const fetchData = async (value: string) => {

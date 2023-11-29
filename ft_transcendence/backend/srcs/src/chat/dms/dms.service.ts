@@ -116,6 +116,12 @@ export class DmsService {
           }),
         ); 
       } else {
+        const blockedList = await this.blockedList(data.receiverLogin);
+        const blockedListLogins = blockedList.blockedList.map((user) => user.login);
+        const blockedByLogins = blockedList.blockedBy.map((user)=> user.login);
+        const allBlocked = [...blockedByLogins , ...blockedListLogins]
+        if (allBlocked.includes(data.senderLogin))
+          return ;
         if (this.getClientFromLogin(data.receiverLogin, users) !== null) 
           io.sockets.sockets.get(this.getClientFromLogin(data.receiverLogin, users)).join(roomName);
         client.to(roomName).emit('receive-message', data);
@@ -136,7 +142,7 @@ export class DmsService {
         });
       }
     } catch (e) {
-     throw new ForbiddenException('User not found');
+      new ForbiddenException('User not found');
     }
   }
 
@@ -302,7 +308,7 @@ export class DmsService {
     // console.log('users with conversation == ', users );
     return users;
   } catch (e) {
-   throw new ForbiddenException('User not found');
+    new ForbiddenException('User not found');
   }
   }
 
@@ -331,7 +337,7 @@ export class DmsService {
     return messagesWithoutBlocked;
   }
   catch (e) {
-   throw new ForbiddenException('User not found');
+    new ForbiddenException('User not found');
   }
   }
 }

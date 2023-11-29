@@ -38,3 +38,6 @@ coverage
 !.vscode/extensions.json
 
 migrations
+
+# envirement file
+.env

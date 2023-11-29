@@ -7,6 +7,7 @@ import {
   useState,
   Fragment,
   MouseEventHandler,
+  cache,
 } from 'react';
 import OptionBar from '../components/forms/OptionBar';
 import ListBox from '../components/buttons/ListBox';
@@ -104,7 +105,7 @@ function Messages() {
           toast.dismiss();
         });
         setUser(_user);
-      });
+      }).catch(()=>{});
     }
   }, [socket]);
 
@@ -133,7 +134,7 @@ function Messages() {
       setDescripion('');
       toast.success('Changes saved successfully!');
       setOpenSettingModal(false);
-    });
+    }).catch(()=>{});
   };
   useEffect(() => {
     if (selected == 1 && roomSelected != '') {
@@ -233,50 +234,56 @@ function Messages() {
   const handleSend = (e: any) => {
     e.preventDefault();
     // alert(`message to ${roomSelected} : ${message}`);
+    
     if (message != '' && roomSelected != '') {
-      socket.emit('send-message', {
-        isChannel: selected == 1 ? true : false,
-        senderLogin: user.login,
-        receiverLogin: roomSelected,
-        text: message,
-        senderAvatar: user.avatarUrl,
-        state: user.state,
-      });
-      const _chatArea = [
-        ...chatArea,
-        { sender: user.login, reciever: roomSelected, text: message },
-      ];
-      setChatArea(_chatArea);
-      //   setChangeList(false);
-      setMessage('');
-      if (selected == 0 && conversations[0].login != roomSelected) {
-        const tempConversation = conversations;
-        const indexOfElementToMove = tempConversation.findIndex(
-          (obj: any) => obj.login == roomSelected,
-        );
-        const elementToMove = tempConversation[indexOfElementToMove];
-        if (indexOfElementToMove != -1) {
-          tempConversation.splice(indexOfElementToMove, 1);
-          tempConversation.unshift(elementToMove);
-          const _user: User = { ...user };
-          _user.conversations = tempConversation;
-          setUser(_user);
-          setConversations(tempConversation);
-        }
-      } else if (selected == 1 && groups[0].name != roomSelected) {
-        const tempGroup = groups;
-        const indexOfElementToMove = tempGroup.findIndex((obj: any) => obj.name == roomSelected);
-        const elementToMove = tempGroup[indexOfElementToMove];
-        if (indexOfElementToMove != -1) {
-          tempGroup.splice(indexOfElementToMove, 1);
-          tempGroup.unshift(elementToMove);
-          const _user: User = { ...user };
-          _user.groups = tempGroup;
-          setUser(_user);
-          setGroups(tempGroup);
+        try{
+        socket.emit('send-message', {
+          isChannel: selected == 1 ? true : false,
+          senderLogin: user.login,
+          receiverLogin: roomSelected,
+          text: message,
+          senderAvatar: user.avatarUrl,
+          state: user.state,
+        })
+      }
+      catch(e){
+        console.log("catchiteeeek=============");
+      }
+        const _chatArea = [
+          ...chatArea,
+          { sender: user.login, reciever: roomSelected, text: message },
+        ];
+        setChatArea(_chatArea);
+        //   setChangeList(false);
+        setMessage('');
+        if (selected == 0 && conversations[0].login != roomSelected) {
+          const tempConversation = conversations;
+          const indexOfElementToMove = tempConversation.findIndex(
+            (obj: any) => obj.login == roomSelected,
+          );
+          const elementToMove = tempConversation[indexOfElementToMove];
+          if (indexOfElementToMove != -1) {
+            tempConversation.splice(indexOfElementToMove, 1);
+            tempConversation.unshift(elementToMove);
+            const _user: User = { ...user };
+            _user.conversations = tempConversation;
+            setUser(_user);
+            setConversations(tempConversation);
+          }
+        } else if (selected == 1 && groups[0].name != roomSelected) {
+          const tempGroup = groups;
+          const indexOfElementToMove = tempGroup.findIndex((obj: any) => obj.name == roomSelected);
+          const elementToMove = tempGroup[indexOfElementToMove];
+          if (indexOfElementToMove != -1) {
+            tempGroup.splice(indexOfElementToMove, 1);
+            tempGroup.unshift(elementToMove);
+            const _user: User = { ...user };
+            _user.groups = tempGroup;
+            setUser(_user);
+            setGroups(tempGroup);
+          }
         }
       }
-    }
   };
 
   // useEffect(()=>{

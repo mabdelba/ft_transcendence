@@ -345,9 +345,7 @@ export class ChannelsService {
             },
           });
         } else
-          throw new ForbiddenException(
-            'You are not owner of this channel and you want to remove admin',
-          );
+          return ;
       } else if (isOtherMember) {
         if (isAdmin || isOwner) {
           await this.prismaservice.channel.update({
@@ -372,7 +370,7 @@ export class ChannelsService {
               },
             },
           });
-        } else throw new ForbiddenException('You are not admin or owner of this channel');
+        } else return ;
     }
       }
       client.to(dto.channelName).emit('user-removed-from-channel', {login: userToRemove, channelName: dto.channelName});
@@ -389,7 +387,7 @@ export class ChannelsService {
         }
       })
     } catch (e) {
-       throw new ForbiddenException('Channel not found');
+        new ForbiddenException('Channel not found');
     }
   }
 
@@ -474,7 +472,7 @@ export class ChannelsService {
           },
         },
       });
-    } else throw new ForbiddenException('You are not admin or owner of this channel');
+    } else return ;
     client.to(dto.channelName).emit('user-unbanned-from-channel',  {login: dto.otherLogin, channelName: dto.channelName});
   }
 
@@ -553,10 +551,10 @@ export class ChannelsService {
             name: dto.channelName,
           },
         });
-      } else throw new ForbiddenException('You are not owner of this channel');
+      } else return ;
       client.to(dto.channelName).emit('channel-removed',  {channelName: dto.channelName});
     } catch (e) {
-       throw new ForbiddenException('Channel not found');
+        new ForbiddenException('Channel not found');
     }
   }
 
@@ -745,7 +743,7 @@ export class ChannelsService {
         );
         return channelsWithConversation;
     } catch (e) {
-       throw new ForbiddenException('Channel not found');
+        new ForbiddenException('Channel not found');
     }
   }
 }

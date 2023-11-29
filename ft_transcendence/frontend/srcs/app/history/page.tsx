@@ -12,12 +12,14 @@ import InviteToast from '../components/shapes/invitetoast';
 import { toast } from 'react-toastify';
 
 const fetchHistory = async () => {
+  try{
   const res = await fetch('http://localhost:3000/api/atari-pong/v1/history', {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
     },
   });
   return res.json();
+} catch(e){}
 };
 
 function History() {
@@ -55,7 +57,7 @@ function History() {
           toast.dismiss();
         });
         setUser(_user);
-      });
+      }).catch(()=>{});
     }
   });
 

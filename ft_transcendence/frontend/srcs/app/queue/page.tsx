@@ -93,7 +93,7 @@ function Queue() {
         socket.emit('inGame', { token: localStorage.getItem('jwtToken') });
         _user.state = 2;
         setUser(_user);
-      });
+      }).catch(()=>{});
     }
   }, [socket]);
 

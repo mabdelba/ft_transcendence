@@ -16,31 +16,39 @@ import InviteToast from '../components/shapes/invitetoast';
 
 const fetchRequestList = async () => {
   const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-requests-list';
-  const res = await fetch(urlreq, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
-    },
-  });
-  return res.json();
+  try{
+    const res = await fetch(urlreq, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+      },
+    });
+    return res.json();
+  } catch(e){}
 };
 const fetchFriendList = async () => {
   const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-list';
+  try{
   const res = await fetch(urlreq, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
     },
   });
   return res.json();
+} catch(e){}
+
 };
 
 const fetchBlockedList = async () => {
   const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/blocked-user-list';
+  try{
   const res = await fetch(urlreq, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
     },
   });
   return res.json();
+} catch(e){}
+
 };
 
 function Friends() {
@@ -79,7 +87,7 @@ function Friends() {
           toast.dismiss();
         });
         setUser(_user);
-      });
+      }).catch(()=>{});
     }
   });
 

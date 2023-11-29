@@ -64,10 +64,10 @@ function MyMenu(props: {
       _user.conversations = tempConv;
       _user.groups = undefined;
       if (_user.blockedList != undefined) _user.blockedList.push(newBlocked);
-      const indexF = _user.friendList.findIndex((obj: any) => obj.login == props.roomSelected);
+      const indexF = _user.friendList?.findIndex((obj: any) => obj.login == props.roomSelected);
       if (indexF != -1) {
         const temFiend = _user.friendList;
-        temFiend.splice(indexF, 1);
+        temFiend?.splice(indexF, 1);
         _user.friendList = temFiend;
       }
       setUser(_user);

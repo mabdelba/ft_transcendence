@@ -12,21 +12,29 @@ import InviteToast from '../components/shapes/invitetoast';
 const OptionBar = dynamic(() => import('../components/forms/OptionBar'), { ssr: false });
 
 const fetchAchivements = async () => {
-  const res = await fetch('http://localhost:3000/api/atari-pong/v1/achievements/all-acquired', {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
-    },
-  });
-  return res.json();
+  try{
+    const res = await fetch('http://localhost:3000/api/atari-pong/v1/achievements/all-acquired', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
+      },
+    });
+    return res.json();
+  } catch(e){
+    
+  }
 };
 
 const fetchUnacquiredAchiev = async () => {
-  const res = await fetch('http://localhost:3000/api/atari-pong/v1/achievements/all-unacquired', {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
-    },
-  });
-  return res.json();
+  try{
+    const res = await fetch('http://localhost:3000/api/atari-pong/v1/achievements/all-unacquired', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('jwtToken'),
+      },
+    });
+    return res.json();
+  } catch(e){
+
+  }
 };
 
 function Achievements() {
@@ -66,7 +74,7 @@ function Achievements() {
           toast.dismiss();
         });
         setUser(_user);
-      });
+      }).catch(()=> {});
     }
   });
   useEffect(() => {

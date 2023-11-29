@@ -5,18 +5,22 @@ services:
     build: ./backend
     container_name: backend
     image: backend
-    # volumes:
-    #   - ./backend/srcs:/app
+    networks:
+      - ft_transcendence
     ports:
-      - "3000:3000"
+      - "3000-3001:3000-3001"
     restart: always
 
   frontend:
     build: ./frontend
     container_name: frontend
     image: frontend
-    volumes:
-      - ./frontend/srcs:/app
+    networks:
+      - ft_transcendence
     ports:
       - "4000:4000"
     restart: always
+
+
+networks:
+  ft_transcendence:

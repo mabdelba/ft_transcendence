@@ -88,7 +88,7 @@ function Settings() {
             toast.dismiss();
           });
           setUser(_user);
-        });
+        }).catch(()=>{});
       } else {
         setId(user.id);
         setName(user.firstName);

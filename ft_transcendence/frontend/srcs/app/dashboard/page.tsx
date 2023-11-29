@@ -75,7 +75,7 @@ function Dashboard() {
         setUser(_user);
         setStatus('success');
       })
-      .catch();
+      .catch(()=>{});
   };
 
   useEffect(() => {

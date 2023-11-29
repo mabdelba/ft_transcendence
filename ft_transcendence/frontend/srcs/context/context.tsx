@@ -51,10 +51,12 @@ const Context = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User>({ conversations: [] });
   const [socket, setSocket] = useState<any>(null);
   useEffect(() => {
+    try{
     const sock = io('http://localhost:3000', {
       transports: ['websocket'],
     });
     setSocket(sock);
+  }catch(e){}
   }, []);
 
   return (
