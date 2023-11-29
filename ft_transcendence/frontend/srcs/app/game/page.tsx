@@ -95,7 +95,7 @@ const gamePage = () => {
                 _user.opponent = '';
                 _user.gameType = '';
                 _user.oppenentAvatar = '';
-                _user.login = undefined
+                // _user.login = undefined
                 setUser(user);
             }
         };
@@ -133,25 +133,13 @@ const handleLeave = () => {;
   useEffect(() => {
     if (gameEnded !== '') {
       setOpenModal(true);
-      // gameSocket?.off('GameState');
-      // gameSocket?.off('gameEnded');
-      // gameSocket?.off('left game');
-      // gameSocket?.off('connect');
-      // gameSocket?.off('disconnect');
+
       gameSocket?.disconnect();
       gameSocket?.close();
       game?.destroy();
     }
   }, [gameEnded]);
 
-  // fetchInfo()
-  //     .then((data) => {
-  //         setUsername(data.login);
-  //         // setAvatar(data.avatar);
-  //     })
-  //     .catch((error) => {
-  //         console.error('Error:', error);
-  //     });
 
   return (
     <>

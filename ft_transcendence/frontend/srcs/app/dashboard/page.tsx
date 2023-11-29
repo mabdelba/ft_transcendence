@@ -56,12 +56,11 @@ function Dashboard() {
         (_user.socket as Socket)?.disconnect();
         // }
         socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
-    
           toast(<InviteToast senderId={data.senderId} login={data.login} />, {
             position: 'top-center',
             autoClose: false,
             hideProgressBar: false,
-            closeOnClick: true,
+            closeOnClick: false,
             draggable: true,
             theme: 'dark',
           });

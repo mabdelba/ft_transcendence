@@ -29,7 +29,7 @@ function Queue() {
       setUser(_user);
       setIsOpen(true);
           user.socket?.emit('NewGame', {map: user.map, type: user.gameType, opponent: user.opponent});
-          if (user.login !== user.opponent){
+          if (user.login !== user.opponent && user.gameType == 'private'){
             socket?.emit('notification', {login: user.opponent, senderId: user.login});
           }
           user.socket?.on('ready', (opponent : any)=>{
@@ -45,6 +45,9 @@ function Queue() {
       user.socket?.emit('CancelGame');
       if(user.gameType == 'private'){
         socket?.emit('cancel-notif', {login: user.opponent});
+        const _user :User = user;
+        _user.gameType = '';
+        setUser(_user);
       }
       setIsOpen(false);
     }

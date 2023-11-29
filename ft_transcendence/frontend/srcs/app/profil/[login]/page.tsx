@@ -60,7 +60,7 @@ function UserProfil(props: newType) {
               position: 'top-center',
               autoClose: false,
               hideProgressBar: false,
-              closeOnClick: true,
+              closeOnClick: false,
               draggable: true,
               theme: 'dark',
             });
