@@ -496,3 +496,7 @@ input:checked + .slider:before {
   animation-iteration-count: 3;
   animation-delay: 0.4s;
 }
+
+.Toastify__close-button {
+  display: none;
+}

@@ -283,15 +283,11 @@ class GameModel{
                 },
               },
             });
-            return (
-              'You have acquired the achievement: ' + (await getAchievementFromId(achievementId)).name
-            );
+            return ;
           } else
-            return (
-              'You already have the achievement: ' + (await getAchievementFromId(achievementId)).name
-            );
+            return  ;
         } catch (e) {
-           throw new ForbiddenException('User not found')
+           new ForbiddenException('User not found')
         }
       }
 
@@ -299,7 +295,7 @@ class GameModel{
       async checkIfAchievementsAcquired(userLogin: string) {
         try{
           const user = await getUserFromLogin(userLogin);
-          if (user.numberOfGamesPlayed == 1) await this.checkIfAchievements(user.id, 1);
+          if (user.numberOfGamesPlayed == 1) return await this.checkIfAchievements(user.id, 1);
           if (user.level < 5 && user.level > 0) return await this.checkIfAchievements(user.id, 2);
           else if (user.level < 10 && user.level >= 5) return await this.checkIfAchievements(user.id, 3);
           else if (user.level < 15 && user.level >= 10) return await this.checkIfAchievements(user.id, 4);
@@ -330,7 +326,7 @@ class GameModel{
           else if (user.level < 100 && user.level >= 99)
             return await this.checkIfAchievements(user.id, 18);
         } catch (e) {
-           throw new ForbiddenException('User not found')
+          new ForbiddenException('User not found')
         }
       }
       async endGame(userLogin: string, opponentLogin: string, scoreP1: number, scoreP2: number) {
