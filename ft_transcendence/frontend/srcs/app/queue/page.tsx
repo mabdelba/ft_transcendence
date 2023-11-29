@@ -97,13 +97,11 @@ function Queue() {
 
   useEffect(() => {
     return () => {
-      socket?.emit('cancel-notif', { login: user.opponent });
-      // user.socket?.emit('CancelGame');
+      if(user.gameType == 'private')
+        socket?.emit('cancel-notif', { login: user.opponent });
       const _user: User = user;
-      _user.opponent = '';
       _user.gameType = '';
       setUser(_user);
-      console.log('unmount');
     };
   }, []);
 

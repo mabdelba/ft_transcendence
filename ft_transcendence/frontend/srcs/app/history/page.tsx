@@ -69,7 +69,7 @@ function History() {
       // });
 
       setMatches(data);
-
+      console.log('data********: ', data);
       const _user: User = user;
       _user.history = data;
       setUser(_user);

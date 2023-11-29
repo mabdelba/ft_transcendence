@@ -33,8 +33,8 @@ export class HistoryService {
           id: match.id,
           me: me.login,
           other: other.login,
-          myAvatar: getAvatarFromLogin(me.login),
-          otherAvatar: getAvatarUrlFromLogin(other.login),
+          myAvatar: null,
+          otherAvatar: getAvatarUrlFromLogin(other.login, other.avatar),
           myScore: me.login == match.player1Login ? match.scoreOfPlayer1 : match.scoreOfPlayer2,
           otherScore: other.login == match.player1Login ? match.scoreOfPlayer1 : match.scoreOfPlayer2,
         };
