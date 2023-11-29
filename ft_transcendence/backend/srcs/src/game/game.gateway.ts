@@ -198,11 +198,11 @@ export class GameGateway {
             const id2 = this.RandomGames[gameIndex].id2;
             if (socket.id == game.socket1.id){
                 game.socket2?.emit('gameEnded', {state: 'win'});
-                await game.endGame(id2, id1, 3, 0);
+                await game.endGame(id2, id1, 0, 3);
             }
             else if (socket.id == game.socket2.id){
                 game.socket1?.emit('gameEnded', {state: 'win'});
-                await game.endGame(id1, id2, 3, 0);
+                await game.endGame(id1, id2, 0, 3);
             }
             game.destroy();
             this.RandomGames.splice(gameIndex, 1);
@@ -213,11 +213,11 @@ export class GameGateway {
             const id2 = this.privateGame[privateIndex].id2;
             if (socket.id == pGame.socket1.id){
                 pGame.socket2?.emit('gameEnded', {state: 'win'});
-                await pGame.endGame(id2, id1, 3, 0);
+                await pGame.endGame(id2, id1, 0, 3);
             }
             else if (socket.id == pGame.socket2.id){
                 pGame.socket1?.emit('gameEnded', {state: 'win'});
-                await pGame.endGame(id1, id2, 3,0);
+                await pGame.endGame(id1, id2, 0,3);
             }
             pGame.destroy();
             this.privateGame.splice(privateIndex, 1);

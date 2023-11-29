@@ -108,7 +108,7 @@ const gamePage = () => {
 
 
 const handleLeave = () => {;
-    gameSocket?.emit('endGame')
+    (gameSocket as Socket)?.disconnect();
     game?.destroy();
     router.push('/dashboard');
 }
