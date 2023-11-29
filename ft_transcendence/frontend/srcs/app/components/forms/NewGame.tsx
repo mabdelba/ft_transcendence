@@ -3,9 +3,8 @@ import { useRouter } from 'next/navigation';
 import SimpleButton from '../buttons/simpleButton';
 import { useContext } from 'react';
 
-
 function NewGame() {
-  let router = useRouter();
+  const router = useRouter();
 
   return (
     <div className="h-full w-full NeonShadowBord flex flex-col ">
@@ -14,11 +13,13 @@ function NewGame() {
       </div>
       <div className="w-full h-[50%]  flex justify-center items-start">
         <div className="w-1/2 h-[50%]">
-          <SimpleButton content="New game" buttonType="button" handleClick={
-            () => {
+          <SimpleButton
+            content="New game"
+            buttonType="button"
+            handleClick={() => {
               router.push('/queue');
-            }
-          }/>
+            }}
+          />
         </div>
       </div>
     </div>

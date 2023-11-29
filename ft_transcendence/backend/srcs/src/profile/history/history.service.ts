@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { getAvatarFromLogin } from 'src/utils/get-avatar-from-login';
+import { getAvatarFromLogin, getAvatarUrlFromLogin } from 'src/utils/get-avatar-from-login';
 import { getUserFromId, getUserFromLogin } from 'src/utils/get-user-from-id';
 
 @Injectable()
@@ -34,7 +34,7 @@ export class HistoryService {
           me: me.login,
           other: other.login,
           myAvatar: getAvatarFromLogin(me.login),
-          otherAvatar: getAvatarFromLogin(other.login),
+          otherAvatar: getAvatarUrlFromLogin(other.login),
           myScore: me.login == match.player1Login ? match.scoreOfPlayer1 : match.scoreOfPlayer2,
           otherScore: other.login == match.player1Login ? match.scoreOfPlayer1 : match.scoreOfPlayer2,
         };

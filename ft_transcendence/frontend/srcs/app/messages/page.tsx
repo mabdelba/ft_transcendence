@@ -1,5 +1,13 @@
 'use client';
-import { useCallback, useContext, useEffect, useRef, useState, Fragment, MouseEventHandler } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  Fragment,
+  MouseEventHandler,
+} from 'react';
 import OptionBar from '../components/forms/OptionBar';
 import ListBox from '../components/buttons/ListBox';
 import { User, context, SocketContext } from '../../context/context';
@@ -26,7 +34,7 @@ import Upload from '../../public/uploadIcon.svg';
 import BlackUpload from '../../public/blackupload.svg';
 import { toast } from 'react-toastify';
 import { Socket } from 'socket.io-client';
-import Avatar from 'react-avatar'
+import Avatar from 'react-avatar';
 import InviteToast from '../components/shapes/invitetoast';
 
 type ChatText = {
@@ -63,30 +71,27 @@ function Messages() {
   const [groupMembers, setGroupMembers] = useState<any>([]);
   const [iAm, setIam] = useState('');
   const [roomSelectedType, setRoomSelectedType] = useState(0);
-  const [isMuted, setIsMuted] = useState(false)
+  const [isMuted, setIsMuted] = useState(false);
   const [userId, setUserId] = useState(0);
 
-
-  useEffect(()=> {
-    if(!user.login && socket){
-
+  useEffect(() => {
+    if (!user.login && socket) {
       const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
       const token = localStorage.getItem('jwtToken');
       const config = {
         headers: { Authorization: `Bearer ${token}` },
       };
-      axios.get(apiUrl, config)
-      .then((response : any) => {
+      axios.get(apiUrl, config).then((response: any) => {
         const _user = response.data;
         // if ( _user.state == 0) {
-          // console.log('hello hello hello');
-          socket.emit('online', { token: localStorage.getItem('jwtToken') });
-          _user.state = 1;
+        // console.log('hello hello hello');
+        socket.emit('online', { token: localStorage.getItem('jwtToken') });
+        _user.state = 1;
         // }
-        socket?.on('inviteToGame', (data: {senderId: string, login: string}) => {
+        socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
           console.log('inviteToGame');
-          toast(<InviteToast senderId={data.senderId} login={data.login}/>,{
-            position: "top-center",
+          toast(<InviteToast senderId={data.senderId} login={data.login} />, {
+            position: 'top-center',
             autoClose: false,
             hideProgressBar: false,
             closeOnClick: true,
@@ -95,47 +100,41 @@ function Messages() {
           });
         });
         socket?.on('cancelNotification', () => {
-          console.log('cancelNotification=======')
+          console.log('cancelNotification=======');
           toast.dismiss();
         });
         setUser(_user);
-
-      })
+      });
     }
-  }, [socket])
+  }, [socket]);
 
   const handleImage = (e: any) => {
     setFilename(e.target.files[0].name);
     setAvatarToUpload(e.target.files[0]);
   };
- 
 
-  const handleChangeSettings = (e: any)=>{
-
+  const handleChangeSettings = (e: any) => {
     e.preventDefault();
-    const apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/update-channel-password";
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/update-channel-password';
     const token = localStorage.getItem('jwtToken');
-    const config ={
-      headers : {Authorization: `Bearer ${token}`}
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
     };
-    axios.post(apiUrl, {channelName: roomSelected, password: description}, config)
-    .then(()=>{
+    axios.post(apiUrl, { channelName: roomSelected, password: description }, config).then(() => {
       const tempConv = user.groups;
-      const index = tempConv.findIndex((obj: any)=> obj.name == roomSelected)
-      if(index != -1){
-        if(roomSelectedType == 0 && description != '')
-          tempConv[index].type = 2;
-        else if(roomSelectedType == 2 && description == '')
-          tempConv[index].type = 0;
-        const _user :User =  user;
+      const index = tempConv.findIndex((obj: any) => obj.name == roomSelected);
+      if (index != -1) {
+        if (roomSelectedType == 0 && description != '') tempConv[index].type = 2;
+        else if (roomSelectedType == 2 && description == '') tempConv[index].type = 0;
+        const _user: User = user;
         _user.groups = tempConv;
         setUser(user);
       }
       setDescripion('');
       toast.success('Changes saved successfully!');
       setOpenSettingModal(false);
-    })
-  }
+    });
+  };
   useEffect(() => {
     if (selected == 1 && roomSelected != '') {
       setGroupMembers([]);
@@ -154,7 +153,7 @@ function Messages() {
           // console.log('for debug: ', response.data)
           response.data.owner.state = 'owner';
 
-          response.data.admins.forEach( async (obj: any) => {
+          response.data.admins.forEach(async (obj: any) => {
             obj.state = 'admin';
           });
           response.data.members.forEach(async (obj: any) => {
@@ -190,7 +189,7 @@ function Messages() {
         .then((response: any) => {
           const tempGroup = [
             ...groups,
-            { name: groupName, ownerLogin: user.login, type: groupType, whoIam : 'owner' },
+            { name: groupName, ownerLogin: user.login, type: groupType, whoIam: 'owner' },
           ];
           setGroups(tempGroup);
           const _user: User = { ...user, groups: tempGroup };
@@ -307,7 +306,7 @@ function Messages() {
     if (socket) {
       if (user.groups == undefined) {
         const _user: User = user;
-        socket.emit('channels-with-conversation', { channelName: user.login  });
+        socket.emit('channels-with-conversation', { channelName: user.login });
         socket.on('get-channels', (data: any) => {
           // console.log("zidch:================================================= ", data);
           setGroups(data);
@@ -316,97 +315,87 @@ function Messages() {
         });
       } else setGroups(user.groups);
       socket.on('user-removed-from-channel', (data: any) => {
-        if(data.login == user.login)
-        {
+        if (data.login == user.login) {
           // console.log(groups);
-          const index = groups.findIndex((obj:any) => obj.name == data.channelName);
+          const index = groups.findIndex((obj: any) => obj.name == data.channelName);
           // console.log('index: ', index);
-          if(index != -1)
-          {
-            if(selected ==1)
-              setShowArray([])
-            const _user : User = user;
+          if (index != -1) {
+            if (selected == 1) setShowArray([]);
+            const _user: User = user;
             _user.groups = undefined;
             setUser(_user);
             // toast.warning(`You have been kicked from ${data.channelName}`)
           }
         }
-      })
+      });
       socket.on('user-banned-from-channel', (data: any) => {
-        if(data.login == user.login)
-        {
+        if (data.login == user.login) {
           // console.log(groups);
-          const index = groups.findIndex((obj:any) => obj.name == data.channelName);
+          const index = groups.findIndex((obj: any) => obj.name == data.channelName);
           // console.log('index: ', index);
-          if(index != -1)
-          {
-            if(selected ==1)
-              setShowArray([])
-            const _user : User = user;
+          if (index != -1) {
+            if (selected == 1) setShowArray([]);
+            const _user: User = user;
             _user.groups = undefined;
             setUser(_user);
             // toast.warning(`You have been banned from ${data.channelName}`)
           }
         }
-      })
-      socket.on('user-muted-in-channel', (data:any)=>{
-        if(data.login == user.login){
-
-          const index = groups.findIndex((obj: any) => obj.name == data.channelName)
-          if(index != -1){
-            if(selected ==1)
-              setShowArray([])
+      });
+      socket.on('user-muted-in-channel', (data: any) => {
+        if (data.login == user.login) {
+          const index = groups.findIndex((obj: any) => obj.name == data.channelName);
+          if (index != -1) {
+            if (selected == 1) setShowArray([]);
             const _user = user;
             _user.groups = undefined;
-            setUser(_user)
+            setUser(_user);
           }
         }
-      })
-      socket.on('channel-removed', (data:any)=> {
-        const index = groups.findIndex((obj: any) => obj.name == data.channelName)
-        if(index != -1){
-          setShowArray([])
+      });
+      socket.on('channel-removed', (data: any) => {
+        const index = groups.findIndex((obj: any) => obj.name == data.channelName);
+        if (index != -1) {
+          setShowArray([]);
           const _user = user;
           _user.groups = undefined;
-          setUser(_user)
+          setUser(_user);
         }
-      })
-      return ()=> {socket.off('user-removed-from-channel')
-        socket.off('user-banned-from-channel')  
-        socket.off('user-muted-in-channel')
-        socket.off('channel-removed')
-    }
+      });
+      return () => {
+        socket.off('user-removed-from-channel');
+        socket.off('user-banned-from-channel');
+        socket.off('user-muted-in-channel');
+        socket.off('channel-removed');
+      };
     }
   };
   const usersWithConversation = async () => {
     if (socket) {
       if (!user.conversations || (user.conversations.length == 1 && user.conversations.isFrd)) {
         const _user: User = { ...user };
-      //  console.log('fles message: ', user.conversations);
-       socket.emit('users-with-conversation', { login: user.login || 'mabdelba' });
-       socket.on('get-users', (data: any) => {
-        //  console.log('data users,', data)
-         if (user && user.conversations && user.conversations.length == 1) {
-           const uLogin : string = user.conversations[0].login
-           data.map((obj: any) => {
-             if (obj.login != uLogin)
-             user.conversations = [...user.conversations, obj];
-          });
-          setUser(user);
-          setConversations(user.conversations);
-          // setRoomSelected(uLogin)
-        } else if(!user.conversations || user.conversations.length == 0){
-          _user.conversations = data;
-          setUser(_user);
-          setConversations(_user.conversations)
-        } 
-        // console.log('fles message wra : ', user.conversations);
-            
+        //  console.log('fles message: ', user.conversations);
+        socket.emit('users-with-conversation', { login: user.login || 'mabdelba' });
+        socket.on('get-users', (data: any) => {
+          //  console.log('data users,', data)
+          if (user && user.conversations && user.conversations.length == 1) {
+            const uLogin: string = user.conversations[0].login;
+            data.map((obj: any) => {
+              if (obj.login != uLogin) user.conversations = [...user.conversations, obj];
+            });
+            setUser(user);
+            setConversations(user.conversations);
+            // setRoomSelected(uLogin)
+          } else if (!user.conversations || user.conversations.length == 0) {
+            _user.conversations = data;
+            setUser(_user);
+            setConversations(_user.conversations);
+          }
+          // console.log('fles message wra : ', user.conversations);
+
           // console.log("nchufo hadi", _user.conversations);
-          
         });
       } else setConversations(user.conversations);
-   
     }
   };
   // const [friendList, setFriendList] = useState(user.friendList);
@@ -420,7 +409,7 @@ function Messages() {
       ]);
     if (selected == 0) {
       // console.log('heeeereeeeeee');
-      
+
       const tempConversation = conversations;
       const indexOfElementToMove = tempConversation.findIndex(
         (obj: any) => obj.login == data.senderLogin || obj.login == data.receiverLogin,
@@ -435,7 +424,12 @@ function Messages() {
         setConversations(tempConversation);
       } else {
         // tempConversation.splice(indexOfElementToMove, 1);
-        tempConversation.unshift({login: data.senderLogin, avatar: 'avatar', avatarUrl: data.senderAvatar, state: 1});
+        tempConversation.unshift({
+          login: data.senderLogin,
+          avatar: 'avatar',
+          avatarUrl: data.senderAvatar,
+          state: 1,
+        });
         const _user: User = { ...user };
         _user.conversations = tempConversation;
         setUser(_user);
@@ -445,7 +439,7 @@ function Messages() {
         //   avatar: data.senderAvatar,
         //   state: data.state,
         // });
-        
+
         // const _user: User = { ...user };
         // _user.conversations = undefined;
         // setUser(_user);
@@ -470,7 +464,6 @@ function Messages() {
 
   useEffect(() => {
     if (socket) {
-
       socket.on('receive-message', recieveMessage);
       return () => socket.off('receive-message');
     }
@@ -479,7 +472,7 @@ function Messages() {
   useEffect(() => {
     if (socket && roomSelected != '') {
       socket.emit('get-messages', {
-        senderLogin: user.login ,
+        senderLogin: user.login,
         receiverLogin: roomSelected,
         isChannel: selected == 1 ? true : false,
       });
@@ -490,22 +483,17 @@ function Messages() {
   }, [roomSelected, socket]);
 
   useEffect(() => {
-    if (selected == 0){
+    if (selected == 0) {
       setRoomSelected('');
-      usersWithConversation()
-      setShowArray(conversations)
+      usersWithConversation();
+      setShowArray(conversations);
       setChatArea([]);
-    } 
-    else if (selected == 1){
-      
+    } else if (selected == 1) {
       setRoomSelected('');
       channelsWithConversation();
       setShowArray(groups);
       setChatArea([]);
-
-    }
-    else
-      setShowArray([]);
+    } else setShowArray([]);
   }, [selected, user.state, user.conversations, conversations, user.groups, groups]);
 
   useEffect(() => {
@@ -516,43 +504,39 @@ function Messages() {
   }, [chatArea]);
 
   useEffect(() => {
-    if((user.socket as Socket)?.connected){
-        (user.socket as Socket)?.disconnect();
-        const _user: User = user;
-        _user.socket = null;
-        setUser(_user);
+    if ((user.socket as Socket)?.connected) {
+      (user.socket as Socket)?.disconnect();
+      const _user: User = user;
+      _user.socket = null;
+      setUser(_user);
     }
-  },)
+  });
 
-
-  const handleAddToGroup  = ( login: string) => {
-
+  const handleAddToGroup = (login: string) => {
     setOpenInviteModal(false);
-    const apiUrl = "http://localhost:3000/api/atari-pong/v1/channels/add-user-to-channel";
-    const config =   {
+    const apiUrl = 'http://localhost:3000/api/atari-pong/v1/channels/add-user-to-channel';
+    const config = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
       },
     };
-    axios.post(apiUrl, {channelName : roomSelected, user : login}, config)
-    .then((response: any)=> {
-      toast.success(`${login} added to ${roomSelected} successfully!`);
-      let indexOfElementToMove = friendList.findIndex((obj: any) => obj.login == login);
-      let elementToMove = friendList[indexOfElementToMove];
-      elementToMove.state = 'member';
-      const tempInviteList = friendList;
-      tempInviteList.splice(indexOfElementToMove, 1);
-      setFriendList(tempInviteList);
-      const tempMembers = [...groupMembers, elementToMove];
-      setGroupMembers(tempMembers);
-
-    })
-    .catch((error : any) => {
-      if(error.response.data)
-      toast.error(error.response.data.message);
-    })
-
-  }
+    axios
+      .post(apiUrl, { channelName: roomSelected, user: login }, config)
+      .then((response: any) => {
+        toast.success(`${login} added to ${roomSelected} successfully!`);
+        const indexOfElementToMove = friendList.findIndex((obj: any) => obj.login == login);
+        const elementToMove = friendList[indexOfElementToMove];
+        elementToMove.state = 'member';
+        const tempInviteList = friendList;
+        tempInviteList.splice(indexOfElementToMove, 1);
+        setFriendList(tempInviteList);
+        const tempMembers = [...groupMembers, elementToMove];
+        setGroupMembers(tempMembers);
+      })
+      .catch((error: any) => {
+        if (error.response.data) toast.error(error.response.data.message);
+      });
+  };
   return (
     <OptionBar flag={3}>
       <main className="w-full h-full    flex flex-col items-center  font-Orbitron min-h-[550px]  min-w-[280px] pb-2 px-6  md:px-12  ">
@@ -577,10 +561,10 @@ function Messages() {
                         <button
                           onClick={() => {
                             setRoomSelected(selected == 0 ? obj.login : obj.name);
-                            setRoomSelectedType(selected == 1 ? obj.type : 0)
+                            setRoomSelectedType(selected == 1 ? obj.type : 0);
                             setIam(selected == 1 ? obj.whoIam : '');
-                            setIsMuted(selected == 1 ? obj.isMuted : false)
-                            setUserId(obj.id)
+                            setIsMuted(selected == 1 ? obj.isMuted : false);
+                            setUserId(obj.id);
                           }}
                           key={obj.id || `${obj.login}${index}` || `${obj.name}${index}`}
                           className={`w-full h-14 ease-in-out 2xl:h-[68px]  truncate   text-xs 2xl:text-base flex flex-row justify-center md:justify-start space-x-3 2xl:space-x-6 md:pl-5 2xl:pl-7 items-center transition-all duration-500 tracking-wide  ${
@@ -589,23 +573,21 @@ function Messages() {
                               : ' hover:md:border-b-2 hover:2xl:border-b-4 hover:border-[#36494e] '
                           }`}
                         >
-                          {
-                            selected == 0 ?
+                          {selected == 0 ? (
                             <Image
-                              src={
-                                 !obj.avatar 
-                                  ? alien
-                                  : selected == 0
-                                  ? obj.avatarUrl
-                                  : group
-                              }
+                              src={!obj.avatar ? alien : selected == 0 ? obj.avatarUrl : group}
                               alt="image"
                               width="50"
                               height="50"
                               className={`rounded-full border-2 2xl:border-[3px] w-10 h-10  2xl:w-12 2xl:h-12 border-inherit bg-slate-800 `}
-                            /> :
-                            <Avatar name={obj.name} className='rounded-full border border-inherit' size={'40'}/>
-                          }
+                            />
+                          ) : (
+                            <Avatar
+                              name={obj.name}
+                              className="rounded-full border border-inherit"
+                              size={'40'}
+                            />
+                          )}
                           <span className="hidden  text-left pt-1 md:flex flex-col 2xl:-space-y-1">
                             <div className="flex flex-row  items-center justify-between">
                               <h1 className="truncate w-[70%]">
@@ -664,17 +646,18 @@ function Messages() {
               <div className="h-auto  overflow-y-auto scroll-smooth" ref={messageEl}>
                 {chatArea &&
                   chatArea.map((obj: ChatText, index: number) => (
-                    <div key={ index } className=" w-full h-auto">
+                    <div key={index} className=" w-full h-auto">
                       <MessageText sender={obj.sender} message={obj.text} selected={selected} />
                     </div>
                   ))}
               </div>
             </div>
-            <div className={`h-16  2xl:h-20  ${roomSelected != '' ? 'border-t-[3px] lineshad' :  ''}  `}>
-              {
-                (roomSelected != '' && !isMuted) &&
-                  <SendMessage SetValue={setMessage} handleClick={handleSend} value={message} />
-              }
+            <div
+              className={`h-16  2xl:h-20  ${roomSelected != '' ? 'border-t-[3px] lineshad' : ''}  `}
+            >
+              {roomSelected != '' && !isMuted && (
+                <SendMessage SetValue={setMessage} handleClick={handleSend} value={message} />
+              )}
             </div>
           </div>
         </div>
@@ -745,16 +728,12 @@ function Messages() {
             <ul className="w-full">
               {groupMembers &&
                 groupMembers.map((member: any, index: number) => (
-                  <li key={member.id  || `${member.login}${index}`}>
+                  <li key={member.id || `${member.login}${index}`}>
                     <div className="flex flex-row items-center my-[10px] justify-between">
                       <div className="flex flex-row">
                         <div className="NeonShadowBord h-[60px] w-[60px] flex items-center mr-[10px]">
                           <Image
-                            src={
-                                member.avatar
-                                  ? member.avatarUrl
-                                  : alien
-                            }
+                            src={member.avatar ? member.avatarUrl : alien}
                             alt="avatar"
                             width="50"
                             height="50"
@@ -766,16 +745,19 @@ function Messages() {
                           <p className="text-[12px] text-yellow-400">{member.state}</p>
                         </div>
                       </div>
-                      <div className="ml-[30px]">{((iAm == 'owner' && member.state != 'owner') || (iAm == 'admin' && member.state == 'member')) && 
-                        <DropDown 
-                         iAm={iAm} 
-                         memberSelected={member.login}
-                         roomSelected={roomSelected} 
-                         members={groupMembers}
-                         setMembers={setGroupMembers}
-                         setOpenModal={setOpenMembersModal}/>
-                         }
-                        </div>
+                      <div className="ml-[30px] ">
+                        {((iAm == 'owner' && member.state != 'owner') ||
+                          (iAm == 'admin' && member.state == 'member')) && (
+                          <DropDown
+                            iAm={iAm}
+                            memberSelected={member.login}
+                            roomSelected={roomSelected}
+                            members={groupMembers}
+                            setMembers={setGroupMembers}
+                            setOpenModal={setOpenMembersModal}
+                          />
+                        )}
+                      </div>
                     </div>
                   </li>
                 ))}
@@ -797,9 +779,7 @@ function Messages() {
         </h1>
         <form className="h-[78%] flex flex-col  justify-between w-full p-2 sm:p-10 ">
           <div className="h-1/5 w-full z-10">
-            <div className=' mb-2 lg:mb-4 font-Orbitron  truncate'>
-              Change Password :
-            </div>
+            <div className=" mb-2 lg:mb-4 font-Orbitron  truncate">Change Password :</div>
             <input
               onChange={(e) => setDescripion(e.target.value)}
               placeholder={roomSelectedType == 1 ? 'Group is private' : 'Password'}
@@ -844,11 +824,7 @@ function Messages() {
                       <div className="flex flex-row">
                         <div className="NeonShadowBord h-[60px] w-[60px] flex items-center mr-[10px]">
                           <Image
-                            src={
-                              member.avatar
-                                ? member.avatarUrl
-                                : alien
-                            }
+                            src={member.avatar ? member.avatarUrl : alien}
                             alt="avatar"
                             width="50"
                             height="50"
@@ -859,11 +835,13 @@ function Messages() {
                           <span>{member.login}</span>
                         </div>
                       </div>
-                      <button onClick={()=> handleAddToGroup(member.login)} className="mr-5 p-1 text-[20px]">
-                        {
-                          (iAm != 'member') &&
+                      <button
+                        onClick={() => handleAddToGroup(member.login)}
+                        className="mr-5 p-1 text-[20px]"
+                      >
+                        {iAm != 'member' && (
                           <AiOutlineUserAdd className="md:h-8 md:w-8 md:hover:h-9 md:hover:w-9 focus:outline-none hover:font-extrabold hover:text-cyan-500 duration-500" />
-                        }
+                        )}
                       </button>
                     </div>
                   </li>

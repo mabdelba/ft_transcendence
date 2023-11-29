@@ -20,7 +20,7 @@ type closeFunc = {
   rout: any;
   setOpenTwoFact: any;
   setJwtToken: any;
-  setLoginTwo: any
+  setLoginTwo: any;
 };
 
 function Login(props: closeFunc) {
@@ -28,16 +28,13 @@ function Login(props: closeFunc) {
   const [password, setPassword] = useState('');
   const [Uerror, setUerror] = useState(false);
   const [Perror, setPerror] = useState(false);
-  const {socket} = useContext(SocketContext);
+  const { socket } = useContext(SocketContext);
   // const [jwtTokenState, setjwtTokenState] = useState<any>('');
   const Data = { username, password };
 
   const regex = /^.+$/;
 
-
-  const check2fa = () => {
-    ;
-  }
+  const check2fa = () => {};
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -51,49 +48,45 @@ function Login(props: closeFunc) {
     const password = Data.password;
 
     const logData = { login, password };
-    console.log("haaaa za: ", logData)
+    console.log('haaaa za: ', logData);
     const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/login';
     axios
       .post(apiUrl, logData)
       .then((response) => {
-
         console.log('response: ', response);
-        if (response.data.twoFaActive == true)
-        {
+        if (response.data.twoFaActive == true) {
           props.setOpenTwoFact(true);
-          props.setJwtToken(response.data.token)
+          props.setJwtToken(response.data.token);
           // check2fa();
-        }
-        else
-        {
+        } else {
           toast.success('You have successfully logged in!');
           const jwtToken = response.data.token;
           localStorage.setItem('jwtToken', jwtToken);
-          socket.emit('online', {token: jwtToken});
+          socket.emit('online', { token: jwtToken });
           props.rout.push('/dashboard');
         }
       })
       .catch((error) => {
-        toast.error('Incorrect username or password!')})   ;
+        toast.error('Incorrect username or password!');
+      });
   };
 
-  useEffect(()=> {
-
-    const keyDownHandler = (e: any)=> {
+  useEffect(() => {
+    const keyDownHandler = (e: any) => {
       // console.log('user pressed: ', e.key);
-      if(e.key === 'Enter'){
+      if (e.key === 'Enter') {
         e.preventDefault();
         handleSubmit(e);
       }
-    }
+    };
     document.addEventListener('keydown', keyDownHandler);
-    return ()=> document.removeEventListener('keydown', keyDownHandler)
-  })
+    return () => document.removeEventListener('keydown', keyDownHandler);
+  });
 
   const handleFtClick = (event: any) => {
     event.preventDefault();
     const ftApiUrl =
-'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-ae7399cd8ce3177bfd638813299cc7a0d4908431f7959eda3bd395b0790adc64&redirect_uri=http%3A%2F%2Flocalhost%3A4000%2Fcallback&response_type=code'
+      'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-ae7399cd8ce3177bfd638813299cc7a0d4908431f7959eda3bd395b0790adc64&redirect_uri=http%3A%2F%2Flocalhost%3A4000%2Fcallback&response_type=code';
     const newWind = window.open(ftApiUrl);
     const handleWindowMessage = (event: any) => {
       if (event.origin === 'http://localhost:4000') {
@@ -106,37 +99,32 @@ function Login(props: closeFunc) {
           axios
             .get(apiUrl)
             .then((response) => {
-              toast.success('You have successfully logged in!', {
-                position: 'top-center',
-                autoClose: 2500,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: 'dark',
-              });
+              toast.success('You have successfully logged in!');
               const jwtToken = response.data.token;
-              axios.get('http://localhost:3000/api/atari-pong/v1/auth/ft-avatar', {
-                headers: {
-                  Authorization: `Bearer ${jwtToken}`,
-                },
-              });
-              localStorage.setItem('jwtToken', jwtToken);
-              socket.emit('online', {token: jwtToken});
-              props.rout.push('/dashboard');
+              axios
+                .get('http://localhost:3000/api/atari-pong/v1/auth/ft-avatar', {
+                  headers: {
+                    Authorization: `Bearer ${jwtToken}`,
+                  },
+                })
+                .catch(() => {});
+              if (response.data.twoFaActive == true) {
+                props.setOpenTwoFact(true);
+                props.setJwtToken(response.data.token);
+                // check2fa();
+              } else {
+                toast.success('You have successfully logged in!');
+                const jwtToken = response.data.token;
+                localStorage.setItem('jwtToken', jwtToken);
+                socket.emit('online', { token: jwtToken });
+                props.rout.push('/dashboard');
+              }
+              // localStorage.setItem('jwtToken', jwtToken);
+              // socket.emit('online', {token: jwtToken});
+              // props.rout.push('/dashboard');
             })
             .catch((error) => {
-              toast.error('User not connected with 42 account', {
-                position: 'top-center',
-                autoClose: 2500,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: 'dark',
-              });
+              toast.error('User not connected with 42 account');
               // console.log('Error', error);
             });
         }
@@ -170,7 +158,7 @@ function Login(props: closeFunc) {
               isVerif={false}
             />
           </div>
-          <div  className="h-[30%] w-full ">
+          <div className="h-[30%] w-full ">
             <SimpleInput
               SetValue={setPassword}
               holder="Password"
@@ -187,10 +175,15 @@ function Login(props: closeFunc) {
         </div>
         <div className="px-2 w-full h-[57.15%] space-y-10">
           <div className="h-[25%] w-full ">
-            <SimpleButton  content="Log-in" buttonType="submit" />
+            <SimpleButton content="Log-in" buttonType="submit" />
           </div>
-          <div  className="h-[25%] w-full flex flex-row justify-center space-x-10">
-              <SimpleButton icon={QuaranteDeux} icon2={blackQuarante} buttonType="button" handleClick={handleFtClick} />
+          <div className="h-[25%] w-full flex flex-row justify-center space-x-10">
+            <SimpleButton
+              icon={QuaranteDeux}
+              icon2={blackQuarante}
+              buttonType="button"
+              handleClick={handleFtClick}
+            />
             {/* <div className="w-[50%] h-full">
               <SimpleButton icon={google} icon2={google} buttonType="button" />
             </div> */}

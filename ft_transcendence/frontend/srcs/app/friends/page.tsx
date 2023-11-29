@@ -1,6 +1,5 @@
 'use client';
 
-
 import alien from '../../public/alien.svg';
 import DiscloComp from '../components/shapes/DiscloComp';
 import { Dialog, Transition } from '@headlessui/react';
@@ -10,11 +9,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { User, context,SocketContext} from '../../context/context';
+import { User, context, SocketContext } from '../../context/context';
 import OptionBar from '../components/forms/OptionBar';
 import { useQueries, useQuery } from 'react-query';
 import InviteToast from '../components/shapes/invitetoast';
-
 
 const fetchRequestList = async () => {
   const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-requests-list';
@@ -54,21 +52,19 @@ function Friends() {
   const { data: friendListData, status: status_ } = useQuery('friendList', fetchFriendList);
   const { data: blockedListData, status: status__ } = useQuery('blockedList', fetchBlockedList);
 
-  useEffect(()=> {
-    if(!user.login){
-
+  useEffect(() => {
+    if (!user.login) {
       const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
       const token = localStorage.getItem('jwtToken');
       const config = {
         headers: { Authorization: `Bearer ${token}` },
       };
-      axios.get(apiUrl, config)
-      .then((response : any) => {
+      axios.get(apiUrl, config).then((response: any) => {
         const _user = response.data;
-        socket?.on('inviteToGame', (data: {senderId: string, login: string}) => {
+        socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
           console.log('inviteToGame');
-          toast(<InviteToast senderId={data.senderId} login={data.login}/>,{
-            position: "top-center",
+          toast(<InviteToast senderId={data.senderId} login={data.login} />, {
+            position: 'top-center',
             autoClose: false,
             hideProgressBar: false,
             closeOnClick: true,
@@ -77,20 +73,16 @@ function Friends() {
           });
         });
         socket?.on('cancelNotification', () => {
-          console.log('cancelNotification=======')
+          console.log('cancelNotification=======');
           toast.dismiss();
         });
         setUser(_user);
-
-      })
+      });
     }
-  })
-
+  });
 
   const getReq = async () => {
     if (requestListData) {
-
-      
       setRequest(requestListData.recievedFriendRequestsBy);
       const _user: User = user;
       _user.friendRequestList = requestListData.recievedFriendRequestsBy;
@@ -104,7 +96,6 @@ function Friends() {
 
   const getFriend = async () => {
     if (friendListData) {
-      
       setFriendsList(friendListData.friends);
       const _user: User = user;
       _user.friendList = friendListData.friends;
@@ -179,7 +170,7 @@ function Friends() {
     if (elementToDelete !== -1) {
       friendsList.splice(elementToDelete, 1);
     }
-    const newObject = { id: userId, login: userName, avatarUrl: userAvatar, avatar :'avatar'};
+    const newObject = { id: userId, login: userName, avatarUrl: userAvatar, avatar: 'avatar' };
     blockedList.push(newObject);
     const _user: User = user;
     _user.friendList = friendsList;
@@ -198,7 +189,6 @@ function Friends() {
     axios
       .post(url, { userId: userId }, conf)
       .then((response) => {
-
         // console.log('response ', response);
       })
       .catch((error) => {
@@ -248,7 +238,7 @@ function Friends() {
     if (elementToDelete !== -1) {
       requests.splice(elementToDelete, 1);
     }
-    const newObject = { id: userId, login: userName, avatar: 'avatar', avatarUrl:userAvatar };
+    const newObject = { id: userId, login: userName, avatar: 'avatar', avatarUrl: userAvatar };
     friendsList.push(newObject);
     const _user: User = user;
     _user.friendRequestList = requests;
@@ -261,13 +251,11 @@ function Friends() {
       headers: { Authorization: `Bearer ${token}` },
     };
     axios
-    .post(url, { senderId: userId }, conf)
-    .then((response) => {
-        
-    })
-    .catch((error) => {
+      .post(url, { senderId: userId }, conf)
+      .then((response) => {})
+      .catch((error) => {
         // console.log('error ', error);
-    });
+      });
     setOpen(false);
   };
 
@@ -279,7 +267,7 @@ function Friends() {
       _user.blockedList = blockedList;
       setUser(_user);
     }
-    const _user : User = user;
+    const _user: User = user;
     _user.groups = undefined;
     _user.conversations = undefined;
     // _user.conversations.isFrd =false;
@@ -324,61 +312,61 @@ function Friends() {
           <div className="w-full h-12 md:h-[10%] pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
             Friends
           </div>
-          {(status == 'loading' || status_ == 'loading' || status__ == 'loading' )&& (
+          {(status == 'loading' || status_ == 'loading' || status__ == 'loading') && (
             <div className=" flex flex-col space-y-2 w-full h-[80%] items-center justify-center">
               <h1>Loading</h1>
               <div className="spinner"></div>
             </div>
           )}
-          {
-            (status == 'success' && status_ == 'success' && status__ == 'success' ) &&
+          {status == 'success' && status_ == 'success' && status__ == 'success' && (
             <div className="w-full h-auto flex flex-col px-2  md:px-12 space-y-8 md:space-y-12 ">
-            <div className="w-full  h-auto ">
-              <DiscloComp
-                title="Friend requests"
-                divArray={requests}
-                textColor="text-[#FF0742] redShadow"
-                Color={false}
-                hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
-                image={alien}
-                isFriend={true}
-                setOpen={setOpen}
-                setLogin={setUserName}
-                setUserId={setUserId}
-                setAvatar={setUserAvatar}
-              />
+              <div className="w-full  h-auto ">
+                <DiscloComp
+                  title="Friend requests"
+                  divArray={requests}
+                  textColor="text-[#FF0742] redShadow"
+                  Color={false}
+                  hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
+                  image={alien}
+                  isFriend={true}
+                  setOpen={setOpen}
+                  setLogin={setUserName}
+                  setUserId={setUserId}
+                  setAvatar={setUserAvatar}
+                />
+              </div>
+              <div className="w-full h-auto ">
+                <DiscloComp
+                  title="Friends list"
+                  divArray={friendsList}
+                  textColor="text-[#00B2FF] blueShadow"
+                  Color={true}
+                  hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
+                  image={alien}
+                  isFriend={true}
+                  setOpen={setOpenFriend}
+                  setLogin={setUserName}
+                  setUserId={setUserId}
+                  setAvatar={setUserAvatar}
+                />
+              </div>
+              <div className="w-full h-auto ">
+                <DiscloComp
+                  title="Blocked list"
+                  divArray={blockedList}
+                  textColor="text-[#FF0742] redShadow"
+                  Color={false}
+                  hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
+                  image={alien}
+                  isFriend={true}
+                  setOpen={setOpenBlock}
+                  setLogin={setUserName}
+                  setUserId={setUserId}
+                  setAvatar={setUserAvatar}
+                />
+              </div>
             </div>
-            <div className="w-full h-auto ">
-              <DiscloComp
-                title="Friends list"
-                divArray={friendsList}
-                textColor="text-[#00B2FF] blueShadow"
-                Color={true}
-                hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
-                image={alien}
-                isFriend={true}
-                setOpen={setOpenFriend}
-                setLogin={setUserName}
-                setUserId={setUserId}
-                setAvatar={setUserAvatar}
-              />
-            </div>
-            <div className="w-full h-auto ">
-              <DiscloComp
-                title="Blocked list"
-                divArray={blockedList}
-                textColor="text-[#FF0742] redShadow"
-                Color={false}
-                hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
-                image={alien}
-                isFriend={true}
-                setOpen={setOpenBlock}
-                setLogin={setUserName}
-                setUserId={setUserId}
-                setAvatar={setUserAvatar}
-              />
-            </div>
-          </div>}
+          )}
         </main>
       </OptionBar>
       {/* request */}

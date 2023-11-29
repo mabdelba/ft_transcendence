@@ -1,10 +1,16 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Switch } from '@headlessui/react'
+import { useState } from 'react';
+import { Switch } from '@headlessui/react';
 
-export default function SwitchButton( {enabled, setEnabled} : {enabled: boolean, setEnabled: any}) {
-//   const [enabled, setEnabled] = useState(false)
+export default function SwitchButton({
+  enabled,
+  setEnabled,
+}: {
+  enabled: boolean;
+  setEnabled: any;
+}) {
+  //   const [enabled, setEnabled] = useState(false)
 
   return (
     <div className="py-16">
@@ -22,5 +28,5 @@ export default function SwitchButton( {enabled, setEnabled} : {enabled: boolean,
         />
       </Switch>
     </div>
-  )
+  );
 }

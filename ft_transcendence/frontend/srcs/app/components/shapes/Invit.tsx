@@ -23,29 +23,26 @@ type newType = {
 
 function Invit(props: newType) {
   const router = useRouter();
-  const {user, setUser} = useContext(context);
+  const { user, setUser } = useContext(context);
 
   const handleClick = () => {
     router.push(`/profil/${props.login}`);
   };
 
-  const handleMessage = ()=> {
-    const _user : User = user;
-    let conversation  = _user.conversations;
+  const handleMessage = () => {
+    const _user: User = user;
+    let conversation = _user.conversations;
     let indexOfElementToMove = -1;
-    if(conversation)
+    if (conversation)
       indexOfElementToMove = conversation.findIndex((obj: any) => obj.login == props.login);
-    if(indexOfElementToMove == -1)
-    {
+    if (indexOfElementToMove == -1) {
       // console.log('zga nchouf', conversation)
-      if(conversation )
-        conversation.unshift({login: props.login,avatar: 'avatar', avatarUrl: props.avatar});
-      else if(!conversation || conversation.length < 1)
-        conversation = [{login: props.login, avatar: 'avatar', avatarUrl: props.avatar}]
+      if (conversation)
+        conversation.unshift({ login: props.login, avatar: 'avatar', avatarUrl: props.avatar });
+      else if (!conversation || conversation.length < 1)
+        conversation = [{ login: props.login, avatar: 'avatar', avatarUrl: props.avatar }];
       // console.log('mora; ' , conversation)
-    }
-    else
-    {
+    } else {
       const elementToMove = conversation[indexOfElementToMove];
       conversation.splice(indexOfElementToMove, 1);
       conversation.unshift(elementToMove);
@@ -54,7 +51,7 @@ function Invit(props: newType) {
     _user.conversations = conversation;
     setUser(_user);
     router.push('/messages');
-  }
+  };
   return (
     <div className="h-full w-full flex flex-col font-Orbitron NeonShadow">
       <div className="flex justify-end items-center h-[15%] w-full ">
@@ -83,33 +80,31 @@ function Invit(props: newType) {
             </div>
           ) : (
             <>
-            <div className='flex flex-row h-full w-full space-x-2'>
-              <SimpleButton
-                buttonType="button"
-                content={props.Content1}
-                handleClick={props.accept}
-              />
-              {props.flag == 1 &&
-              <SimpleButton
-                buttonType="button"
-                content={props.Content2}
-                handleClick={props.delete}
-              />
-              }
-            </div>
-            <div className='h-full w-full'>
-            { 
-              props.flag != 1 ? 
-              <SimpleButton 
-                buttonType="button"
-                content={props.Content2}
-                handleClick={props.delete} /> : 
-              <SimpleButton 
-                buttonType="button"
-                content="Message"
-                handleClick={handleMessage} />
-              }
-            </div>
+              <div className="flex flex-row h-full w-full space-x-2">
+                <SimpleButton
+                  buttonType="button"
+                  content={props.Content1}
+                  handleClick={props.accept}
+                />
+                {props.flag == 1 && (
+                  <SimpleButton
+                    buttonType="button"
+                    content={props.Content2}
+                    handleClick={props.delete}
+                  />
+                )}
+              </div>
+              <div className="h-full w-full">
+                {props.flag != 1 ? (
+                  <SimpleButton
+                    buttonType="button"
+                    content={props.Content2}
+                    handleClick={props.delete}
+                  />
+                ) : (
+                  <SimpleButton buttonType="button" content="Message" handleClick={handleMessage} />
+                )}
+              </div>
             </>
           )}
         </div>

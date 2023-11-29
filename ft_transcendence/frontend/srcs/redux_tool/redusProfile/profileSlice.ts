@@ -1,6 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
-import { getMyProfile } from "./profileThunk";
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { getMyProfile } from './profileThunk';
 
 export interface ProfileState {
   profile: any;
@@ -13,7 +13,7 @@ const initialState: ProfileState = {
 };
 
 export const ProfileSlice = createSlice({
-  name: "Profile",
+  name: 'Profile',
   initialState,
   reducers: {
     setProfile: (state, action: PayloadAction<any>) => {
@@ -34,9 +34,5 @@ export const ProfileSlice = createSlice({
   },
 });
 
-export const {
-  setProfile,
-  updateUsename,
-  updateImage,
-} = ProfileSlice.actions;
+export const { setProfile, updateUsename, updateImage } = ProfileSlice.actions;
 export default ProfileSlice.reducer;

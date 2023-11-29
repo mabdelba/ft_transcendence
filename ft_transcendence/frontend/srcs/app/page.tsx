@@ -6,7 +6,7 @@ import { Fragment, useContext, useEffect, useState } from 'react';
 import Register from './components/forms/Register';
 import Login from './components/forms/Login';
 import { context } from '../context/context';
-import TwoFactor from './twofactor/page';
+import TwoFactor from './components/forms/TwoFactor';
 
 export default function Home() {
   const [loginOpen, setLoginOpen] = useState(false);
@@ -50,7 +50,11 @@ export default function Home() {
       }
     }
   }
-  checkToken();
+  
+  useEffect(()=> {
+
+    checkToken();
+  })
 
   return (
     <>
