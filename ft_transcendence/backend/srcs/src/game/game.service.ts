@@ -16,6 +16,7 @@ class GameModel{
     xForce: number = 0;
     yForce: number = 0;
     gameStarted: boolean = false;
+    datapost: boolean = false
     lance: boolean = true;
     walls: Body[] = [];
     ball: Body | null = null;
@@ -136,16 +137,14 @@ class GameModel{
     }
     public runGame(): void{
        
-          // this.gameStarted = !this.gameStarted;
-          this._createBall();
-          if(this.lance)
-            this.setForce(-1.40, -1.40);
-          else
-            this.setForce(1.40, 1.40);
+      if(this.lance)
+        this.setForce(-1.40, -1.40);
+      else
+        this.setForce(1.40, 1.40);
+      this._createBall();
           setTimeout(() => {
             World.add(this._world, this.ball);
-          },3000);
-        
+          },3000); 
     }
 //destroy this function when the game ends
     public destroy(): void{
@@ -166,8 +165,8 @@ class GameModel{
 
 
     async addNewGame(dto: { userLogin: string, opponentLogin: string, scoreP1: number, scoreP2: number }) {
-        console.log("addNewGame");
         try {
+          console.log('game added====================');
             await this.prisma.game.create({
                 data: {
                     player1Login: dto.userLogin,

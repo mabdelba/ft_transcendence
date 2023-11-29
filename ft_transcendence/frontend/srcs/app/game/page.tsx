@@ -95,7 +95,7 @@ const gamePage = () => {
                 _user.opponent = '';
                 _user.gameType = '';
                 _user.oppenentAvatar = '';
-                // _user.login = undefined
+                _user.login = undefined
                 setUser(user);
             }
         };
@@ -168,7 +168,7 @@ const handleLeave = () => {;
                 height={'50'}
               />
             </div>
-            <div className="blueShadow text-[20px] text-[#00B2FF] m-2 hidden md:block">
+            <div className=" text-[20px]  m-2 hidden md:block">
               {user.login}
             </div>
           </div>
@@ -183,7 +183,7 @@ const handleLeave = () => {;
             <div className="hidden md:block pl-2 text-[15px]">Leave</div>
           </button>
           <div className="flex flex-row items-center m-2">
-            <div className="redShadow text-[20px] text-[#FF0742] m-2 hidden md:block">
+            <div className=" text-[20px]  m-2 hidden md:block">
               {user.opponent}
             </div>
             <div className="NeonShadowBord h-[70px] w-[70px] md:w-[90px] md:h-[90px] m-auto flex">
