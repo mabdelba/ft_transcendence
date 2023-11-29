@@ -93,12 +93,14 @@ export class GameGateway {
     handleStartGame(@ConnectedSocket() socket: Socket, @MessageBody() data: { map: string }) {
         const index = this.RandomGames.findIndex((game) => (game.game.id1 == socket.id && game.id2 != '') || game.game.id2 == socket.id);
         const privateIndex = this.privateGame.findIndex((game) => (game.game.id1 == socket.id && game.id2 != '') || game.game.id2 == socket.id);
-        if (index >= 0 && this.RandomGames[index].game.socket1.connected && this.RandomGames[index].game.socket2.connected){
+        if (index >= 0 && this.RandomGames[index].game.socket1.connected && this.RandomGames[index].game.socket2.connected && this.RandomGames[index].game.gameStarted == false){
             const game: GameModel = this.RandomGames[index].game;
             game.runGame();
+            game.setGameStarted();
         }
-        else if(privateIndex >= 0 && this.privateGame[privateIndex].game.socket1.connected && this.privateGame[privateIndex].game.socket2.connected){
+        else if(privateIndex >= 0 && this.privateGame[privateIndex].game.socket1.connected && this.privateGame[privateIndex].game.socket2.connected && this.privateGame[privateIndex].game.gameStarted == false){
             const game: GameModel = this.privateGame[privateIndex].game;
+            game.setGameStarted();
             game.runGame();
         }
     }

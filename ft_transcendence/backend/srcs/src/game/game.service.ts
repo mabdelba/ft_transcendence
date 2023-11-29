@@ -5,6 +5,7 @@ import { ForbiddenException } from "@nestjs/common";
 import { getAchievementFromId } from "src/utils/get-achievement-from-id";
 import { User } from "@prisma/client";
 import { getUserFromLogin } from "src/utils/get-user-from-id";
+import { set } from "husky";
 
 class GameModel{
     private _engine: Engine;
@@ -14,7 +15,7 @@ class GameModel{
     height: number = 800;
     xForce: number = 0;
     yForce: number = 0;
-    gameStarted: boolean = true;
+    gameStarted: boolean = false;
     lance: boolean = true;
     walls: Body[] = [];
     ball: Body | null = null;
@@ -82,25 +83,26 @@ class GameModel{
                {//need to check whois scored
                    World.remove(this._world, this.ball);
                     Body.setPosition(this.ball, {x: this.width / 2, y: this.height / 2});
+                    this.lance = false;
+                    this.runGame();
                     this.player1Score++;
-                    this.socket2?.emit('startBotton');
                     this.socket1?.emit('Score', {player1: this.player1Score, player2: this.player2Score});
                     this.socket2?.emit('Score', {player1: this.player2Score, player2: this.player1Score});
                     if(this.player1Score == 10)
                         this.socket2?.emit('gameOver');
-                    this.lance = false;
                 }
                 else if ((pair.bodyA.label == "ball" && pair.bodyB.label == "bottomWall") || (pair.bodyB.label == "ball" && pair.bodyA.label == "bottomWall"))
                 {
                     World.remove(this._world, this.ball);
                     Body.setPosition(this.ball, {x: this.width / 2, y: this.height / 2});
+                    this.lance = true;
+                    this.runGame();
                     this.player2Score++;
-                    this.socket1?.emit('startBotton');
                     this.socket1?.emit('Score', {player1: this.player1Score, player2: this.player2Score});
                     this.socket2?.emit('Score', {player1: this.player2Score, player2: this.player1Score}); 
                     if(this.player2Score == 10)
                         this.socket1?.emit('gameOver');
-                    this.lance = true;
+                    
                 }
 
             }
@@ -125,11 +127,9 @@ class GameModel{
         this.id2 = id;
     } 
 
-//run this function when the game starts
-    // public run(): void{
-    //     console.log("run");
-        
-    // }
+    public setGameStarted(): void{
+        this.gameStarted = true;
+    }
     public runGame(): void{
        
           // this.gameStarted = !this.gameStarted;
@@ -138,7 +138,9 @@ class GameModel{
             this.setForce(-1.40, -1.40);
           else
             this.setForce(1.40, 1.40);
-          World.add(this._world, this.ball);
+          setTimeout(() => {
+            World.add(this._world, this.ball);
+          },3000);
         
     }
 //destroy this function when the game ends

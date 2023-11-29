@@ -19,15 +19,6 @@ import { start } from 'repl';
 
 let game: Game | null = null;
 
-// const fetchInfo = async () => {
-//     const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
-//     const token = localStorage.getItem('jwtToken');
-//     const config = {
-//         headers: { Authorization: `Bearer ${token}` },
-//     };
-//     const res = await fetch(apiUrl, config);
-//     return res.json();
-// };
 
 const gamePage = () => {
     const {user, setUser} = useContext(context);
@@ -41,9 +32,7 @@ const gamePage = () => {
     const [startState, setStartState] = useState(true);
     const [player1Score, setPlayer1Score] = useState<number>(0);
     const [player2Score, setPlayer2Score] = useState<number>(0);
-    // opponent login and avatar
-    const [username, setUsername] = useState("");
-    const [avatar, setAvatar] = useState();
+
 
     useEffect(() => {
         const handleResize = () => {
@@ -72,9 +61,7 @@ const gamePage = () => {
             setPlayer1Score(data.player1);
             setPlayer2Score(data.player2);
         })
-        // user.socket?.on('startBotton', (start : boolean) => {
-        //     setStartState(start);
-        // })
+        user.socket?.emit('StartGame', {map: user.map});
         
         setGameSocket(user.socket);
         
@@ -176,14 +163,14 @@ return (
             <div className='text-[40px] -mt-4'>
                 {player1Score} - {player2Score}
             </div>
-            {startState && <button
-                type='button'
-                onClick={() => {
-                    console.log(gameSocket);
-                    setStartState(true);
-                    gameSocket?.emit('StartGame', {map: user.map});
-                } }
-                className='z-10 mb-2 w-fit NeonShadowBord flex flex-row items-center justify-center h-fit px-4 py-3 hover:bg-white hover:text-[black] transition-[300]'>Start Game</button>}
+            {/* {startState && <button
+                // type='button'
+                // onClick={() => {
+                //     console.log(gameSocket);
+                //     setStartState(true);
+                //     gameSocket?.emit('StartGame', {map: user.map});
+                // } }
+                className='z-10 mb-2 w-fit NeonShadowBord flex flex-row items-center justify-center h-fit px-4 py-3 hover:bg-white hover:text-[black] transition-[300]'>Start Game</button>} */}
             <div className='w-[100%] h-[80%] flex justify-center items-center' ref={gameDiv}>
             </div>
 

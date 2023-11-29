@@ -43,7 +43,9 @@ function Queue() {
     
     const checkCancel = () => {
       user.socket?.emit('CancelGame');
-      socket?.emit('cancel-notif', {login: user.opponent});
+      if(user.gameType == 'private'){
+        socket?.emit('cancel-notif', {login: user.opponent});
+      }
       setIsOpen(false);
     }
 
