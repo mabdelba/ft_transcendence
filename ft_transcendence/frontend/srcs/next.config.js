@@ -2,7 +2,7 @@
 const nextConfig = {
     reactStrictMode: false,
     images: {
-        domains: ['localhost'] // whatever port your backend runs on
+        domains: ['backend'] // whatever port your backend runs on
     }
 }
 

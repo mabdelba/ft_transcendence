@@ -15,7 +15,7 @@ async function getAvatarFromLogin(login:string, avatar?: string){
 }
 function getAvatarUrlFromLogin(login: string, avatar?: string) {
   if (avatar !== null) {
-    return `http://localhost:3000/avatars/${login}.jpg`;
+    return `http://backend:3000/avatars/${login}.jpg`;
   } else {
     return null;
   }
@@ -24,7 +24,7 @@ function getAvatarUrlFromLogin(login: string, avatar?: string) {
 async function getAvatarFromLogin2(login:string){
   const avatar = (await getUserFromLogin(login)).avatar;
   if (avatar !== null) {
-    return `http://localhost:3000/avatars/${login}.jpg`;
+    return `http://backend:3000/avatars/${login}.jpg`;
   }
   return null;
 }
