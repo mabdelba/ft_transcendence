@@ -2,13 +2,18 @@
 
 import { useRouter } from 'next/navigation';
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import Register from './components/forms/Register';
 import Login from './components/forms/Login';
+import { context } from '../context/context';
+import TwoFactor from './components/forms/TwoFactor';
 
 export default function Home() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
+  const [twoFactorOpen, setTwoFactorOpen] = useState(false);
+  const [jwtTokenState, setjwtTokenState] = useState<any>('');
+  const [login, setLogin] = useState('');
 
   const closeLoginModal = () => {
     setLoginOpen(false);
@@ -25,23 +30,31 @@ export default function Home() {
   const openRegisterModal = () => {
     setRegisterOpen(true);
   };
+
   
   const router = useRouter();
   function checkToken() {
-    const token = localStorage.getItem('jwtToken');
-    if (token) {
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      const exp = decodedToken.exp;
-      const current_time = Date.now() / 1000;
-      if (exp < current_time) {
-        localStorage.removeItem('jwtToken');
-        router.push('/');
+    if(localStorage){
+
+      const token = localStorage.getItem('jwtToken');
+      if (token) {
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        const exp = decodedToken.exp;
+        const current_time = Date.now() / 1000;
+        if (exp < current_time) {
+          localStorage.removeItem('jwtToken');
+          router.push('/');
+        }
+        else
+        router.push('/dashboard');
       }
-      else
-      router.push('/dashboard');
     }
   }
-  checkToken();
+  
+  useEffect(()=> {
+
+    checkToken();
+  })
 
   return (
     <>
@@ -130,7 +143,43 @@ export default function Home() {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="px-6 py-1 flex flex-col justify-center min-w-[280px] min-h-[479px] w-full h-[65%] md:w-2/3  lg:w-1/3  bg-black NeonShadowBord">
-                  <Login handler={closeLoginModal} rout={router} />
+                  <Login handler={closeLoginModal} rout={router} setOpenTwoFact={setTwoFactorOpen} setJwtToken={setjwtTokenState} setLoginTwo={setLogin}/>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+      {/* Two factor section */}
+      <Transition appear show={twoFactorOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={()=> {setTwoFactorOpen(false)}}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex justify-center items-center bg-opacity-40 backdrop-blur bg-[#282828] w-screen h-screen">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="flex justify-center items-center w-fit h-screen m-auto">
+                  {/* <Login handler={closeLoginModal} rout={router} /> */}
+                  <TwoFactor setopenModal={setTwoFactorOpen} jwtToken={jwtTokenState} login={login}/>
+
                 </Dialog.Panel>
               </Transition.Child>
             </div>

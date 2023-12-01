@@ -66,6 +66,9 @@ model Channel {
   id                Int       @id @default(autoincrement())
   name              String    @unique
   description       String?
+  // type 0 == public, 1 == private, 2 == protected
+  type              Int       @default(0)
+  password          String?
   members           User[]    @relation("joinedChannel")
   banned            User[]    @relation("bannedFromChannel")
   muted             UserMutedInChannel[]
@@ -99,11 +102,12 @@ model Achievement {
 
 model Game {
   id                Int      @id @default(autoincrement())
-  player1Id         Int
-  player2Id         Int
-  player1           User     @relation("player1", fields: [player1Id], references: [id])
-  player2           User     @relation("player2", fields: [player2Id], references: [id])
+  player1Login         String
+  player2Login         String
+  player1           User     @relation("player1", fields: [player1Login], references: [login])
+  player2           User     @relation("player2", fields: [player2Login], references: [login])
   scoreOfPlayer1    Int
   scoreOfPlayer2    Int
+  winnerLogin       String
   dateOfGame        DateTime @default(now())
 }

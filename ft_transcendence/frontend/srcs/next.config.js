@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    reactStrictMode: false,
     images: {
-        domains: ['localhost:4000'] // whatever port your backend runs on
+        domains: ['backend'] // whatever port your backend runs on
     }
 }
 

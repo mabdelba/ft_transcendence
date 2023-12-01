@@ -1,9 +1,6 @@
 'use client';
 
-import Pdp from '../components/shapes/Pdp';
-import Photo from '../../public/42.svg';
 import alien from '../../public/alien.svg';
-import blueAchiev from '../../public/blueAchiev.svg';
 import DiscloComp from '../components/shapes/DiscloComp';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment, useContext, useEffect, useState } from 'react';
@@ -11,41 +8,47 @@ import Invit from '../components/shapes/Invit';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-import { error } from 'console';
-import io from 'socket.io-client';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import { User, context,SocketContext} from '../../context/context';
+import { User, context, SocketContext } from '../../context/context';
 import OptionBar from '../components/forms/OptionBar';
 import { useQueries, useQuery } from 'react-query';
-import { data } from 'autoprefixer';
+import InviteToast from '../components/shapes/invitetoast';
 
 const fetchRequestList = async () => {
   const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-requests-list';
-  const res = await fetch(urlreq, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
-    },
-  });
-  return res.json();
+  try{
+    const res = await fetch(urlreq, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+      },
+    });
+    return res.json();
+  } catch(e){}
 };
 const fetchFriendList = async () => {
   const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/friend-list';
+  try{
   const res = await fetch(urlreq, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
     },
   });
   return res.json();
+} catch(e){}
+
 };
+
 const fetchBlockedList = async () => {
   const urlreq = 'http://localhost:3000/api/atari-pong/v1/friend/blocked-user-list';
+  try{
   const res = await fetch(urlreq, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
     },
   });
   return res.json();
+} catch(e){}
+
 };
 
 function Friends() {
@@ -56,37 +59,40 @@ function Friends() {
   const { data: requestListData, status } = useQuery('requestList', fetchRequestList);
   const { data: friendListData, status: status_ } = useQuery('friendList', fetchFriendList);
   const { data: blockedListData, status: status__ } = useQuery('blockedList', fetchBlockedList);
-  const getImageByLogin = async (login: string): Promise<string | null> => {
-    return new Promise<string | null>(async (resolve) => {
-      if (login != '') {
-        await axios
-          .post(
-            'http://localhost:3000/api/atari-pong/v1/user/avatar',
-            { userLogin: login },
-            {
-              headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-              responseType: 'blob',
-            },
-          )
-          .then((response) => {
-            const imageBlob = URL.createObjectURL(response.data) as string;
-            if (imageBlob) resolve(imageBlob);
-            else resolve(alien);
-          })
-          .catch(() => {
-            // resolve(alien);
-          });
-      }
-    });
-  };
 
-  const getReq = () => {
-    if (requestListData) {
-      requestListData.recievedFriendRequestsBy.forEach((obj: any) => {
-        getImageByLogin(obj.login).then((imageBlog) => {
-          obj.avatar = imageBlog;
+  useEffect(() => {
+    if (!user.login) {
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+      const token = localStorage.getItem('jwtToken');
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      axios.get(apiUrl, config).then((response: any) => {
+        const _user = response.data;
+        socket.emit('online', { token: localStorage.getItem('jwtToken') });
+        _user.state = 1;
+        socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
+    
+          toast(<InviteToast senderId={data.senderId} login={data.login} />, {
+            position: 'top-center',
+            autoClose: false,
+            hideProgressBar: false,
+            closeOnClick: false,
+            draggable: true,
+            theme: 'dark',
+          });
         });
-      });
+        socket?.on('cancelNotification', () => {
+
+          toast.dismiss();
+        });
+        setUser(_user);
+      }).catch(()=>{});
+    }
+  });
+
+  const getReq = async () => {
+    if (requestListData) {
       setRequest(requestListData.recievedFriendRequestsBy);
       const _user: User = user;
       _user.friendRequestList = requestListData.recievedFriendRequestsBy;
@@ -98,13 +104,8 @@ function Friends() {
     }
   };
 
-  const getFriend = () => {
+  const getFriend = async () => {
     if (friendListData) {
-      friendListData.friends.forEach((obj: any) => {
-        getImageByLogin(obj.login).then((imageBlog) => {
-          obj.avatar = imageBlog;
-        });
-      });
       setFriendsList(friendListData.friends);
       const _user: User = user;
       _user.friendList = friendListData.friends;
@@ -112,13 +113,9 @@ function Friends() {
     }
   };
 
-  const getBlocked = () => {
+  const getBlocked = async () => {
     if (blockedListData) {
-      blockedListData.blockedList.forEach((obj: any) => {
-        getImageByLogin(obj.login).then((imageBlog) => {
-          obj.avatar = imageBlog;
-        });
-      });
+      // console.log("test all: ", blockedListData.blockedList);
       setBlockedList(blockedListData.blockedList);
       const _user: User = user;
       _user.blockedList = blockedListData.blockedList;
@@ -133,7 +130,7 @@ function Friends() {
 
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
-    if (!token) router.push('/');
+    if (!token || token == undefined) router.push('/');
     else {
       const decodedToken = JSON.parse(atob(token.split('.')[1]));
       const exp = decodedToken.exp;
@@ -169,21 +166,12 @@ function Friends() {
     axios
       .post(url, { friendId: userId }, conf)
       .then((response) => {
-        console.log('response ', response);
+  
       })
       .catch((error) => {
-        console.log('error ', error);
+
       });
-    toast.error(`${userName} has been deleted from your friend list!`, {
-      position: 'top-center',
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'dark',
-    });
+    toast.error(`${userName} has been deleted from your friend list!`);
     setOpenFriend(false);
   };
 
@@ -192,11 +180,16 @@ function Friends() {
     if (elementToDelete !== -1) {
       friendsList.splice(elementToDelete, 1);
     }
-    const newObject = { id: userId, login: userName, avatar: userAvatar };
+    const newObject = { id: userId, login: userName, avatarUrl: userAvatar, avatar: 'avatar' };
     blockedList.push(newObject);
     const _user: User = user;
     _user.friendList = friendsList;
     _user.blockedList = blockedList;
+    // const _user : User = user;
+    _user.groups = undefined;
+    _user.conversations = undefined;
+    // _user.conversations.isFrd =false;
+    // setUser(_user);
     setUser(_user);
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/block-user';
     const token = localStorage.getItem('jwtToken');
@@ -206,21 +199,12 @@ function Friends() {
     axios
       .post(url, { userId: userId }, conf)
       .then((response) => {
-        console.log('response ', response);
+        // console.log('response ', response);
       })
       .catch((error) => {
-        console.log('error ', error);
+        // console.log('error ', error);
       });
-    toast.error(`You blocked ${userName}!`, {
-      position: 'top-center',
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'dark',
-    });
+    toast.error(`You blocked ${userName}!`);
     setOpenFriend(false);
   };
 
@@ -241,10 +225,10 @@ function Friends() {
     axios
       .post(url, { senderId: userId }, conf)
       .then((response) => {
-        console.log('response ', response);
+
       })
       .catch((error) => {
-        console.log('error ', error);
+ 
       });
     toast.error(`Friend request from ${userName} has been deleted!`, {
       position: 'top-center',
@@ -264,12 +248,13 @@ function Friends() {
     if (elementToDelete !== -1) {
       requests.splice(elementToDelete, 1);
     }
-    const newObject = { id: userId, login: userName, avatar: userAvatar };
+    const newObject = { id: userId, login: userName, avatar: 'avatar', avatarUrl: userAvatar };
     friendsList.push(newObject);
     const _user: User = user;
     _user.friendRequestList = requests;
     _user.friendList = friendsList;
     setUser(_user);
+    toast.success(`New friend ${userName} added successfully!`);
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/accept-friend-request';
     const token = localStorage.getItem('jwtToken');
     const conf = {
@@ -277,22 +262,10 @@ function Friends() {
     };
     axios
       .post(url, { senderId: userId }, conf)
-      .then((response) => {
-        console.log('response ', response);
-      })
+      .then((response) => {})
       .catch((error) => {
-        console.log('error ', error);
+        // console.log('error ', error);
       });
-    toast.success(`New friend ${userName} added successfully!`, {
-      position: 'top-center',
-      autoClose: 2500,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'dark',
-    });
     setOpen(false);
   };
 
@@ -304,6 +277,12 @@ function Friends() {
       _user.blockedList = blockedList;
       setUser(_user);
     }
+    const _user: User = user;
+    _user.groups = undefined;
+    _user.conversations = undefined;
+    // _user.conversations.isFrd =false;
+
+    setUser(_user);
 
     const url = 'http://localhost:3000/api/atari-pong/v1/friend/unblock-user';
     const token = localStorage.getItem('jwtToken');
@@ -313,15 +292,15 @@ function Friends() {
     axios
       .post(url, { userId: userId }, conf)
       .then((response) => {
-        console.log('response ', response);
+        // console.log('response ', response);
       })
       .catch((error) => {
-        console.log('error ', error);
+        // console.log('error ', error);
       });
     setOpenBlock(false);
   };
   const [userId, setUserId] = useState<any>(null);
-  const [userAvatar, setUserAvatar] = useState<any>(null);
+  const [userAvatar, setUserAvatar] = useState(alien);
   const [userName, setUserName] = useState('');
   const [open, setOpen] = useState(false);
   const [openFriend, setOpenFriend] = useState(false);
@@ -343,73 +322,61 @@ function Friends() {
           <div className="w-full h-12 md:h-[10%] pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
             Friends
           </div>
-          {(status == 'loading' || status_ == 'loading' || status__ == 'loading' )&& (
+          {(status == 'loading' || status_ == 'loading' || status__ == 'loading') && (
             <div className=" flex flex-col space-y-2 w-full h-[80%] items-center justify-center">
               <h1>Loading</h1>
               <div className="spinner"></div>
             </div>
           )}
-          {
-            (status == 'success' && status_ == 'success' && status__ == 'success' ) &&
+          {status == 'success' && status_ == 'success' && status__ == 'success' && (
             <div className="w-full h-auto flex flex-col px-2  md:px-12 space-y-8 md:space-y-12 ">
-            <div className="w-full  h-auto ">
-              <DiscloComp
-                title="Friend requests"
-                divArray={requests}
-                textColor="text-[#FF0742] redShadow"
-                Color={false}
-                hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
-                image={alien}
-                isFriend={true}
-                setOpen={setOpen}
-                setLogin={setUserName}
-                setUserId={setUserId}
-                setAvatar={setUserAvatar}
-              />
+              <div className="w-full  h-auto ">
+                <DiscloComp
+                  title="Friend requests"
+                  divArray={requests}
+                  textColor="text-[#FF0742] redShadow"
+                  Color={false}
+                  hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
+                  image={alien}
+                  isFriend={true}
+                  setOpen={setOpen}
+                  setLogin={setUserName}
+                  setUserId={setUserId}
+                  setAvatar={setUserAvatar}
+                />
+              </div>
+              <div className="w-full h-auto ">
+                <DiscloComp
+                  title="Friends list"
+                  divArray={friendsList}
+                  textColor="text-[#00B2FF] blueShadow"
+                  Color={true}
+                  hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
+                  image={alien}
+                  isFriend={true}
+                  setOpen={setOpenFriend}
+                  setLogin={setUserName}
+                  setUserId={setUserId}
+                  setAvatar={setUserAvatar}
+                />
+              </div>
+              <div className="w-full h-auto ">
+                <DiscloComp
+                  title="Blocked list"
+                  divArray={blockedList}
+                  textColor="text-[#FF0742] redShadow"
+                  Color={false}
+                  hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
+                  image={alien}
+                  isFriend={true}
+                  setOpen={setOpenBlock}
+                  setLogin={setUserName}
+                  setUserId={setUserId}
+                  setAvatar={setUserAvatar}
+                />
+              </div>
             </div>
-            <div className="w-full h-auto ">
-              <DiscloComp
-                title="Friends list"
-                divArray={friendsList}
-                textColor="text-[#00B2FF] blueShadow"
-                Color={true}
-                hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
-                image={alien}
-                isFriend={true}
-                setOpen={setOpenFriend}
-                setLogin={setUserName}
-                setUserId={setUserId}
-                setAvatar={setUserAvatar}
-              />
-            </div>
-            <div className="w-full h-auto ">
-              <DiscloComp
-                title="Blocked list"
-                divArray={blockedList}
-                textColor="text-[#FF0742] redShadow"
-                Color={false}
-                hoverColor="hover:font-extrabold hover:bg-slate-900 hover:bg-opacity-10"
-                image={alien}
-                isFriend={true}
-                setOpen={setOpenBlock}
-                setLogin={setUserName}
-                setUserId={setUserId}
-                setAvatar={setUserAvatar}
-              />
-            </div>
-          </div>}
-          <ToastContainer
-            position="top-center"
-            autoClose={4000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-          />
+          )}
         </main>
       </OptionBar>
       {/* request */}
@@ -438,7 +405,7 @@ function Friends() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
+                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[40%] xl:h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
                   <Invit
                     login={userName}
                     closeModal={closeModal}
@@ -482,7 +449,7 @@ function Friends() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
+                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[40%] xl:h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
                   <Invit
                     login={userName}
                     closeModal={closeFriendModal}
@@ -527,7 +494,7 @@ function Friends() {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
+                <Dialog.Panel className="min-w-[260px] min-h-[100px] h-[40%] xl:h-[30%] w-4/5  sm:w-2/3  xl:w-1/3 bg-black NeonShadowBord">
                   <Invit
                     login={userName}
                     closeModal={closeBlockModal}

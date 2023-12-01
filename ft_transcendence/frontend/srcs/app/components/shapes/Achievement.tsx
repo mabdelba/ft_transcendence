@@ -5,6 +5,7 @@ import blueAchiev from '../../../public/blueAchiev.svg';
 type newType = {
   name: string;
   color: boolean;
+  description?: any;
 };
 
 function Achievement(props: newType) {
@@ -14,12 +15,14 @@ function Achievement(props: newType) {
         props.color ? 'blueShadow text-[#00B2FF]' : 'text-[#FF0742] redShadow'
       }`}
     >
+      <abbr title={props.description || ''}>
       <Image
         src={props.color ? blueAchiev : redAchiev}
         alt="achievment"
         className="w-auto h-auto"
       />
       {props.name}
+      </abbr>
     </div>
   );
 }

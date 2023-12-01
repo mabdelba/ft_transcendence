@@ -10,14 +10,13 @@ import seePassword from '../../../public/seePassword.svg';
 import hidePass from '../../../public/hidepass.svg';
 import blackupload from '../../../public/blackupload.svg';
 import blackQuarante from '../../../public/black42.svg';
-import { useState, MouseEvent } from 'react';
+import { useState, MouseEvent, useEffect } from 'react';
 import React from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { SocketContext } from '../../../context/context';
 import { useContext } from 'react';
-
 
 type closeFunc = {
   handler: any;
@@ -29,7 +28,7 @@ function Register(props: closeFunc) {
   const EmRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
   const PassRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
   const UserRegex = /^[^\s]+$/;
-  const {socket} = useContext(SocketContext);
+  const { socket } = useContext(SocketContext);
 
   const [firstname, setFirstName] = useState('');
   const [lastname, setLastName] = useState('');
@@ -45,73 +44,45 @@ function Register(props: closeFunc) {
   const [verror, setVerror] = useState(false);
   // const [valid, setValid] = useState(false);
 
-  const Data = { firstname, lastname, username, email, password, vpassword };
+  // const Data = { firstname, lastname, username, email, password, vpassword };
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
 
     if (!ferror || !lerror || !uerror || !eerror || !perror || !verror) {
-      toast.error('Please fill out all fields with compatible format!', {
-        position: 'top-center',
-        autoClose: 2500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'dark',
-      });
+      toast.error('Please fill out all fields with compatible format!');
       return;
     }
 
-
     const apiUrl = 'http://localhost:3000/api/atari-pong/v1/auth/register';
-    const login = Data.username;
-    const firstName = Data.firstname;
-    const lastName = Data.lastname;
-    const avatar = '';
-    const email = Data.email;
-    const password = Data.password;
+    // const login = username;
+    // const firstName = Data.firstname;
+    // const lastName = Data.lastname;
+    // const avatar = '';
+    // const email = Data.email;
+    // const password = Data.password;
 
     const requestData = {
-      login,
-      firstName,
-      lastName,
-      email,
-      password,
-      avatar,
+      login: username,
+      firstName: firstname,
+      lastName: lastname,
+      email: email,
+      password: password,
+      // avatar,
     };
     axios
       .post(apiUrl, requestData)
       .then((response) => {
-        toast.success('Congratulations! You have successfully registered!', {
-          position: 'top-center',
-          autoClose: 2500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'dark',
-        });
+        toast.success('Congratulations! You have successfully registered!');
         const jwtToken = response.data.token;
         localStorage.setItem('jwtToken', jwtToken);
-        socket.emit('online', {token: jwtToken});
+        socket.emit('online', { token: jwtToken });
         props.rout.push('/dashboard');
-        console.log('Response from loclahost:3000', response.data);
+        // console.log('Response from loclahost:3000', response.data);
       })
       .catch((error) => {
-        toast.error('This user is already registred!', {
-          position: 'top-center',
-          autoClose: 2500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'dark',
-        });
-        console.log('Error', error);
+        toast.error('This user is already registred!');
+        // console.log('Error', error);
       });
   };
 
@@ -132,40 +103,35 @@ function Register(props: closeFunc) {
           axios
             .get(apiUrl)
             .then((response) => {
-              console.log('Response from 42 api: ', response.data);
-              toast.success('You have successfully registred!', {
-                position: 'top-center',
-                autoClose: 2500,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: 'dark',
-              });
+              // console.log('Response from 42 api: ', response.data);
+              toast.success('You have successfully registred!');
               const jwtToken = response.data.token;
               localStorage.setItem('jwtToken', jwtToken);
-              socket.emit('online', {token: jwtToken});
+              socket.emit('online', { token: jwtToken });
               props.rout.push('/dashboard');
             })
             .catch((error) => {
-              toast.error('User not connected with 42 account', {
-                position: 'top-center',
-                autoClose: 2500,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: 'dark',
-              });
-              console.log('Error', error);
+              toast.error('User not connected with 42 account');
+              // console.log('Error', error);
             });
         }
       }
     };
     window.addEventListener('message', handleWindowMessage);
   };
+
+  useEffect(() => {
+    const keyDownHandler = (e: any) => {
+      // console.log('user pressed: ', e.key);
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSubmit(e);
+      }
+    };
+    document.addEventListener('keydown', keyDownHandler);
+    return () => document.removeEventListener('keydown', keyDownHandler);
+  });
+
   return (
     <div className="flex flex-col w-full h-full">
       <div className="h-1/6 w-full  flex flex-col">
@@ -187,7 +153,7 @@ function Register(props: closeFunc) {
               SetValue={setFirstName}
               setError={setFerror}
               regex={Regex}
-              val={Data.firstname}
+              val={firstname}
               isVerif={false}
             />
           </div>
@@ -198,7 +164,7 @@ function Register(props: closeFunc) {
               SetValue={setLastName}
               setError={setLerror}
               regex={Regex}
-              val={Data.lastname}
+              val={lastname}
               isVerif={false}
             />
           </div>
@@ -210,7 +176,7 @@ function Register(props: closeFunc) {
             SetValue={setUsername}
             setError={setUerror}
             regex={UserRegex}
-            val={Data.username}
+            val={username}
             isVerif={false}
           />
         </div>
@@ -221,21 +187,21 @@ function Register(props: closeFunc) {
             SetValue={setEmail}
             setError={setEerror}
             regex={EmRegex}
-            val={Data.email}
+            val={email}
             isVerif={false}
           />
         </div>
         <div className="h-[10%] w-full ">
           <SimpleInput
+            SetValue={setPassword}
             holder="Password"
             type1="password"
             type2="text"
             icon={seePassword}
             icon2={hidePass}
-            SetValue={setPassword}
             setError={setPerror}
             regex={PassRegex}
-            val={Data.password}
+            val={password}
             isVerif={false}
           />
         </div>
@@ -248,41 +214,22 @@ function Register(props: closeFunc) {
             icon2={hidePass}
             SetValue={setVerif}
             setError={setVerror}
-            val={Data.vpassword}
+            val={vpassword}
             isVerif={true}
-            pass={Data.password}
+            pass={password}
           />
         </div>
-        <div className="h-[10%] w-full ">
-          <SimpleButton
-            buttonType="button"
-            content="Upload avatar"
-            icon={uploadIcon}
-            icon2={blackupload}
-          />
-        </div>
+
         <div className="h-[10%] w-full ">
           <SimpleButton buttonType="submit" content="Register" />
-          <ToastContainer
-            position="top-center"
-            autoClose={4000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-          />
         </div>
         <div className="h-[10%] w-full flex flex-row justify-center space-x-2">
-          <div className="w-1/2 h-full" onClick={handleFtClick}>
-            <SimpleButton buttonType="button" icon={QuaranteDeux} icon2={blackQuarante} />
-          </div>
-          <div className="w-[50%] h-full">
-            <SimpleButton buttonType="button" icon={google} icon2={google} />
-          </div>
+          <SimpleButton
+            buttonType="button"
+            icon={QuaranteDeux}
+            icon2={blackQuarante}
+            handleClick={handleFtClick}
+          />
         </div>
       </form>
     </div>

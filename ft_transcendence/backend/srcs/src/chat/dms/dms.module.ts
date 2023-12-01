@@ -7,5 +7,4 @@ import { DmsService } from './dms.service';
   providers: [DmsGateway, DmsService],
   exports: [DmsGateway],
 })
-export class DmsModule {} 
- 
+export class DmsModule {}

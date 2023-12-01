@@ -4,19 +4,22 @@ import alien from '../../public/alien.svg';
 import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import io from 'socket.io-client';
 import axios from 'axios';
 import OptionBar from '../components/forms/OptionBar';
 import { User, context, SocketContext } from '../../context/context';
 import { useQuery } from 'react-query';
+import InviteToast from '../components/shapes/invitetoast';
+import { toast } from 'react-toastify';
 
 const fetchHistory = async () => {
+  try{
   const res = await fetch('http://localhost:3000/api/atari-pong/v1/history', {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
     },
   });
   return res.json();
+} catch(e){}
 };
 
 function History() {
@@ -27,16 +30,47 @@ function History() {
 
   const { data, status } = useQuery('history', fetchHistory);
 
+  useEffect(() => {
+    if (!user.login) {
+      const apiUrl = 'http://localhost:3000/api/atari-pong/v1/user/me-from-token';
+      const token = localStorage.getItem('jwtToken');
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      axios.get(apiUrl, config).then((response: any) => {
+        const _user = response.data;
+        socket.emit('online', { token: localStorage.getItem('jwtToken') });
+        _user.state = 1;
+        socket?.on('inviteToGame', (data: { senderId: string; login: string }) => {
+      
+          toast(<InviteToast senderId={data.senderId} login={data.login} />, {
+            position: 'top-center',
+            autoClose: false,
+            hideProgressBar: false,
+            closeOnClick: false,
+            draggable: true,
+            theme: 'dark',
+          });
+        });
+        socket?.on('cancelNotification', () => {
+
+          toast.dismiss();
+        });
+        setUser(_user);
+      }).catch(()=>{});
+    }
+  });
+
   async function getMatches() {
     if (data) {
-		// var i = 0;
-      data.forEach((obj: any) => {
-		
-        getImageByLogin(obj.other).then((imageBlog) => {
-			
-          obj.avatar = imageBlog;
-        });
-	});
+      // var i = 0;
+      //     data.forEach((obj: any) => {
+
+      //       getImageByLogin(obj.other).then((imageBlog) => {
+
+      //         obj.avatar = imageBlog;
+      //       });
+      // });
 
       setMatches(data);
 
@@ -48,7 +82,7 @@ function History() {
 
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
-    if (!token) router.push('/');
+    if (!token || token == undefined) router.push('/');
     else {
       const decodedToken = JSON.parse(atob(token.split('.')[1]));
       const exp = decodedToken.exp;
@@ -65,33 +99,33 @@ function History() {
         setUser(_user);
       }
     }
-  }, [status,]);
+  }, [status]);
 
-  const getImageByLogin = async (login: string): Promise<string | null> => {
-    return new Promise<string | null>(async (resolve) => {
-      if (login != '') {
-        await axios
-          .post(
-            'http://localhost:3000/api/atari-pong/v1/user/avatar',
-            { userLogin: login },
-            {
-              headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
-              responseType: 'blob',
-            },
-          )
-          .then((response) => {
-            const imageBlob = URL.createObjectURL(response.data) as string;
-            if (imageBlob) resolve(imageBlob);
-            else resolve(alien);
-          })
-          .catch(() => {
-            // resolve(alien);
-          });
-      }
-    });
-  };
+  // const getImageByLogin = async (login: string): Promise<string | null> => {
+  //   return new Promise<string | null>(async (resolve) => {
+  //     if (login != '') {
+  //       await axios
+  //         .post(
+  //           'http://localhost:3000/api/atari-pong/v1/user/avatar',
+  //           { userLogin: login },
+  //           {
+  //             headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
+  //             responseType: 'blob',
+  //           },
+  //         )
+  //         .then((response) => {
+  //           const imageBlob = URL.createObjectURL(response.data) as string;
+  //           if (imageBlob) resolve(imageBlob);
+  //           else resolve(alien);
+  //         })
+  //         .catch(() => {
+  //           // resolve(alien);
+  //         });
+  //     }
+  //   });
+  // };
 
-  let matchPlayed = matches.length;
+  const matchPlayed = matches.length;
   let play = false;
   if (matchPlayed != 0) play = true;
   const [userName, setUserName] = useState('');
@@ -103,13 +137,13 @@ function History() {
         <div className="w-[95%] h-10 md:h-24 pl-6 md:pl-12 NeonShadow flex justify-start items-center text-base xl:text-3xl -yellow-300">
           History
         </div>
-        {(status == 'loading' )  && (
+        {status == 'loading' && (
           <div className=" flex flex-col space-y-2 w-full h-[80%] items-center justify-center">
             <h1>Loading</h1>
             <div className="spinner"></div>
           </div>
         )}
-        {status == 'success'  && (
+        {status == 'success' && (
           <div className=" w-full h-full flex items-start justify-center overflow-y-auto mb-8">
             <div className="w-[95%] h-auto NeonShadowBord ">
               {!play ? (
@@ -121,7 +155,7 @@ function History() {
                   <div key={obj.id} className="w-full  p-2 md:p-9 flex flex-row  ">
                     <div className="h-full w-[10%] md:w-[18%] "></div>
                     <div className="w-[15%] h-[67%] flex flex-col justify-start items-end">
-                      <Pdp name={obj.me} color={true} router={router} image={user.avatar} />
+                      <Pdp name={obj.me} color={true} router={router} image={user.avatarUrl} />
                     </div>
                     <div className="w-[50%] md:w-[34%]  NeonShadow text-sm lg:text-3xl flex flex-col justify-around items-center">
                       <div>
@@ -141,7 +175,7 @@ function History() {
                         color={false}
                         router={router}
                         myProfile={true}
-                        image={obj.avatar == `public/avatars/${obj.other}.jpg` ? alien : obj.avatar}
+                        image={obj.otherAvatar || alien}
                       />
                     </div>
                   </div>

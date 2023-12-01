@@ -12,9 +12,17 @@ import { AchievementsModule } from './achievements/achievements.module';
 import { StateModule } from './state/state.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksService } from './tasks/tasks.service';
+import { GameGateway } from './game/game.gateway';
+import { ChannelsModule } from './channels/channels.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
     AuthModule,
     PrismaModule,
     ChatModule,
@@ -26,8 +34,10 @@ import { TasksService } from './tasks/tasks.service';
     AchievementsModule,
     StateModule,
     ScheduleModule.forRoot(),
+    ChannelsModule,
+    GameModule,
   ],
   controllers: [AppController],
-  providers: [AppService, StateGateway, TasksService],
+  providers: [AppService, StateGateway, GameGateway, TasksService],
 })
 export class AppModule {}

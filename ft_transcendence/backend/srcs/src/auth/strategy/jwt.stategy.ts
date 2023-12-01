@@ -1,7 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -13,10 +13,16 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
   async validate(payload: { id: number; login: string }) {
+    try{
     const user = await this.prisma.user.findUnique({
       where: { login: payload.login },
     });
     delete user.password;
     return user;
   }
+    catch (e) {
+        new UnauthorizedException('Invalid authorization grant');
+      }
+  }
 }
+ 

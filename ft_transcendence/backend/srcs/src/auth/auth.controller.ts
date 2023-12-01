@@ -30,7 +30,7 @@ export class AuthController {
   }
   @Post('login')
   login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+    return this.authService.login(dto); 
   }
   @Get('google')
   @UseGuards(GoogleOauthGuard)
@@ -48,7 +48,7 @@ export class AuthController {
     try {
       return this.authService.ftLogin(req.user as User);
     } catch (e) {
-      new UnauthorizedException('Invalid authorization grant');
+      throw new UnauthorizedException('Invalid authorization grant');
     }
   }
 
@@ -62,7 +62,7 @@ export class AuthController {
         filename: (req, file, cb) => {
           const user = req.user as User;
           cb(null, user.login + '.jpg');
-        },
+        }, 
       }),
     }),
   )
@@ -94,7 +94,7 @@ export class AuthController {
 
   // @UseGuards(JwtGuard)
   @Post('regenerate-token')
-  async regenerateToken(@Body() dto: {id, login}) {
+  async regenerateToken(@Body() dto: { id; login }) { 
     return await this.authService.getToken(dto.id, dto.login);
   }
 }
